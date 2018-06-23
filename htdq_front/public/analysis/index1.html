@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>系统配置</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script></script>
+</head>
+<body>
+    <div class="demo-section k-content wide">
+        <div>
+            <ul id="menu-images"></ul>
+            <button type="button" id="imageButton1">概览</button>
+            <button type="button" id="imageButton2">效能分析</button>
+            <button type="button" id="imageButton3">综合分析</button>
+            <button type="button" id="imageButton4">走势图</button>
+            <button type="button" id="imageButton5">报警信息 </button>
+            <button type="button" id="imageButton6">加工信息</button>
+        </div>
+        <div class = "detail">
+            <a href="#"><button onclick="" type="button" id="imageButton7">设置布局图</button></a>     
+            <button type="button" id="imageButton8">显示布局图</button>
+
+            <button id="primaryTextButton11" class="k-primary">设备运行效率</button>
+            <button id="primaryTextButton12" class="k-primary">设备总利用率</button>
+            <button id="primaryTextButton13" class="k-primary">设备总开机率</button>
+
+            <button id="primaryTextButton21" class="k-primary">设备运行效率</button>
+            <button id="primaryTextButton22" class="k-primary">设备总利用率</button>
+            <button id="primaryTextButton23" class="k-primary">设备总开机率</button>
+            <button id="primaryTextButton24" class="k-primary">设备状态统计</button>
+
+            <button id="primaryTextButton41" class="k-primary">设备运行效率</button>
+            <button id="primaryTextButton42" class="k-primary">设备总利用率</button>
+            <button id="primaryTextButton43" class="k-primary">设备总开机率</button>
+        </div>
+    </div>
+    <!--left sidebar-->
+    <div class="sidebar">
+        <div style="padding:7px 0 7px">
+            开始时间：<input id="datetimepicker1" />
+        </div>
+        <div style="padding:7px 0 7px">
+            结束时间：<input id="datetimepicker2" />
+        </div>
+        <button type="button" id="primaryTextButton5">确定</button>
+        <select id="size">
+            <option>最近24小时</option>
+            <option>今天</option>
+            <option>昨天</option>
+            <option>最近一周</option>
+            <option>最近30天</option>
+            <option>本周</option>
+            <option>上周</option>
+            <option>本月</option>
+            <option>上月</option>
+        </select>
+        <div style="text-align:center;" id="trtitle">设备列表</div>
+        <div id="treeview" class="treeview"></div>
+    </div>
+    <!--container-->
+    <div class="main">
+        <!--内容-->
+        <iframe id="iframeId" src="" frameborder="0" scrolling="no"></iframe>
+    </div>           
+    <div class="<resp></resp>onsive-message"></div>
+</body>
+    <script>
+        $(document).ready(function() {
+
+            $("#imageButton1").kendoButton({
+                imageUrl: "/content/shared/icons/sports/snowboarding.png"
+            });
+            $("#imageButton2").kendoButton({
+                imageUrl: "/content/shared/icons/sports/swimming.png"
+            });
+            $("#imageButton3").kendoButton({
+                imageUrl: "/content/shared/icons/sports/baseball.png"
+            });
+            $("#imageButton4").kendoButton({
+                imageUrl: "/content/shared/icons/16/speaker.png"
+            });
+            $("#imageButton5").kendoButton({
+                imageUrl: "/content/shared/icons/16/photo.png"
+            });
+            $("#imageButton6").kendoButton({
+                imageUrl: "/content/shared/icons/sports/golf.png"
+            });
+            $("#imageButton7").kendoButton({
+                imageUrl: "/content/shared/icons/16/star.png"
+            });
+            $("#imageButton8").kendoButton({
+                imageUrl: "/content/shared/icons/16/video.png"
+            });
+
+            $("#primaryTextButton11").kendoButton();
+            $("#primaryTextButton12").kendoButton();
+            $("#primaryTextButton13").kendoButton();
+
+            $("#primaryTextButton21").kendoButton();
+            $("#primaryTextButton22").kendoButton();
+            $("#primaryTextButton23").kendoButton();
+            $("#primaryTextButton24").kendoButton();
+
+            $("#primaryTextButton41").kendoButton();
+            $("#primaryTextButton42").kendoButton();
+            $("#primaryTextButton43").kendoButton();
+
+            $("#size").kendoDropDownList();
+
+            // //
+            $(".k-primary").hide();
+            $("#imageButton1").click(function () {
+                $(".k-primary").hide();
+                $("#primaryTextButton11").show();
+                $("#primaryTextButton12").show();
+                $("#primaryTextButton13").show();
+            });
+            $("#imageButton2").click(function () {
+                $(".k-primary").hide();
+                $("#primaryTextButton21").show();
+                $("#primaryTextButton22").show();
+                $("#primaryTextButton23").show();
+                $("#primaryTextButton24").show();
+            });
+            $("#imageButton3").click(function () {
+                $(".k-primary").hide();
+            });
+            $("#imageButton4").click(function () {
+                $(".k-primary").hide();
+                $("#primaryTextButton41").show();
+                $("#primaryTextButton42").show();
+                $("#primaryTextButton43").show();
+            });
+            $("#imageButton5").click(function () {
+                $(".k-primary").hide();
+            });
+            $("#imageButton6").click(function () {
+                $(".k-primary").hide();
+            });
+
+            /*treeview*/
+            var Data;
+            var Data1;
+            var selectedItem;
+            var mntid;
+            $.get("/api/GD_DEPARTMENT",function(data,status){
+                if (status=="success"){
+                    // console.log(data);
+                    $.get("/api/MDC_MTGROUP", function (data1, status) {
+                        if (status == "success") {
+                            $.get("/api/MDC_MACHINETOOLS", function(data2, status){
+                                if (status == "success") {
+                                    var resolve = [];
+                                    resolve.push({id: 1, pid: 0, name: "工厂"});
+                                    data.forEach(function(element){
+                                        resolve.push({id: element.RECORDID, pid: 1, name: element.DEPTNAME});
+                                        data1.forEach(function(elemen){
+                                        if(elemen.DEPTID == element.RECORDID){
+                                            resolve.push({id: elemen.MTGRPID, pid: elemen.DEPTID, name: elemen.GRPNAME});
+                                            data2.forEach(function(eleme){
+                                            if(eleme.MATOLGRPID == elemen.MTGRPID){
+                                                resolve.push({id: eleme.ID, pid: eleme.MATOLGRPID, name: eleme.MATOLNAME});
+                                            }
+                                            });
+                                        }
+                                        });
+                                    });
+
+                                    function fn(data, pid) {
+                                        var result = [], temp;
+                                        for (var i = 0; i < data.length; i++) {
+                                            if (data[i].pid == pid) {
+                                                var obj = {"text": data[i].name};
+                                                temp = fn(data, data[i].id);
+                                                if (temp.length > 0) {
+                                                    obj.items = temp;
+                                                }
+                                                result.push(obj);
+                                            }
+                                        }
+                                        return result;
+                                    }
+
+                                    // console.log(fn(nodes, 0));
+                                    dataSource = fn(resolve, 0);
+
+                                    $("#treeview").kendoTreeView({
+                                        checkboxes: {
+                                            checkChildren: true
+                                        },
+                                        dataSource: dataSource,
+                                        // dataTextField: ["text","children"],
+                                        change:function(e){
+                                            $("#iframeId").attr("src","/jc_list?name="+this.text(this.select()));
+                                        }
+                                    });
+                                    var treeview = $("#treeview").data("kendoTreeView");
+                                    treeview.expand(".k-item");
+                                    var handleTextBox = function(callback) {
+                                        return function(e) {
+                                            if (e.type != "keypress" || kendo.keys.ENTER == e.keyCode) {
+                                                callback(e);
+                                            }
+                                        };
+                                    };
+                                    // 概览
+                                    $("#imageButton1").click(function(){
+                                        $("#iframeId").attr("src","");
+                                    });  
+                                    // 效能分析
+                                    $("#imageButton2").click(function(){
+                                        $("#iframeId").attr("src","");
+                                    });
+                                    // run_chart 走势图
+                                    $("#imageButton4").click(function(){
+                                        $("#iframeId").attr("src","");
+                                    });                                    
+                                    $("#primaryTextButton41").click(function(){
+                                        $("#iframeId").attr("src","run_chart/operation_rate");
+                                    });
+                                    // alarm_info 报警信息
+                                    $("#imageButton5").click(function(){
+                                        $("#iframeId").attr("src","");
+                                        $("#iframeId").attr("src","alarm_info/alarm_info");
+                                    });
+                                    // process_info 加工信息
+                                    $("#imageButton6").click(function(){
+                                        $("#iframeId").attr("src","");
+                                        $("#iframeId").attr("src","process_info/process_info");
+                                    });
+                                    // meta_analysis 综合分析
+                                    $("#imageButton3").click(function(){
+                                        $("#iframeId").attr("src","");
+                                        $("#iframeId").attr("src","meta_analysis/meta_analysis");
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            $("#datetimepicker1").kendoDateTimePicker({
+                value: new Date()
+            });
+            $("#datetimepicker2").kendoDateTimePicker({
+                value: new Date()
+            }); 
+        });     
+    </script>
+    <style>
+        media screen and (max-width: 1023px) {
+            div.k-window {
+                display: none !important;
+            }
+        }
+        .demo-section {
+            line-height: 1em;
+            margin-top: 2em;
+        }
+        .demo-section .k-button {
+            margin-right: 20px;
+        }
+        .k-button .k-image {
+            height: 16px;
+        }
+        .detail {
+            margin-top: 2em;
+        }
+        .detail .k-button {
+            margin-right: 0px;
+        }
+        #imageButton1 {
+            margin-left: 26%;
+        }
+        #primaryTextButton11, #primaryTextButton21, #primaryTextButton41 {
+            margin-left: 20%;
+        }
+        #trtitle {
+            background-color:gray;
+            margin: 2em auto 1em;
+        }
+        .sidebar {
+            width:250px;
+            float:left;
+            margin-left: 2em;
+            margin-right:20px;
+            border-right:1px solid #ccc;
+            padding:5px;
+            min-height: 1200px;
+        }
+        .main { 
+            height: 1200px;
+        }
+        .k-textbox {
+            width: 80px;
+        }
+        #iframeId {
+            width:75%;
+            height:100%;
+        }
+    </style>
+</html>

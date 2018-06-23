@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>公式配置</title>
+    <meta charset="utf-8">
+    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+</head>
+<body>
+<div id="windows">
+    <div id="formula" style="height:100%">
+	  <fieldset style="height:205px;border: 1px solid #CCCCCC;">
+                <legend>设备列表</legend>
+                <div id="treeview" style="font-size:1.2em;"></div>
+      </fieldset>
+      <div>
+              <!--<iframe id="lathecontent" src="" width="100%" height="800"></iframe>-->
+			<div style="margin: 1% 0 1% 1%">
+				<strong  style="font-size: 1.2em">当前设定的设备为:<span id="toolselected"></span></strong>
+			</div>
+			<div id="tabstrip" style="margin:0 4% 0 1%">
+				<ul>
+					<li class="k-state-active">
+						基本公式
+					</li>
+					<li>
+						自定义公式   
+					</li>
+				</ul>
+				<div class="box-col">
+							<div style="margin: 0px" id="grid1" data-role="grid" class="k-grid k-widget k-editable">
+				</div>
+      		</div>
+			<div class="box-col">
+							<div style="margin: 0px" id="grid2" data-role="grid" class="k-grid k-widget k-editable">
+				</div>
+      		</div>
+    </div>
+</div>
+</div>
+
+<style>
+    #tabstrip h2 {
+        font-weight: lighter;
+        font-size: 5em;
+        line-height: 1;
+        padding: 0 0 0 30px;
+        margin: 0;
+    }
+
+    #tabstrip h2 span {
+        background: none;
+        padding-left: 2px;
+        font-size: .2em;
+        vertical-align: top;
+    }
+
+    #tabstrip p {
+
+        text-align: center;
+    }
+</style>
+
+    <script>
+        $("#formula").kendoSplitter({
+            panes:[{size:"15%",collapsible:true},
+            {collapsible:true}]
+        });
+       
+	    function onClose() {
+            window.location.assign("../../");
+        }
+        $("#windows").kendoWindow({
+            actions:["Minimize","Maximize","Close"],
+            close: onClose
+        });
+        var dialog = $("#windows").data("kendoWindow");
+        dialog.maximize();
+        // configuration of the products service end-point
+
+		 $("#tabstrip").kendoTabStrip({
+            animation:  {
+                open: {
+                    effects: "fadeIn"
+                }
+            }
+            });
+
+        $.get("/api/MDC_MACHINETOOLS",function(data,status){
+            if (status=="success"){
+                var dataSource = [];
+                var items = {};
+                data.forEach(function(e){  
+                    if(e.MATOLTYPE) {
+                        items[e.MATOLTYPE] = items[e.MATOLTYPE]? items[e.MATOLTYPE]:[];
+                        items[e.MATOLTYPE].push(e);
+                    }
+
+
+
+					
+                })  
+
+                for ( var key in items ){
+                    dataSource.push({"MATOLTYPE":key,"items":items[key]});
+                }
+
+                // console.log(dataSource);
+
+
+                // Data=data;
+                // // console.log(Data);
+    
+                // var dataSource = new kendo.data.DataSource({
+                // data:Data,
+                // batch: true,
+                // pageSize: 20,
+                // schema: {
+                //         model: {
+                //             id:"ID",
+                //             fields: {
+                //                 ID:  { type: "number", editable: false, nullable: true },
+                //                 MATOLCODE: { validation: {  required: true } },
+                //                 MATOLNAME: { validation: {  required: true } },
+                //                 MATOLTYPE: { validation: {  required: true } },
+                //                 // MATOLGRPID: { validation: {  required: true } },
+                //                 // DEPTID: { validation: {  required: true } },
+                //                 // COLSERVERID: { type: "number", validation: { required: true }},
+                //                 // MATOLIP: { validation: {  required: true } },
+                //                 // MATOLPORT: { type: "number", validation: { required: true }},
+                //                 // INSTIME: { validation: {  required: true } },
+                //                 // EXPAND: { validation: {  required: true } },
+                //                 // ACTIVE:{ type: "number", validation: { required: true }},
+                //                 // SYSTEMTYPE: { validation: {  required: true } },
+                //                         }
+                //                     }
+                //             }
+                //     });
+                //     // console.log(dataSource);
+                //     var data = [{
+                //                 Toolist: "设备列表",
+                //                 Tooltype: [{
+                //                 MATOLTYPE: "MATOLTYPE",
+                //                 MATOLNAME: [{
+                //                     MATOLNAME: "MATOLNAME"
+                //                 }]
+                //                 }]
+                //             }];
+
+                //             var MATOLNAME= {
+                //                 schema: {
+                //                 data: "MATOLNAME"
+                //                 }
+                //             };
+
+                //             var MATOLTYPE = {
+                //                 schema: {
+                //                 data: "MATOLTYPE",
+                //                 model: {
+                //                     children: MATOLNAME
+                //                 }
+                //                 }
+                //             };
+
+				$("#treeview").kendoTreeView({
+					dataSource: dataSource,
+					dataTextField: ["MATOLTYPE", "MATOLNAME"],
+					change: function(e) {
+						var toolselected=this.dataItem(this.select());
+						// console.log("Change", this.select());
+						console.log(toolselected.MATOLNAME);
+					$("#toolselected").text(toolselected.MATOLNAME);
+					var IDselected=toolselected.ID;
+					}
+				});
+				var treeview = $("#treeview").data("kendoTreeView");
+				// expand all loaded items
+				treeview.expand(".k-item");
+
+				$("#grid1").kendoGrid({
+					// dataSource: dataSource,
+					pageable: {
+						refresh: true
+					},
+					height: 420,
+					selectable: "multiple, row",
+					sortable:true,
+					columns: [
+					{field:"",title:"标识"},
+					{field:"",title:"名称"},
+					{field:"",title:"颜色"},
+					{field:"",title:"内容"},
+					{field:"",title:"反状态名称"},
+					{field:"",title:"反状态颜色"},
+					{field:"",title:"描述"},
+					{ command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+						]
+					});
+				
+				$("#grid2").kendoGrid({
+					// dataSource: dataSource,
+					pageable: {
+						refresh: true
+					},
+					height: 420,
+					selectable: "multiple, row",
+					sortable:true,
+					columns: [
+					{field:"",title:"标识"},
+					{field:"",title:"名称"},
+					{field:"",title:"颜色"},
+					{field:"",title:"内容"},
+					{field:"",title:"反状态名称"},
+					{field:"",title:"反状态颜色"},
+					{field:"",title:"描述"},
+					{ command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+						]
+					});
+            }
+            else {
+                alert("获取数据失败 !");
+            }
+        });
+
+    </script>
+</body>
+</html>

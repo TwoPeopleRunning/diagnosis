@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Basic usage</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script>
+    </script>
+</head>
+
+<body>
+    <div id="tabstrip">
+        <div id="example" style="margin:0px">
+            <table style="width: 100%">
+                <tr>
+                    <td style="width: 33%; font-size:12px;">最高设备总利用率：<span class="MaxUse"></span></td>
+                    <td style="width: 33%; font-size:12px;">最低设备总利用率：<span class="MinUse"></span></td>
+                    <td style="width: 33%; font-size:12px;">平均设备总利用率：<span class="AvaUse"></span></td>
+                </tr>
+            </table>
+            <br>
+            <table id="grid2">
+            </table>
+            <div>
+                <table class="k-grid-content k-widget k-grid">
+                    <colgroup>
+                        <col />
+                        <col style="width:25%" />
+                        <col style="width:25%" />
+                    </colgroup>
+                    <tr class="k-alt">
+                        <td>最高设备总利用率</td>
+                        <td class="MaxUseName"></td>
+                        <td class="MaxUse"></td>
+                    </tr>
+                    <tr>
+                        <td>最低设备总利用率</td>
+                        <td class="MinUseName"></td>
+                        <td class="MinUse"></td>
+                    </tr>
+                </table>
+            </div>
+            <table class="k-grid-content k-widget k-grid">
+                <colgroup>
+                    <col />
+                    <col style="width:20%" />
+                    <col style="width:20%" />
+                    <col style="width:20%" />
+                </colgroup>
+                <tr class="k-alt">
+                    <td>合计</td>
+                    <td class="TotalRun"></td>
+                    <td class="WholeTime"></td>
+                    <td>（平均）<span class="AvaUse"></span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script src="/analysis/js/statement.js"></script>
+    <script src="/analysis/js/perf_analysis.js"></script>
+
+</body>
+<style>
+    table {
+        text-align: center;
+        font-size: 12px;
+    }
+</style>
+
+</html>

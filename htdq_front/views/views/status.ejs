@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>设备状态数据感知与汇聚：电子看板</title>
+    <meta charset="utf-8">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+    <link href="views.css" rel="stylesheet">
+</head>
+
+<body ng-app="myApp">
+    <div ng-controller="StatusCtrl">
+
+        <div ng-repeat="mt in devices" style="margin:10px 0px">
+            <a href="/views/detail?ID={{mt.ID}}">
+                <div ng-class="{true: 'active', false: 'inactive', undefined: 'inactive'}[(mt.online && mt.params.STATUS && mt.params.STATUS!=='OFFLINE')]"
+                    style="width:100%;height: 50px;margin:10px 0px 0px 0px">
+                    <p style="padding-left: 20px;display: inline-block">{{mt.MATOLNAME}} ({{mt.MATOLIP}})</p>
+                    <button type="button" ng-class="{true: 'MTALARM'}[mt.online && mt.params.STATUS=='ALARM']" style="float: right; margin:5px 20px 5px 5px; height: 40px;"
+                        class="imageButton1">报 警</button>
+                    <button type="button" ng-class="{true: 'MTONLINE'}[mt.online && mt.params.STATUS=='ONLINE']" style="float: right; margin:5px 5px; height: 40px;"
+                        class="imageButton2">暂 停</button>
+                    <button type="button" ng-class="{true:'MTRUNNING'}[mt.online && mt.params.STATUS=='RUNNING']" style="float: right; margin:5px 5px; height: 40px;"
+                        class="imageButton3">运 行</button>
+
+                </div>
+            </a>
+        </div>
+    </div>
+
+</body>
+<script>
+    var app = angular.module('myApp', []);
+    app.controller('StatusCtrl', function ($scope, $http, $rootScope) {
+        var _devices;
+        var _indexes = {};
+        //设备状态更新上传
+        const GenQueryPayload = function (mt, params) {
+            //{"action":"update","apikey":"e8039c44-5483-4166-91ee-ba6790f39afb","deviceid":41,"params":{"status":"ONLINE"}}
+            var payload = { action: 'query', "userAgent": "web" };
+            payload.apikey = mt.MATOLGRPID;
+            payload.deviceid = mt.ID;
+            payload.params = params;
+             payload.test = [0,1,2];
+            console.log('GenUpdatePayload:', (new Date()).toLocaleString(), payload);
+            return payload;
+        }
+
+        function WSConnect(devices) {
+            if ("WebSocket" in window) {
+                // 打开一个 web socket
+                var ws = new WebSocket("ws://<%=BACK.HOST%>:<%=BACK.PORT%>/api/ws");
+                ws.binaryType = "arraybuffer" ;
+                var _pending = {};
+                var _send = function (data, successCallback, errorCallback) {
+                    if (!angular.isObject(data)) {
+                        return;
+                    }
+
+                    data.sequence = data.deviceid.toString() + Date.now();
+                    _pending[data.sequence] = {
+                        success: successCallback,
+                        error: errorCallback
+                    };
+                    console.log(JSON.stringify(data));
+                    ws.send(JSON.stringify(data));
+                };
+
+                ws.onopen = function () {
+                    // ws.send("发送数据");
+                    console.log("Web Socket 已连接上");
+                    devices.forEach(function (mt) {
+                        // var params = ['all'];
+                        var params = ['key','STATUS','BEGINTIME'];
+                        _send(GenQueryPayload(mt, params), function (data) {
+                            mt.params = mt.params || {};
+                            angular.extend(mt.params, data.params);
+                            $rootScope.$apply();
+                        }, function (error) {
+                            console.log(mt.ID, error);
+                        });
+                    }, this);
+                };
+
+                ws.onmessage = function (evt) {
+                    console.log(evt.data);
+                    var data = JSON.parse(evt.data);
+
+                    // request
+                    if ('action' in data) {
+                        var _device = _indexes[data.deviceid.toString()];
+                        if (!_device) return;
+
+                        if (data.action === 'sysmsg') {
+                            if ('online' in data.params) {
+                                _device.online = data.params.online;
+                                //注释以下，因为设备在线后设备首先会上传其状态，APP会收到更新，无需设备在线查询其状态
+                                if (_device.online) { //设备在线查询所有状态
+                                    _send(GenQueryPayload(_device, ["any_not_exist_property"]), function (data) {
+                                        _device.params = _device.params || {};
+                                        angular.extend(_device.params, data.params);
+                                        $rootScope.$apply();
+                                    }, function (error) {
+                                        console.log(_device.deviceid, error);
+                                    });
+                                }
+                            }
+
+                            // manually trigger AngularJS digest
+                            // so modified device property will be visible on UI
+                            $rootScope.$apply();
+                            return;
+                        }
+
+                        if (data.action === 'update') {
+                            _device.params = _device.params || {};
+                            angular.extend(_device.params, data.params);
+                            // manually trigger AngularJS digest
+                            // so modified device property will be visible on UI
+                            $rootScope.$apply();
+                        }
+                    }
+
+                    // response
+                    else if ('error' in data) {
+                        // dummy query response
+                        if (!('sequence' in data)) return;
+
+                        var _callback = _pending[data.sequence];
+                        if (!_callback) return;
+
+                        if (data.error) {
+                            _callback.error(data.error);
+                        }
+                        else {
+                            _callback.success(data);
+                        }
+                    }
+                };
+
+                ws.onclose = function () {
+                    console.log("Web Socket 连接已关闭...");
+                };
+            }
+
+            else {
+                // 浏览器不支持 WebSocket
+                alert("您的浏览器不支持 WebSocket!");
+            }
+        }
+
+        $http({
+            method: 'GET',
+            url: '/api/MDC_MACHINETOOLS?ID=<%=ID%>'
+        }).then(function successCallback(res) {
+            console.log(res.data);
+            _devices = res.data;
+            angular.forEach(_devices, function (_device) {
+                _device.params = _device.params || {};
+                _indexes[_device.ID.toString()] = _device;
+            });
+            $scope.devices = _devices;
+
+            WSConnect($scope.devices);
+        }, function errorCallback(res) {
+            console.log(res);
+        });
+    });
+
+</script>
+
+</html>

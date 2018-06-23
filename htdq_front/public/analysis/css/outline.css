@@ -1,0 +1,44 @@
+.top {
+    width: 100%;
+    height: 30px;
+    font-size: 15;
+    text-align: right;
+}
+
+.charts {
+    height: 600px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.pillar-pipe {
+    height: 250px;
+    width: 100%;
+}
+
+.gaue3 {
+    height: 350px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.pillar {
+    height: 350px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+
+/* .pipe {
+    height: 250px;
+    width: 300px;
+    float: left;
+    display: inline
+} */
+
+.gaue {
+    width: 30%;
+    float: left;
+    height: 300px;
+}

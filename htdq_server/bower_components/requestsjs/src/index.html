@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Requests test page</title>
+</head>
+<body>
+	<input type="file" onchange="upfile(this)">
+	<input type="file" onchange="upfile2(this)">
+	<input type="file" onchange="upfile3(this)">
+
+	<label for="aliyun">aliyun <span id="progress">0</span>/100</label>
+	<input name="aliyun" type="file" onchange="upfile4(this)">
+
+	<script src="requests.js"></script>
+	<script>
+		var uploader2 = new Requests('http://server.com:9040?uid=admin&token=xixix');
+
+		function upfile(ele) {
+			new Requests({
+				url: 'http://server.com:9040?uid=admin&token=qwer#jiajiajia',
+				params: {
+					name: 'wahaha'
+				},
+				load:function(args){
+					console.warn('MY LOAD HANDLER: ', args)
+				},
+				progress:function(args){
+					console.warn('MY progress HANDLER: ', args)
+				}
+			}).upload(ele.files[0]);
+		};
+
+
+		function upfile2(ele) {
+			new Requests('http://server.com:9040?uid=admin&token=qwer#jiajiajia')
+				.upload(ele.files[0]);
+		};
+
+
+		function upfile3(ele) {
+			new Requests({
+				url: 'http://server.com:9040?uid=admin&token=qwer',
+				form:{
+					ha:"hahahha",
+					hei:'heihie',
+					file:ele.files[0]
+				},
+				error:function(args){
+					console.warn('MY ERROR HANDLER: ', args)
+				},
+				load:function(args){
+					console.warn('MY LOAD HANDLER: ', args)
+				},
+				progress:function(args){
+					console.warn('MY progress HANDLER: ', args)
+				}
+			}).post();
+
+			new Requests({
+				url: 'http://server.com:9040/hahahaha?uid=admin&token=qwer',
+				form:{
+					ha:"hahahha",
+					hei:'heihie',
+					file:ele.files[0]
+				},
+				error:function(args){
+					console.warn('MY ERROR HANDLER: ', args)
+				},
+				load:function(args){
+					console.warn('MY LOAD HANDLER: ', args)
+				},
+				progress:function(args){
+					console.warn('MY progress HANDLER: ', args)
+				}
+			}).put();
+		};
+
+
+		new Requests({
+			url: 'http://api.xunsheng90.com/haha/houhou',
+			params: {ssid:"piupiupi"}
+		}).get()
+		  .load(function(args){
+			console.log(args)
+		}).error(function (args) {
+			console.error(args)
+		})
+
+
+		// new Requests({
+		// 	url: 'http://server.com:9040?/hahahaha?uid=admin&token=qwer',
+		// 	params: {ssid:"piupiupi"}
+		// }).delete()
+
+
+		function upfile4(ele) {
+			var uid = 'admin001';
+			var progress_ele = document.getElementById('progress');
+			new Requests({
+				url:'http://api.xunsheng90.com/user/login',
+				form:{uid:uid, pwd:''}, // hashed pwd
+				error:function (args) {
+					console.error("VFGTYUJNBV", args)
+					// do something
+				}
+			}).post().load(function (args) { // 发送成功后
+				new Requests({
+					url: 'http://sign.xunsheng90.com/oss-sign',
+					params:{
+						uid:uid,
+						token:args.token
+					},
+					error:function (args) {
+						console.error("ZZZZZZ", args)
+						// do something
+					}
+				}).get().load(function (args) { // 发送成功后
+					new Requests({
+						url: 'http://temp.xunsheng90.com/',
+						form:{
+							key:args.key,
+							OSSAccessKeyId: args.OSSAccessKeyId,
+							callback: args.callback,
+							policy: args.policy,
+							signature: args.signature,
+							file: ele.files[0]
+						},
+						error:function (args) {
+							console.error("VVVVVVVV", args)
+							// do something
+						}
+					}).post().load(function (args) { // 发送成功后
+						console.log(args)
+					}).progress(function (args) { // 进度变化时
+						console.log("PROGRESS!!", args);
+						progress_ele.innerHTML = (args.progress * 100).toString().slice(0,4);
+					})
+				})
+			})
+
+		}
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Basic usage</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+</head>
+
+<body>
+
+    <table style="width:100%">
+        <tr>
+            <td style="font-size:12px;float:right;"><button type="button" class="k-button" id="historyButton">设备历史状态</button></td>
+            <td style="font-size:12px;float:right;margin-right:2%"><button type="button" class="k-button" id="pipeButton">设备饼状图对比</button></td>
+        </tr>
+    </table>
+
+    <div id="tabstrip">
+        <div id="example" style="margin:0px">
+            <table id="grid4">
+            </table>
+            <table class="k-grid-content k-widget k-grid" style="margin-top:-15px">
+                <colgroup>
+                    <col style="width:20%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                    <col style="width:10%" />
+                </colgroup> 
+                <tr class="k-alt">
+                    <td>合计</td>
+                    <td class="TotalRun"></td>
+                    <td class="TotalOnline"></td>
+                    <td class="TotalAlarm"></td>
+                    <td class="TotalOffline"></td>
+                    <td class="AvaUse"></td>
+                    <td class="AvaOnline"></td>
+                    <td class="AvaAlarm"></td>
+                    <td class="AvaOffline"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="dialog1"></div>
+    <div id="dialog2"></div>
+    <div id="dialog3"></div>
+    <script src="/analysis/js/statement.js"></script>
+    <script src="/analysis/js/perf_analysis.js"></script>
+    <script>
+        var myWindow1 = $("#dialog1");
+        var myWindow2 = $("#dialog2");
+
+        myWindow1.kendoWindow({
+            width: "500px",
+            height: "600px",
+            visible: false,
+            position: {
+                top: "0", // or "100px"
+                left: "20%"
+            },
+            scrollable: false,
+            title: "饼状图",
+            actions: ["Refresh", "Maximize", "Close"],
+            content: "/analysis/effct_analysis/status_static/pipe_display"
+        });
+        myWindow2.kendoWindow({
+            width: "900px",
+            height: "600px",
+            visible: false,
+            position: {
+                top: "0", // or "100px"
+                left: "10%"
+            },
+            scrollable: false,
+            title: "设备历史状态",
+            actions: ["Refresh", "Maximize", "Close"],
+            content: "/analysis/effct_analysis/status_static/day_bar"
+        });
+
+        $("#pipeButton").click(function() {
+            myWindow1.data("kendoWindow").open();
+        });
+
+        $("#historyButton").click(function() {
+            myWindow2.data("kendoWindow").open();
+        });
+    </script>
+</body>
+<style>
+    table {
+        text-align: center;
+        font-size: 12px;
+    }
+</style>
+
+</html>

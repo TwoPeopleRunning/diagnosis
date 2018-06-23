@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="/bower_components/angular/angular.min.js"></script>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+</head>
+
+<body ng-app="myApp" style="background: #4A4A4A; opacity: 0.89;">
+
+    <div ng-controller="validateCtrl" class="row row-centered col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4"
+        style="padding-bottom:20px; text-align:center; border: 1px solid #979797; border-radius: 8px; background-color:white; margin-top:60px; margin-bottom:20px">
+        <br>
+
+        <img style="margin-top:15px" border="0" align="center" src="/images/logo_rb.png" width="80%">
+        <div>
+            <br>
+            <h3>
+                <b>工业大数据融合与分析系统</b>
+            </h3>
+            <h4>
+                <b>——车间数据融合与大数据分析</b>
+            </h4>
+            <br>
+
+            <form class="col-xs-10 col-sm-10 col-md-10 col-centered col-xs-offset-1" ng-submit="login()" class="ng-pristine ng-valid-email ng-invalid ng-invalid-required">
+                <div class="form-group">
+                    <label class="sr-only" for="email">Email Address</label>
+                    <input name="user" class="form-control input-lg ng-pristine ng-untouched ng-valid-email ng-invalid ng-invalid-required" ng-model="user.user"
+                        type="text" required="" placeholder="用户名" style="text-align:center;">
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="password">Password</label>
+                    <input name="passwd" class="form-control input-lg ng-pristine ng-untouched ng-invalid ng-invalid-required" ng-model="user.passwd"
+                        type="password" required="" placeholder="密码" style="text-align:center;">
+                </div>
+                <button type="submit" class="btn btn-block btn-lg btn-primary">登录</button>
+                <br>
+            </form>
+        </div>
+        <br>
+    </div>
+
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('validateCtrl', ["$http", "$scope", "$window", "$location", function ($http, $scope, $window, $location) {
+            var host = 'http://' + $location.host() + ':' + $location.port() + '/users/login';
+
+            function setCookie(name, value) {
+                var Days = 30; //此 cookie 将被保存 30 天
+                var exp = new Date();
+                exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+                document.cookie = name + "=" + escape(value) + ";expires=" + exp + ";path=/";
+            }
+
+            function getCookie(name) {
+                var arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
+                if (arr != null) return unescape(arr[2]); return null;
+            }
+
+
+
+            $scope.login = function () {
+                console.log(window.location.href);
+                if (window.location.pathname != "/users/login") {
+                    setCookie("currentUrl", window.location.href)
+                };
+
+                // console.log($scope.user);
+                $http.post(host, $scope.user).then(function (data) {
+                    // console.log(data.error)
+                    if (data.data.error) {
+                        $window.alert(data.data.error);
+                        $window.location.reload("/users/login");
+                        // console.log(data);
+                    } else {
+                        // var session = data.data;
+                        // $window.sessionStorage.userToken = session.jwt;
+                        var currentUrl = getCookie('currentUrl');
+                        setCookie("currentUrl", "");
+                        if (currentUrl != "" && currentUrl != null) {
+                            $window.location.assign(currentUrl);
+                        } else {
+                            $window.location.assign("/");
+                        }
+                        // $scope.info = "下载完成，感谢使用！";
+                        // _download(data, "2016筑成凯棠老乡会通讯录" + _getNowFormatDate() + ".csv")
+
+                    }
+
+                    // }).error(function(err) {
+                    //     $window.alert(err);
+
+                });
+
+            }
+        }]);
+    </script>
+
+
+
+</body>
+
+</html>

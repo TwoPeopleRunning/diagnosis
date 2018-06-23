@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Basic usage</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script>
+
+    </script>
+
+
+</head>
+
+<body>
+
+
+
+
+    <div id="example">
+        <div>
+
+            <fieldset>
+                <legend>当前操作；修改用户</legend>
+                <table style="width: 100%; " cellpadding="10px">
+
+                    <tr>
+                        <!--   <td>姓名：</td> -->
+                        <td><label style="margin-right: 10px">用户名：</label> <input type="text" class="username"></td>
+                        <!--    <td>登录名：</td> -->
+                        <td><label style="margin-right: 14px">登录名：</label> <input type="text" class="username"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="validator"><label style="margin-right: 15px">密  码&nbsp;：&nbsp;</label><input type="password" id="pw1" required
+                                validationMessage="密码不能为空"></td>
+                        <td class="samevalid"> <label style="margin-right: 5px">密码确认：</label><input type="password" id="pw2"></td>
+                    </tr>
+                </table>
+                <div> <span style="margin-left:12px;letter-spacing:4px">备注：</span></div>
+                <textarea id="textnote" rows="3" cols="61" style="margin-left:72px;margin-top: -15px"> </textarea>
+            </fieldset>
+
+            <div id="tabstrip">
+                <ul>
+                    <li class="k-state-active">
+                        角色信息
+                    </li>
+                    <!-- <li>
+                        所属部门
+                    </li>
+                    <li>
+                        管理设备
+                    </li> -->
+                    <!--                         <li>
+                            功率信息
+                        </li> -->
+                </ul>
+
+                <div>
+                    <label style="margin-right: 15px">所属工厂：</label> <input id="department" style="width: 40%">
+                    <!-- <label style="margin-right: 15px">关键字：</label> <input type="text" name="tx" style="width: 40%"> -->
+                    <!--   <a class="button" href="#">查找</a> -->
+                    <!-- <button type="submit" value="reserch" style="width:70px;">查找</button> -->
+
+                    <table id="usertype" border="1" style="width: 100%; border-collapse:collapse; margin-top: 18px" cellpadding="10px">
+
+
+                        <tr style="height: 20px">
+                            <td>名称</td>
+                            <td>备注</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="usertype" id="system" /><label>系统管理员</label> </td>
+                            <td> </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="usertype" id="ordinary" /><label>普通用户</label></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+
+                    <p style="text-align: right; margin-top: 15px; height:30px">
+                        <button class="offline-button" onclick="submit()">修改</button>
+                        <!-- <a class="offline-button" href="../index.html">取消</a> -->
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                $("#tabstrip").kendoTabStrip();
+
+
+            });
+
+
+
+            $(document).ready(function () {
+                // var myWindow = $("#window"),
+                //     undo = $("#undo");
+
+                // undo.click(function() {
+                //     myWindow.data("kendoWindow").open();
+                //     undo.fadeOut();
+                // });
+
+                // function onClose() {
+                //     undo.fadeIn();
+                // }
+
+                // myWindow.kendoWindow({
+                //     width: "600px",
+                //     // title: "About Alvar Aalto",
+                //     visible: false,
+                //     actions: [
+                //         // "Pin",
+                //         "Minimize",
+                //         "Maximize",
+                //         "Close"
+                //     ],
+                //     close: onClose
+                // }).data("kendoWindow").center().open();
+
+                $(".validator").kendoValidator({});
+                $(".samevalid").kendoValidator({
+                    rules: {
+                        samevalid: function (input) {
+                            var pswd1 = $("#pw1").val();
+                            if (input.val() == pswd1) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+
+                        }
+                    },
+                    messages: {
+                        samevalid: "密码必须一致"
+                    }
+                });
+
+                selectname = parent.document.getElementById("SelecttreeNode").value;
+                $.get("/api/GD_USER?NAME=" + selectname, function (users, resp) {
+                    if (resp == "success") {
+                        // console.log(users)
+                        $(".username").val(users[0].NAME);
+                        $(".username").prop("readonly", true);
+                        var usertype = users[0].ISADMIN
+                        if (usertype == 1) {
+                            $("#system").prop("checked", true)
+                        };
+                        if (usertype == 0) {
+                            $("#ordinary").prop("checked", true)
+                        }
+                        $.get("/api/MDC_FACTORY", function (factories, status) {
+                            var department = [""];
+                            if (status == 'success') {
+                                factories.forEach(function (facroty) {
+                                    department.push(facroty.NAME);
+                                });
+                            }
+                            $("#department").kendoDropDownList({
+                                dataSource: department,
+                                value: users[0].DEPARTMENT
+                            });
+                        })
+                    }
+                });
+            });
+
+            function submit() {
+                console.log($("#usertype input")[0].checked);
+                //系统管理员
+                if ($("#usertype input")[0].checked) {
+                    var usertype = 1;
+                }
+                //普通用户
+                if ($("#usertype input")[1].checked) {
+                    var usertype = 0;
+                }
+                var payload = {
+                    "NAME": selectname,
+                    "NOTE": $("#textnote").val(),
+                    "USERPASSWORD": $("#pw1").val(),
+                    "ISADMIN": usertype,
+                    "DEPARTMENT": $("#department").val()
+                };
+                // console.log(payload);
+                $.post("/api/GD_USER/UPDATE?NAME=" + selectname, payload, function (data, resp) {
+                    if (resp == "success" && data.length != 0) {
+                        alert("修改完成！")
+                    } else {
+                        alert(err)
+                    }
+                });
+
+            }
+        </script>
+        <!-- 
+            <style>
+
+                #example
+                {
+                    min-height:500px;
+                }
+
+                media screen and (max-width: 1023px) {
+                    div.k-window {
+                        display: none !important;
+                    }
+                }
+            </style> -->
+    </div>
+
+</body>
+
+</html>

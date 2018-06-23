@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>固化数据配置</title>
+    <meta charset="utf-8">
+    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+    <script></script>
+    
+</head>
+<body>
+    <div id="window" ng-app="" ng-init="mySwitch=true">
+        <div  style="padding:5px 20px 5px;">
+            <input type="checkbox" name="" ng-model="mySwitch">是否启用固化数据功能
+        </div>
+        <div  ng-disabled="mySwitch">
+            <fieldset>
+                <legend>标准固化时间设定</legend>
+                <table>
+                    <tr>
+                        <td><input type="checkbox" name="" >按天固化</td>
+                        <td><input type="checkbox" name="" >按周固化</td>
+                        <td><input type="checkbox" name="" >按月固化</td>
+                        <td><input type="checkbox" name="" >按季度固化</td>
+                        <td><input type="checkbox" name="" >按天年化</td>
+                    </tr>
+                </table>
+            </fieldset>
+            <br>
+            <fieldset>
+                <legend>自定义固化时间设定</legend>
+                <input type="checkbox" name="" >自定义季度固化
+                <div style="padding:7px 0 7px">
+                    开始时间：
+                    <select>
+                        <option>上季度</option>
+                        <option>下季度</option>
+                    </select>
+                    <select>
+                        <option>第一月</option>
+                        <option>第二月</option>
+                        <option>第三月</option>
+                    </select>
+                    <input id="datetimepicker1" />
+                </div>
+                <div>
+                    结束时间：
+                    <select>
+                        <option>上季度</option>
+                        <option>下季度</option>
+                    </select>
+                    <select>
+                        <option>第一月</option>
+                        <option>第二月</option>
+                        <option>第三月</option>
+                    </select>
+                    <input id="datetimepicker2" />
+                </div>                
+                <br>
+                <input type="checkbox" name="" >自定义月份固化
+                <div style="padding:7px 0 7px">
+                    开始时间：
+                    <select>
+                        <option>上季度</option>
+                        <option>下季度</option>
+                    </select>
+                    <select>
+                        <option>第一月</option>
+                        <option>第二月</option>
+                        <option>第三月</option>
+                    </select>
+                    <input id="datetimepicker3" />
+                </div>
+                <div>
+                    结束时间：
+                    <select>
+                        <option>上季度</option>
+                        <option>下季度</option>
+                    </select>
+                    <select>
+                        <option>第一月</option>
+                        <option>第二月</option>
+                        <option>第三月</option>
+                    </select>
+                    <input id="datetimepicker4" />
+                </div> 
+
+            </fieldset>
+            <br />
+            <p style="text-align: center">
+            <a class="offline-button" href="#">确定</a>
+                <a class="offline-button" href="/">关闭</a>
+            </p>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var myWindow = $("#window");
+            function onClose() {
+                window.location.assign("/")
+            }
+            myWindow.kendoWindow({
+                width: "800px",
+                title: "固化数据配置",
+                visible: false,
+                actions: [
+                "Minimize",
+                "Maximize",
+                "Close"
+                ],
+                close: onClose
+            }).data("kendoWindow").center().open();
+
+            $("#datetimepicker1").kendoDateTimePicker({
+                value:new Date()
+            });
+
+            $("#datetimepicker2").kendoDateTimePicker({
+                value:new Date()
+            });
+            $("#datetimepicker3").kendoDateTimePicker({
+                value:new Date()
+            });
+            $("#datetimepicker4").kendoDateTimePicker({
+                value:new Date()
+            });
+        }); 
+    </script>
+
+    <style type="text/css">
+        fieldset {
+            border: #CCCCCC 1px solid;
+            padding-left: 20px ;
+        }
+
+
+        input {
+            vertical-align:middle;
+        }
+
+        td {
+            padding-right: 40px ;
+        }
+    </style>
+</body>
+</html>

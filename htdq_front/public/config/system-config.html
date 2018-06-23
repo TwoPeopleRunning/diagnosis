@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>系统配置</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script>
+        
+    </script>
+    
+    
+</head>
+<body>
+    <div id="example">
+        <div id="window">
+
+            <div id="tabstrip">
+                <ul>
+                    <li class="k-state-active">
+                        监控类型配置
+                    </li>
+                    <li>
+                        DSS报表配置
+                    </li>
+                    <li>
+                        实时信息设置
+                    </li>
+                    <li>
+                        其它设置
+                    </li>
+                </ul>
+                <!--1-->
+                <div>
+                <form name="input" method="POST">
+                    <fieldset>
+                        <legend>设备类型配置</legend>
+                        <table>                
+                            <tr>
+                                <td>
+                                    <input name="jc1"  id="jc1" type="checkbox" checked="checked" /> <label for="jc1">启用西门子设备监控</label>
+                                </td>
+                                <td>
+                                    <input name="jc2" id="jc2" type="checkbox"/> <label for="jc2">启用沙迪克设备监控</label>
+                                </td>
+                                <td>
+                                    <input name="jc3" id="jc3" type="checkbox"/> <label for="jc3">启用发那科设备监控</label>
+                                </td>                                               
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <input name="jc4" id="jc4" type="checkbox"/> <label for="jc4">启用海德汉设备监控</label>
+                                </td>
+                                <td>
+                                    <input name="jc5" id="jc5" type="checkbox"/> <label for="jc5">启用Moxa_E1242设备监控</label>
+                                </td>
+                                <td>
+                                    <input name="jc6" id="jc6" type="checkbox"/> <label for="jc6">启用Moxa_E2242设备监控</label>
+                                </td>                                               
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <input name="jc7" id="jc7" type="checkbox"/> <label for="jc7">启用Moxa_E2210设备监控</label>
+                                </td>
+                                <td>
+                                    <input name="jc8" id="jc8" type="checkbox"/> <label for="jc8">启用Moxa_E1210设备监控</label>
+                                </td>
+                                <td>
+                                    <input name="jc9" id="jc9" type="checkbox"/> <label for="jc9">启用PLC设备监控</label>
+                                </td>                                               
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <input name="jc10" id="jc10" type="checkbox"/> <label for="jc10">启用华中数控(HNC)设备监控</label>
+                                </td>
+                                <td>
+                                    <input name="jc11" id="jc11" type="checkbox"/> <label for="jc11">启用Advantech_6018设备监控</label>
+                                </td>
+                                <td>
+                                    <input name="jc12" id="jc12" type="checkbox"/> <label for="jc12">启用Advantech_6250设备监控</label>
+                                </td>                                               
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <input name="jc13" id="jc13" type="checkbox"/> <label for="jc13">启用BcNetPLC设备监控</label>
+                                </td>
+                                <td></td>
+                                <td>
+                                    <input name="jc14" id="jc14" type="checkbox"/> <label for="jc14">菲亚迪</label>
+                                    <span style="padding-left: 40px"><input name="jc15" id="jc15" type="checkbox"/> <label for="jc15">兄弟</label></span>
+                                </td>                                                                                       
+                            </tr>                                        
+                        </table>
+                    </fieldset>
+                    <br />
+                    <fieldset>
+                        <legend>其它配置</legend>
+                        <table>
+                            <tr>
+                                <td align="right">
+                                    沙迪克监控数据库地址：<input type="text" name="adr1" style="width:500px"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">
+                                    沙迪克实时监控地址：<input type="text" name="adr2" style="width:500px"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">
+                                    系统配置日志保留最近次数：<input type="text" name="number" id="numeric" type="number" value="100" step="1" style="width:500px"/>
+                                </td>
+                            </tr>
+                        </table>                                                                           
+                    </fieldset>
+                    <br />
+                    <br />
+                    <p style="text-align: center">
+                        <a class="offline-button" href="#">保存</a>
+                        <a class="offline-button" href="/">关闭</a>
+                    </p>
+                </form>
+                </div>
+
+                <!--2-->
+                <div>
+                <form name="input2" method="POST">
+                    <fieldset>
+                        <legend>默认地址配置</legend>
+                        <table>
+                            <tr>
+                                <td align="right">
+                                    DSS报表默认地址：<input value="http://127.0.0.1/dss/logins.aspx" type="text" name="adr3" style="width:500px"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                    <br>
+                    <br>
+                    <p style="text-align: center">
+                        <a class="offline-button" href="#">保存</a>
+                        <a class="offline-button" href="/">关闭</a>
+                    </p> 
+                </form>                               
+                </div>
+                <!--3-->
+                <div>
+                <form name="input3" method="POST">
+                    <fieldset>
+                        <legend>详细信息设置</legend>
+                        <table cellpadding="10px">
+                            <tr>
+                                <td>甘特图显示方案：</td>
+                                <td>
+                                    <input id="gtt1" type="radio" name="mo" checked="checked" /> <label for="gtt1">普通模式</label>
+                                    <input id="gtt2" type="radio" name="mo" /> <label for="gtt2">折分模式</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input name="jc16" id="jc16" type="checkbox"/> <label for="jc16">是否显示海德汉功率信息</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    产品信息：
+                                </td>
+                                <td><input type="text" name="cpi" value="产品代号-零件号-零件号-工序号" style="width:300px"/></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="color: red">说明:(Fanus:以"-"分割的程序注释,西门子:以"_"分割的程序名)</td>
+                            </tr>                                    
+                        </table>
+                    </fieldset>
+                    <br>
+                    <br>
+                    <p style="text-align: center">
+                        <a class="offline-button" href="#">保存</a>
+                        <a class="offline-button" href="/">关闭</a>
+                    </p>
+                    </form>                                 
+                </div>
+
+                <!--4-->
+                <div>
+                <form name="input5" method="POST">
+                        <table cellpadding="10px">
+                            <tr>
+                                <td>
+                                    <span class="changegray"><input id="ysn" type="checkbox" name="ysn" onclick="selecEl()" /> <label for="ysn">是否启用远程DbLink用户系统</label></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <span class="changegray">
+                                <td>
+                                DbLink名称：
+                                </td>
+                                <td>
+                                    <input name="dblink" id="dblink" type="text" style="width:300px" disabled/>
+                                </td>
+                                </span>
+                            </tr>
+                            <tr>
+                                <td>
+                                版本信息：
+                                </td>
+                                <td>
+                                    <input name="bbi" id="bbi" type="text" style="width:300px"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input id="ysn2" type="checkbox" name="ysn2" /> <label for="ysn2">是否显示布局图设备名称</label></td>
+                            </tr>
+                                   
+                        </table>
+                        <br>
+                        <br>
+                        <table cellpadding="10px">
+                            <tr>
+                                <td>高级配置文件：  【请选择】</td>
+                                <td style="color: red">说明:高级配置文件主要为自定义系统权限、属性等。</td>
+                            </tr>                             
+                        </table>
+                    <br>
+                    <br>
+                    <p style="text-align: center">
+                        <a class="offline-button" href="#">保存</a>
+                        <a class="offline-button" href="/">关闭</a>
+                    </p>
+                    </form>                                 
+                </div>                                            
+            </div>
+            <div class="responsive-message"></div>            
+            <script>
+                $(document).ready(function() {
+                    var myWindow = $("#window");
+                    function onClose() {
+                        window.location.assign("/")
+                    }
+                    myWindow.kendoWindow({
+                        width: "1000px",
+                        title: "系统配置",
+                        visible: false,
+                        actions: [
+                        "Minimize",
+                        "Maximize",
+                        "Close"
+                        ],
+                        close: onClose
+                    }).data("kendoWindow").center().open();
+                    $("#tabstrip").kendoTabStrip({
+                        animation:  {
+                            open: {
+                                effects: "fadeIn"
+                            }
+                        }
+                    });
+                 
+                }); 
+
+                function selecEl(){
+                    if ($("#ysn").prop("checked")) {
+                        $("<input name='dblink' id='dblink' type='text' style='width:300px' />").replaceAll("#dblink");
+                        $("span").removeClass("changegray");
+                    } else {
+                        $("<input name='dblink' id='dblink' type='text' style='width:300px' disabled/>").replaceAll("#dblink");
+                        $("span").addClass("changegray");
+
+                    }
+                }                 
+            </script>
+            <style>
+                #example
+                {
+                    min-height:500px;
+                }
+                .demo-section {
+                    min-height: 500px;
+                    max-height: 500px;
+                }
+                .k-tabstrip > .k-content {
+                    padding: 20px;
+                }  
+                td {
+                    padding-right: 20px;
+                    padding-left: 20px;
+                }              
+                media screen and (max-width: 1023px) {
+                    div.k-window {
+                        display: none !important;
+                    }
+                }
+
+                .changegray {
+                    color: gray;
+                }
+            </style>
+        </div>    
+    </body>
+</html>

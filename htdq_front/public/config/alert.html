@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>报警信息管理界面</title>
+    <meta charset="utf-8">
+    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+    <script>
+        
+    </script>
+
+
+</head>
+
+<body>
+    <div id="windows">
+        <div class="divbox">
+            <fieldset style="height:205px;border: 1px solid #CCCCCC;">
+                <legend>报警信息导入</legend>
+                <table class="tablestyle" cellpadding="5">
+                    <tr>
+                        <td>系统类型:&nbsp;</td>
+                        <td><input id="sysinfo"></td>
+                        <td><button>系统信息选择</button></td>
+                    </tr>
+                    <tr>
+                        <td>设备列表:&nbsp;</td>
+                        <td><input id="toollist"></td>
+                        <td><button>厂家信息选择</button></td>
+                    </tr>
+                    <tr>
+                        <td>表格选择:&nbsp;</td>
+                        <td><input id="gridstyle"></td>
+                        <td><button>开始导入</button></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>
+                            <input style="vertical-align: middle;" type="checkbox" class="k-checkbox-label" id="notimport">
+                            <span>不重复导入</span>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+        </div>
+        <span class="divbox">
+        <fieldset style="height:205px;border: 1px solid #CCCCCC;">   
+        <legend>报警信息操作</legend>
+            <table class="tablestyle" cellpadding="5">
+                <tr>
+                 <td >查询类型:&nbsp;</td>
+                 <td ><label style="float: left;"><input type="radio" name="findstyle" value="" >系统信息</label>&nbsp;
+                 <label><input type="radio" name="findstyle" value="">厂家信息</label>
+                 </td>
+                </tr>
+                <tr>
+                 <td >报 警 号:&nbsp;</td>
+                 <td ><input id="begin" type="number" style="float: left;width: 90px;"><p style="float: left;">&nbsp;至&nbsp;</p><input id="end" type="number" style="float: left;width: 90px"></td>
+                </tr>
+                <tr>
+                 <td >&nbsp;</td>
+                 <td><button style="height:40px;width: 200px">保存修改</button></td>
+                </tr>
+            </table>
+            <span class="findbutton">
+                <button id="find" style="width: 100px;height: 80px;font-size: 1.4em">查询</button>
+            </span>
+        </fieldset>
+        </span>
+        <div style="font-size:1.2em;float:left; margin:0 3% 0 1%;">
+            <fieldset style="border: 1px solid #CCCCCC;">
+                <legend>报警列表</legend>
+                <div id="grid" data-role="grid" class="k-grid k-widget">
+                    <!--<div class="k-grid-header">
+                        <div class="k-grid-header-wrap k-auto-scrollable">
+                            <table role="grid">
+                            <thead role="rowgroup">
+                                <tr role="row">
+                                    <th scope="col" role="columnheader" width=10% align=center rowspan="1" data-index="1" class="k-header"><p style="text-align: center;">&nbsp;</p></th>
+                                    <th scope="col" role="columnheader" rowspan="1" data-index="2" id="alertnum" class="k-header"><p style="text-align: center;">报警号</p></th>
+                                    <th scope="col" role="columnheader" rowspan="1" data-index="3" id="cninfo" class="k-header"><p style="text-align: center;">报警中文信息</p></th>
+                                    <th scope="col" role="columnheader" rowspan="1" data-index="4" id="infoclass" class="k-header"><p style="text-align: center;">信息分类</p></th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            <div class="k-grid-content k-auto-scrollable" style="height: 400px;">
+                <table role="grid" style="height: auto;">
+                </table>
+            </div>-->
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <style>
+        .divbox {
+            font-size: 1.2em;
+            float: left;
+            margin: 1% 1% 0 1%;
+            width: 47%;
+        }
+        
+        .tablestyle {
+            float: left;
+            text-align: center;
+            font-size: 1.2em;
+            margin: 2% 0 0 10%;
+        }
+        
+        .findbutton {
+            float: left;
+            text-align: center;
+            margin: 2% 0 0 5%;
+        }
+        
+        #windows button {
+            width: 100%;
+        }
+    </style>
+
+    <script>
+     function onClose() {
+            window.location.assign("../../");
+        }
+        $("#windows").kendoWindow({
+            actions:["Minimize","Maximize","Close"],
+            close: onClose
+        });
+        var dialog = $("#windows").data("kendoWindow");
+        dialog.maximize();
+        // //数据接口
+    // var dataSource = new kendo.data.HierarchicalDataSource({
+    //   transport: {
+    //     read: {
+    //       url: "http://demos.telerik.com/kendo-ui/service/Employees",
+    //       dataType: "jsonp"
+    //     }
+    //             },
+    //   schema: {
+    //       model: {
+    //       id: "EmployeeId",
+    //       hasChildren: "HasEmployees"
+    //         }
+    //     }
+    // });
+    $("#sysinfo").kendoDropDownList({
+          dataSource: {
+          },
+          animation: false
+        });
+    $("#toollist").kendoDropDownList({
+          dataSource: {
+          },
+          animation: false
+        });
+    $("#gridstyle").kendoDropDownList({
+          dataSource: {
+          },
+          animation: false
+        });
+   
+    var dataSource = new kendo.data.DataSource({
+                batch: true,
+                pageSize: 15,
+                transport:{
+                    read:{
+                        url:"/api/MDC_MDALARMDATA",
+                        type:"get",
+                        dataType:"json"
+                    },
+                    parameterMap: function(options, operation) {
+                        if (operation !== "read" && options.models) {
+                            return options.models[0];
+                        }else{
+                            var parameter={
+                                page:options.page,
+                                limit:100,
+                            }
+                            return parameter;
+                        }
+                    }
+                },
+                schema: {
+                        model: {
+                            id:"ID",
+                            fields: {
+                                    ID: { type: "number", editable: false, nullable: true },
+                                    MTID: { type: "number", validation: { required: true }},
+                                    ALARMTIME: {  validation: { required: true } },
+                                    ALARMCODE: {  validation: { required: true } },
+                                    ALARMNUM: { type: "number", validation: { required: true }},
+                                    ALARMINFO:  {  validation: { required: true } },
+                                    ALARMTYPE: {  validation: { required: true } },
+                                    ALARMTYPEID: { type: "number", validation: { required: true }},
+                            }
+                        }
+                    }
+            });
+
+            $("#grid").kendoGrid({
+                dataSource: dataSource,
+                pageable: {
+                    refresh: true
+                },
+                sortable:true,
+                height: 600,
+                columns: [
+                {field:"ID",title:"报警号"},
+                {field:"ALARMTIME",title:"报警时间"},
+                {field:"ALARMINFO",title:"报警信息"},
+                {field:"ALARMTYPE",title:"报警类型"}
+                ]
+            });
+            var grid = $("#grid").data("kendoGrid");
+
+    $("#find").click(function(){
+    var begin=Number(document.getElementById("begin").value);
+    var end=Number(document.getElementById("end").value);
+        if (! begin ||! end||(begin>end)){
+            alert("查询条件应满足条件且不能为空!")
+        }
+        else{
+            // 报警信息读入
+             var dataSource1 = new kendo.data.DataSource({
+                batch: true,
+                pageSize: 15,
+                transport:{
+                    read:{
+                        url:"/api/MDC_MDALARMDATA",
+                        type:"get",
+                        dataType:"json"
+                    },
+                    parameterMap: function(options, operation) {
+                        if (operation !== "read" && options.models) {
+                            return options.models[0];
+                        }else{
+                            var parameter={
+                                page:options.page,
+                                limit:100,
+                                IDBegin:begin,
+                                IDEnd:end
+                            }
+                            return parameter;
+                        }
+                    }
+                },
+                schema: {
+                        model: {
+                            id:"ID",
+                            fields: {
+                                    ID: { type: "number", editable: false, nullable: true },
+                                    MTID: { type: "number", validation: { required: true }},
+                                    ALARMTIME: {  validation: { required: true } },
+                                    ALARMCODE: {  validation: { required: true } },
+                                    ALARMNUM: { type: "number", validation: { required: true }},
+                                    ALARMINFO:  {  validation: { required: true } },
+                                    ALARMTYPE: {  validation: { required: true } },
+                                    ALARMTYPEID: { type: "number", validation: { required: true }},
+                            }
+                        }
+                    }
+            });
+            grid.setDataSource(dataSource1);
+
+                }
+            });
+</script>
+</body>
+
+</html>

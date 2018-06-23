@@ -1,0 +1,31 @@
+{
+  "name": "requestsjs",
+  "version": "0.1.0",
+  "description": "ajax in python Requests style",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gaomeng1900/requests.git"
+  },
+  "keywords": [
+    "requests",
+    "ajax",
+    "request",
+    "python"
+  ],
+  "author": "Meng G.",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/gaomeng1900/requests/issues"
+  },
+  "homepage": "https://github.com/gaomeng1900/requests#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-coffee": "^2.3.1",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-watch": "^4.3.5"
+  }
+}

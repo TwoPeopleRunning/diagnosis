@@ -1,0 +1,43 @@
+{
+    "action": "query",
+    "apikey": "e8039c44-5483-4166-91ee-ba6790f39afb",
+    "deviceid": 41,
+    "params": [
+        "any_not_exist_property"
+    ],
+    "userAgent": "web"
+}
+
+{
+    "action": "update",
+    "apikey": "837ba25f-4289-402f-a648-d0962df60c2e",
+    "deviceid": 2,
+    "params": {
+        "status": "ONLINE"
+    }
+}
+{
+    "action": "update",
+    "apikey": "26c0fed3-7d6e-4102-9d52-9e5826e0f9f3",
+    "deviceid": 2,
+    "params": {
+        "status": "ONLINE"
+    }
+}
+
+{
+    "action": "query",
+    "apikey": "26c0fed3-7d6e-4102-9d52-9e5826e0f9f3",
+    "deviceid": 11,
+    "params": [
+        "key",
+        "STATUS",
+        "BEGINTIME"
+    ],
+    "test": [
+        0,
+        1,
+        2
+    ],
+    "userAgent": "web"
+}

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>幻灯片设置界面</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script>
+
+    </script>
+
+
+</head>
+
+<body>
+    <div id="windows">
+        <div class="divbox">
+            <fieldset style="border: 1px solid #CCCCCC;">
+                <legend>基本设置</legend>
+                <table class="tablestyle" cellspacing="20">
+                    <tr>
+                        <td>切换时间设置(秒):</td>
+                        <td>
+                            <input id="timesetting" type="number">
+                        </td>
+                        <td>
+                            <p>&nbsp;</p>
+                        </td>
+                        <td rowspan="1">
+                            <p>切换内容设置:</p>
+                        </td>
+                        <td id="selectContent">
+                            <input type="checkbox" class="checkbox check" id="elecborad">
+                            <label style="vertical-align: middle;">电子看板</label>
+                            <input type="checkbox" class="checkbox check" id="overall">
+                            <label style="vertical-align: middle;">布局图</label>
+                            <input type="checkbox" class="checkbox check" id="statement" onchange="selectSmt()">
+                            <label style="vertical-align: middle;">报表</label>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+        </div>
+        <div class="divbox">
+            <fieldset style="border: 1px solid #CCCCCC;">
+                <legend>报表设置</legend>
+                <table id="statementSet" class="tablestyle" rowspan="1" cellspacing="10">
+                    <tr>
+                        <td style="width:180px;text-align:left;">
+                            <input type="radio" name="findmethod" id="findmethod1" value=0 checked="true" onclick="getMethod(this.value)" style="vertical-align: middle;">
+                            <label style="vertical-align: middle;">设定报表查询时间</label>
+                        </td>
+                        <td>
+                            <input id="findbytime">
+                        </td>
+                        <td></td>
+                        <td>设定报表显示比例:
+                            <input id="displaypercent">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:180px;text-align:left;">
+                            <input type="radio" name="findmethod" id="findmethod2" value=1 onclick="getMethod(this.value)" style="vertical-align: middle;">
+                            <label style="vertical-align: middle;">自定义报表查询时间</label>
+                        </td>
+                        <td>
+                            <input id="datebegin" class="k-input" style="width:260px;">
+                        </td>
+                        <td>
+                            <p>至</p>
+                        </td>
+                        <td>
+                            <input id="dateend" class="k-input" style="width: 260px;">
+                        </td>
+                    </tr>
+                </table>
+                <p style="color:red;margin-left: 7%">备注:设备列表填入设备ID，并以英文”,“隔开，如41,42,44。另外，表中开始时间与结束时间不用编辑</p>
+            </fieldset>
+        </div>
+        <div id="grid_id" class="k-grid k-widget" style="width:29.5%;float:left;border: 1px solid #000;margin: 1% 0 0 0"></div>
+        <div id="grid" data-role="grid" class="k-grid k-widget" style="width:70%;float:right;border: 1px solid #000;margin: 1% 0 0 0">
+        </div>
+        <div style="text-align: center">
+            <button id="storage" style="width: 80px;height: 40px" onclick="submit()">提交</button>
+            <button id="cancel" style="width: 80px;height: 40px">取消</button>
+        </div>
+    </div>
+    <style>
+        .check {
+            vertical-align: middle;
+            height: 20px;
+            width: 20px
+        }
+
+        .divbox {
+            font-size: 1.2em;
+            margin: 1% 0 0 0
+        }
+
+        .tablestyle {
+            text-align: left;
+            font-size: 1.2em;
+            margin-left: 5%
+        }
+
+        .findbutton {
+            float: left;
+            text-align: center;
+            margin: 2% 0 0 5%;
+        }
+
+        #windows button {
+            width: 100%;
+        }
+
+        #windows legend {
+            font-size: 1.2em
+        }
+    </style>
+
+    <script>
+        var myWindow = $("#windows"),
+            undo = $("#undo");
+
+        undo.click(function () {
+            myWindow.data("kendoWindow").open();
+            undo.fadeOut();
+        });
+
+        function onClose() {
+            undo.fadeIn();
+            window.location.assign("../");
+        }
+
+        myWindow.kendoWindow({
+            width: "80%",
+            // title: "About Alvar Aalto",
+            visible: false,
+            title: "幻灯片设置",
+            position: {
+                top: "5%",
+                left: "10%"
+            },
+            actions: [
+                // "Pin",
+                "Minimize",
+                "Maximize",
+                "Close"
+            ],
+            close: onClose
+        }).data("kendoWindow").open();
+        // function onClose() {
+        //     window.location.assign("../../");
+        // }
+        // $("#windows").kendoWindow({
+        //     width: "80%",
+        //     title: "幻灯片设置",
+        //     actions: ["Minimize", "Maximize", "Close"],
+        //     close: onClose
+        // }).data("kendoWindow").center().open();
+        // var dialog = $("#windows").data("kendoWindow");
+        // // dialog.maximize();
+
+        $.get("/api/MDC_FACTORY", function (data, status) {
+            if (status == "success") {
+                $.get("/api/MDC_MTGROUP", function (data1, status) {
+                    if (status == "success") {
+                        $.get("/api/MDC_MACHINETOOLS", function (data2, status) {
+                            var dataSource = new kendo.data.DataSource({
+                                // push: dataSource_push,
+                                data: data2,
+                                pageSize: 12,
+                                schema: {
+                                    model: {
+                                        fields: {
+                                            ID: {
+                                                type: "number"
+                                            },
+                                            MATOLNAME: {
+                                                type: "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            var grid = $("#grid_id").kendoGrid({
+                                dataSource: dataSource,
+                                pageable: {
+                                    refresh: true
+                                },
+                                height: 400,
+                                columns: [{
+                                    field: "ID",
+                                    title: "MTID",
+                                    width: "30%"
+                                }, {
+                                    field: "MATOLNAME",
+                                    title: "设备列表",
+                                    width: "70%"
+                                }],
+                                sortable: true
+                            })
+                        });
+                    }
+                });
+            }
+        });
+        var dataSource;
+        $.get("/api/PPTCONFIG", function (data, resp) {
+            var storage = [];
+            if (resp == "success" && data.length != 0) {
+                var URL = data[0].CONTENT;
+                URL.forEach(function (url, index) {
+                    var temp = {
+                        "URL": "",
+                        "MTID": "",
+                        "BEGINTIME": "",
+                        "ENDTIME": "",
+                    };
+                    temp.URL = url;
+                    temp.MTID = data[0].MTID[index];
+                    temp.BEGINTIME = kendo.toString(new Date(data[0].BEGINTIME), "yyyy-MM-dd HH:mm:ss");
+                    temp.ENDTIME = kendo.toString(new Date(data[0].ENDTIME), "yyyy-MM-dd HH:mm:ss");
+                    storage[index] = temp;
+                });
+                $("#displaypercent").kendoNumericTextBox({
+                    value: data[0].DISPLAYPERCENT,
+                    format: "p0",
+                    step: 0.1
+                });
+                $("#timesetting").kendoNumericTextBox({
+                    value: data[0].TIMESETTING,
+                    format: "n0",
+                    step: 1
+                });
+                // $("#timesetting").prop("value", data[0].TIMESETTING);
+                // $("#displaypercent").val(data[0].DISPLAYPERCENT);
+                // console.log($("#timesetting").val())
+                $("#datebegin").val(data[0].BEGINTIME);
+                $("#dateend").val(data[0].ENDTIME);
+                $("#findmethod2").prop("checked", true);
+                data[0].NODEID.forEach(function (node, index) {
+                    $("#" + node).prop("checked", true);
+                });
+                if ($("#selectContent input")[2].checked == false) {
+                    $("#findmethod1").prop("disabled", true);
+                    $("#findmethod2").prop("disabled", true);
+                }
+            }
+
+            // console.log(storage);
+            dataSource = new kendo.data.DataSource({
+                // push: dataSource_push,
+                data: storage,
+                pageSize: 8,
+                schema: {
+                    model: {
+                        fields: {
+                            URL: {
+                                type: "string"
+                            },
+                            MTID: {
+                                type: "string"
+                            },
+                            BEGINTIME: {
+                                type: "string"
+                            },
+                            ENDTIME: {
+                                type: "string"
+                            }
+                        }
+                    }
+                }
+            });
+
+            var grid = $("#grid").kendoGrid({
+                dataSource: dataSource,
+                pageable: {
+                    refresh: true
+                },
+                height: 400,
+                toolbar: [{
+                    name: "create",
+                    text: "添加"
+                }],
+                columns: [{
+                    field: "URL",
+                    title: "URL地址",
+                    width: "25%"
+                }, {
+                    field: "MTID",
+                    title: "设备列表",
+                    width: "20%"
+                }, {
+                    field: "BEGINTIME",
+                    title: "开始时间",
+                    width: "18%",
+                }, {
+                    field: "ENDTIME",
+                    title: "结束时间",
+                    width: "18%",
+                }, {
+                    command: [{
+                        name: "edit",
+                        text: {
+                            cancel: "取消",
+                            update: "保存"
+                        }
+                    }, {
+                        name: "destroy",
+                        text: "删除"
+                    },],
+                    title: "&nbsp;",
+                    width: "19%"
+                }],
+                sortable: {
+                    showIndexes: true,
+                    mode: "multiple"
+                },
+                editable: "inline",
+            });
+        });
+
+        $("#findbytime").kendoDropDownList({
+            dataSource: [{
+                name: "最近24小时",
+                value: 1
+            }, {
+                name: "最近三天",
+                value: 2
+            }, {
+                name: "最近一周",
+                value: 3
+            }, {
+                name: "最近30天",
+                value: 4
+            }, {
+                name: "最近三个月",
+                value: 5
+            },],
+            dataTextField: "name",
+            dataValueField: "value",
+            value: "1",
+            change: function (e) {
+                var value = this.value();
+                getRecenty(value);
+            }
+        });
+
+        //获取时间
+        function getRecenty(value) {
+            Now = new Date();
+            // times = Now.getTime();
+            // console.log(times)
+            switch (value) {
+                case "1":
+                    ENDTIME = new Date();
+                    BEGINTIME = new Date(Now.setDate(Now.getDate() - 1));
+                    break;
+                case "2":
+                    ENDTIME = new Date();
+                    BEGINTIME = new Date(Now.setDate(Now.getDate() - 3));
+                    break;
+                case "3":
+                    ENDTIME = new Date();
+                    BEGINTIME = new Date(Now.setDate(Now.getDate() - 7));
+                    break;
+                case "4":
+                    ENDTIME = new Date();
+                    BEGINTIME = new Date(Now.setDate(Now.getDate() - 30));
+                    break;
+                case "5":
+                    ENDTIME = new Date();
+                    BEGINTIME = new Date(Now.setDate(Now.getDate() - 90));
+                    break;
+            }
+        };
+
+
+        $("#datebegin").kendoDateTimePicker({
+            value: new Date(),
+            change: dateChange
+        })
+        $("#dateend").kendoDateTimePicker({
+            value: new Date(),
+            change: dateChange
+        });;
+
+
+
+        //是否选择报表
+        function selectSmt() {
+            if ($("#selectContent input")[2].checked == false) {
+                $("#findmethod1").prop("disabled", true);
+                $("#findmethod2").prop("disabled", true);
+            } else {
+                $("#findmethod1").prop("disabled", false);
+                $("#findmethod2").prop("disabled", false);
+            }
+        };
+        //选择报表设置
+        if (!$("#datebegin").val() || !$("#dateend").val()) {
+            var ENDTIME = new Date(),
+                BEGINTIME = new Date(new Date().setDate(new Date().getDate() - 1));
+        }
+
+
+        function dateChange() {
+            BEGINTIME = new Date($("#datebegin").val());
+            ENDTIME = new Date($("#dateend").val());
+        }
+
+        function getMethod(value) {
+            var flag = value;
+            if (flag == 0) {
+                var recentVal = ($("#findbytime").val());
+                getRecenty(recentVal);
+            };
+            if (flag == 1) {
+                BEGINTIME = new Date($("#datebegin").val());
+                ENDTIME = new Date($("#dateend").val());
+                // console.log(BEGINTIME)
+            }
+        }
+
+        //存储数据
+        function submit() {
+            // console.log())·
+            //获取需要显示内容
+            nodeid = [];
+            //切换设置
+            var timesetting = $("#timesetting").val();
+            //显示比例
+            var displaypercent = kendo.toString(Number($("#displaypercent").val()), "p0");
+            var InputContent = $("#selectContent input")
+            selectlen = InputContent.len;
+            for (var index = 0; index < InputContent.length; index++) {
+                if (InputContent[index].checked == true) {
+                    nodeid.push(InputContent[index].id)
+                }
+            };
+            var hasStm = $.inArray("statement", nodeid);
+            var hasErc = $.inArray("elecborad", nodeid);
+            var hasOvl = $.inArray("overall", nodeid);
+            var content = [];
+            var mtid = [];
+            var payload = {
+                "NODEID": nodeid,
+                "TIMESETTING": timesetting,
+                "DISPLAYPERCENT": displaypercent,
+                "BEGINTIME": "",
+                "ENDTIME": "",
+                "EB": "",
+                "LAYOUT": "",
+                "CONTENT": [],
+                "MTID": [],
+            }
+
+            if (hasErc != -1) {
+                dataSource._data.forEach(function (griddata) {
+                    if (RegExp("\/views\/.*").test(griddata.URL)) {
+                        content.push(griddata.URL);
+                        mtid.push(griddata.MTID)
+                    };
+                });
+            }
+            if (hasOvl != -1) {
+                payload.LAYOUT = "/layout/"
+            }
+            if (hasStm != -1) {
+                payload.BEGINTIME = BEGINTIME;
+                payload.ENDTIME = ENDTIME;
+                dataSource._data.forEach(function (griddata) {
+                    if (RegExp("\/analysis\/.*").test(griddata.URL)) {
+                        content.push(griddata.URL);
+                        mtid.push(griddata.MTID)
+                    };
+                });
+            }
+            payload.CONTENT = content;
+            payload.MTID = mtid;
+            console.log(payload);
+            $.ajaxSettings.traditional = true;
+            $.post("/api/PPTCONFIG", payload, function (data, resp) {
+                if (resp == "success" && !data.error) {
+                    // console.log(data);
+                    alert("save successful");
+                    location.reload();
+                    return;
+                }
+                alert(data.error);
+            });
+
+            // console.log(dataSource._pristineData)
+        }
+    </script>
+</body>
+
+</html>

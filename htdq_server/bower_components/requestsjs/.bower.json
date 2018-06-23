@@ -1,0 +1,36 @@
+{
+  "name": "requestsjs",
+  "description": "ajax in python Requests style",
+  "main": "app.js",
+  "authors": [
+    "Meng G."
+  ],
+  "license": "GPL-3.0",
+  "keywords": [
+    "requests",
+    "ajax",
+    "request",
+    "python"
+  ],
+  "moduleType": [],
+  "homepage": "https://github.com/gaomeng1900/requests",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "dist/test.js"
+  ],
+  "version": "1.1.4",
+  "_release": "1.1.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.1.4",
+    "commit": "1e135c993a82b90b465fbc128c8c0f55981576e4"
+  },
+  "_source": "https://github.com/gaomeng1900/requests.git",
+  "_target": "^1.1.4",
+  "_originalSource": "requests",
+  "_direct": true
+}

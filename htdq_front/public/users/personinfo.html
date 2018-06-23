@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Basic usage</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script>
+    </script>
+
+
+</head>
+
+<body>
+
+
+
+
+    <div id="example">
+        <div id="window">
+            <div>
+                <p style="font-weight: bold;">登录信息</p>
+
+                <table style="width: 100%;float: left; " cellpadding="10px">
+
+                    <tr>
+                        <td style="letter-spacing:4px">登录名 ：
+                            <input type="readonly" class="username k-textbox" style="width:50%">
+                        </td>
+
+                    </tr>
+                    <tr class="validator">
+                        <td style="letter-spacing:4px"> 密 码 &nbsp;：
+                            <input type="password" class="k-textbox" id="pw1" style="width:50%" required validationMessage="密码不能为空" />
+                        </td>
+
+                    </tr>
+                    <tr class="samevalid">
+                        <td style="letter-spacing:4px">密码确认:
+                            <input type="password" class="k-textbox" id="pw2" style="width:50%" />
+                        </td>
+                    </tr>
+                </table>
+
+                <p style="font-weight: bold;">其他信息</p>
+                <table style="width: 100%;float: left; " cellpadding="10px">
+
+                    <tr>
+                        <td style="letter-spacing:4px">用户名 ：
+                            <input type="readonly" class="username k-textbox" style="width:50%">
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="letter-spacing:4px">注册时间:
+                            <input type="text" id="time" style="width:50%" class="k-textbox">
+                        </td>
+                    </tr>
+
+                </table>
+
+                <div>
+                    <span style="margin-left:23px;letter-spacing:8px">备注：</span>
+                </div>
+                <textarea id="textnote" rows="10" cols="61" style="overflow: scroll; overflow-x:hidden;margin-left:85px;margin-top: -20px"> </textarea>
+
+                <div style="text-align: center; margin-top: 15px;height: 60px">
+                    <button class="offline-button" onclick="submit()">修改</button>
+                    <!-- <a class="offline-button" href="../index.html">关闭</a> -->
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                var myWindow = $("#window"),
+                    undo = $("#undo");
+
+                undo.click(function () {
+                    myWindow.data("kendoWindow").open();
+                    undo.fadeOut();
+                });
+
+                function onClose() {
+                    undo.fadeIn();
+                    window.location.assign("../");
+                }
+
+                myWindow.kendoWindow({
+                    width: "40%",
+                    // title: "About Alvar Aalto",
+                    visible: false,
+                    position: {
+                        top: "5%",
+                        left: "30%"
+                    },
+                    actions: [
+                        // "Pin",
+                        "Minimize",
+                        "Maximize",
+                        "Close"
+                    ],
+                    close: onClose
+                }).data("kendoWindow").open();
+
+                $(".validator").kendoValidator({});
+                $(".samevalid").kendoValidator({
+                    rules: {
+                        samevalid: function (input) {
+                            var pswd1 = $("#pw1").val();
+                            if (input.val() == pswd1) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+
+                        }
+                    },
+                    messages: {
+                        samevalid: "密码必须一致"
+                    }
+                });
+                // console.log(get_cookie("thisuser"));
+                selectname = get_cookie("user");
+                $.get("/api/GD_USER?NAME=" + selectname, function (users, resp) {
+                    if (resp == "success") {
+                        // console.log(users)
+                        $(".username").val(users[0].NAME);
+                        $("#time").val(kendo.toString(new Date(users[0].EDITDATE), "yyyy-MM-dd HH:mm:ss"));
+                        $(".username").prop("readonly", true);
+                        $("#time").prop("readonly", true);
+                        $("#textnote").val(users[0].NOTE);
+                        // $("#pw1").val(users[0].USERPASSWORD)
+                    }
+                });
+            });
+
+            function submit() {
+                var pswd1 = $("#pw1").val();
+                var pswd2 = $("#pw2").val();
+
+                var payload = {
+                    "NAME": selectname,
+                    "NOTE": $("#textnote").val(),
+                    "USERPASSWORD": $("#pw1").val()
+                };
+                // console.log(payload);
+                $.post("/api/GD_USER/UPDATE?NAME=" + selectname, payload, function (data, resp) {
+                    if (resp == "success" && data.length != 0) {
+                        alert("修改完成！")
+                    } else {
+                        alert(err)
+                    }
+                })
+
+            }
+
+            function get_cookie(Name) {
+                var search = Name + "=" //查询检索的值
+                var returnvalue = ""; //返回值
+                if (parent.window.document.cookie.length > 0) {
+                    sd = parent.window.document.cookie.indexOf(search);
+                    if (sd != -1) {
+                        sd += search.length;
+                        end = parent.window.document.cookie.indexOf(";", sd);
+                        if (end == -1)
+                            end = parent.window.document.cookie.length;
+                        //unescape() 函数可对通过 escape() 编码的字符串进行解码。
+                        returnvalue = unescape(parent.window.document.cookie.substring(sd, end))
+                    }
+                }
+                return returnvalue;
+            }
+        </script>
+    </div>
+
+</body>
+
+</html>

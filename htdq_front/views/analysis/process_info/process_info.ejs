@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>加工信息总</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+</head>
+
+<div class="main">
+    <button class='export-image k-button' id='processimage'>导出Image</button>
+    <div id="chartRun" style="height: 300px"></div>
+    <div id="gridRun" style="height: 320px"></div>
+</div>
+<script src="/analysis/js/statement.js"></script>
+<script src="/analysis/js/perf_analysis.js"></script>
+<script>
+    $("#processimage").click(function () {
+        $("#chartRun").getKendoChart().exportImage({ paperSize: "auto", margin: { left: "1cm", top: "1cm", right: "1cm", bottom: "1cm" } }).done(function (data) {
+            kendo.saveAs({
+                dataURI: data,
+                fileName: "加工信息统计图.png",
+            });
+        });
+    });
+
+</script>
+<style>
+    .main {
+        height: 620px;
+    }
+</style>
+
+</body>
+
+</html>

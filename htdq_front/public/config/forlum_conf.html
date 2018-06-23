@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>报表公式配置</title>
+    <meta charset="utf-8">
+    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+    
+</head>
+<body>
+    <div id="window">
+        <fieldset>
+            <legend>公式列表</legend>
+            <div id="grid"></div>
+        </fieldset>
+        <br>
+        <form method="POST" action="/api/MDC_DSSEXPRESSIONS/Create">
+        <fieldset>
+        <legend>基本信息</legend>
+            <table>
+                <tr>
+                    <td>
+                        <pre>公式中文名称：</pre><input type="text" name="CNAME" value="" id="CNAME">
+                        <pre style="margin-left:50px">公式英文名称：</pre><input type="text" name="ENAME" value="" id="ENAME">
+                    </td>                  
+
+                </tr>
+                <tr>
+                    <td>
+                        <pre>呈 现  顺 序：</pre><input type="number" name="SORT" value="" id="SORT">
+                    </td>
+                </tr>
+                <tr>
+                    <td><pre>公 式  元 素：</pre><textarea rows="5" style="width:800px; vertical-align:text-top; margin-left:30px;" >元素名称                元素内容
+运行时间|Running        [Mdc_MdStatus.RUNNING]/3600
+开机时间|Power-on Time  [Mdc_MdStatus.ONLINE]/3600</textarea></td>
+                </tr>
+                <tr>                      
+                    <td><pre>公 式  内 容：</pre><textarea rows="5" style="width:800px; vertical-align:text-top; margin-left:30px;" name="EXPAND" id="EXPAND">[Mdc_MdStatus.RUNNING]/[Mdc_NormalTime]*100</textarea></td>
+                </tr>
+            </table>
+        </fieldset>
+        <br>
+        <p style="text-align: center">
+            <input type="button" onClick="addItem()" class="offline-button" id="add_item" value="添加">
+            <input class="offline-button" type="submit" value="保存" id="a_post">
+            <input class="offline-button" type="button" value="删除" id="deleItem">
+            <a class="offline-button" href="/">关闭</a>
+        </p>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        // var Data;
+        // $.get('/api/MDC_DSSEXPRESSIONS',function(data,status){
+        //     if (status == "success") {
+        //         Data = data;
+        //     }
+            
+        // });
+
+        var myWindow = $("#window");
+
+        function onClose() {
+            window.location.assign("/")
+        }
+        myWindow.kendoWindow({
+            width: "1000px",
+            title: "报表公式配置",
+            visible: false,
+            actions: [
+            "Minimize",
+            "Maximize",
+            "Close"
+            ],
+            close: onClose
+        }).data("kendoWindow").center().open();
+
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: "/api/MDC_DSSEXPRESSIONS",
+                    dataType: "json",
+                    type: "get"
+                }
+            },
+            batch: true,
+            pageSize: 5,
+            schema: {
+                model: {
+                    id: "ProductID",
+                    fields: {
+                        CNAME: { type: "string" },
+                        ENAME: { type: "string" },
+                        EXPAND: { type: "string" },
+                        SORT: { type: "number" }
+                    }
+                }
+            }
+        });
+
+        // dataSource.online(false);
+
+        $("#grid").kendoGrid({
+            dataSource: dataSource,
+            selectable: "multiple row",
+            change: onChange,
+            scrollable: true,
+            sortable: true,
+            filterable: true,
+            pageable: {
+                input: false,
+                numeric: false,
+                refresh: false
+            },
+            height: 250,
+            //toolbar: [{name:"create", text:''}],
+            columns: [
+            { field: "CNAME", title:"公式中文名称", width:"200px" },
+            { field: "ENAME", title:"公式英文名称", width:"200px" },
+            { field: "EXPAND", title:"公式内容" },
+            { field: "SORT", title:"呈现顺序", width:"100px" },
+            ]
+        });
+    }); 
+        function onChange(arg) {
+            // var selected = $.map(this.select(), function(item) {
+            //     return $(item).text();
+            // });
+
+            var grid = $("#grid").data("kendoGrid");
+            var data = grid.dataItem(grid.select());
+            // console.log(data.SORT);            
+            $("#CNAME").val(data.CNAME);
+            $("#ENAME").val(data.ENAME);
+            $("#SORT").val(data.SORT);
+
+        }
+
+        $('#a_post').click(function(){
+            $.post('/api/MDC_DSSEXPRESSIONS/Create', {'nike':0},
+                function(cdata) {
+                    console.log('ok', cdata)
+                })
+        });
+        $('#deleItem').click(function(){
+            $.post('/api/MDC_DSSEXPRESSIONS/Destroy', {'nike':0},
+                function(cdata) {
+                    console.log('ok', cdata)
+                })
+        });
+
+        function addItem(){
+            $("#CNAME").val("");
+            $("#ENAME").val("");
+            $("#SORT").val("");
+            $("#EXPAND").val("");
+        };
+        // $("#a_post").on("click",function(event){
+        // event.preventDefault();//使a自带的方法失效，即无法调整到href中的URL(http://www.baidu.com)
+        // $.ajax({
+        //    type: "POST",
+        //    url: "/api/MDC_DSSEXPRESSIONS",
+        //    contentType:"application/json",
+        //        data: JSON.stringify({param1:param1,param2:param2}),//参数列表
+        //        dataType:"json",
+        //        success: function(result){
+        //           //请求正确之后的操作
+        //       },
+        //       error: function(result){
+        //           //请求失败之后的操作
+        //       }
+        //   });
+        // });
+    </script>
+
+    <style type="text/css">
+        fieldset {
+            border: #CCCCCC 1px solid;
+        }
+
+        pre {
+            display: inline;
+        }
+
+        input {
+            margin-left: 30px;
+        }
+    </style>
+
+</body>
+</html>

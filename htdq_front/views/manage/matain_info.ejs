@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+
+</head>
+
+<body>
+    <div id="windows" style="margin:0 auto">
+        <h1 style="text-align:center">维修记录</h1>
+        <br>
+        <div id="formbody" style="width:40%;margin-left:30%;border:1px solid;text-align:center;background-color:bisque">
+            <form action="/api/HS_MAINTAIN/Create" id="myform" model="POST" style="text-align:center;margin:10px auto;">
+                <label>&nbsp;机&nbsp;床&nbsp;ID:&nbsp;</label>
+                <input disabled="true" class="k-textbox" type="text" id="MTID" value="<%= ID %>" />
+                <br>
+                <br>
+                <label>机床名称:&nbsp;</label>
+                <input disabled="true" class="k-textbox" type="text" id="NAME" />
+                <br>
+                <br>
+                <label>机床类型:&nbsp;</label>
+                <input disabled="true" class="k-textbox" type="text" id="TYPE" />
+                <br>
+                <br>
+                <label>维修人员:&nbsp;</label>
+                <input class="k-textbox" type="text" id="WORKER" required/>
+                <br>
+                <br>
+                <label>维修周期:&nbsp;</label>
+                <input class="k-textbox" type="text" id="PERIOD" required/>
+                <br>
+                <br>
+                <label>联系电话:&nbsp;</label>
+                <input class="k-textbox" type="text" id="PHONE" required/>
+                <br>
+                <br>
+                <label>维修时间:&nbsp;</label>
+                <input disabled="true" class="k-textbox" type="text" id="TIME" />
+                <br>
+                <br>
+                <label>维修内容&nbsp;</label>
+                <br>
+                <textarea id="CONTENT" type="text" style="border-radius:5px;width:50%;height: 100px;" name="CONTENT" required></textarea>
+                <br>
+                <input type="button" class="k-button" value="提交" onclick="submitForm();" />
+            </form>
+
+
+        </div>
+    </div>
+
+    <style type="text/css">
+        label {
+            font-weight: bold
+        }
+    </style>
+
+
+    <script>
+        $(document).ready(function () {
+            $("#windows").kendoWindow({
+                width: '100%',
+                actions: ["Minimize", "Maximize", "Close"],
+                close: onClose
+            }).data("kendoWindow").open();
+            function onClose() {
+                window.location.assign("../../");
+            }
+
+            ID = "<%= ID %>"
+            $.get("/api/MDC_MACHINETOOLS?ID=" + ID, function (mtool, status) {
+                if (status == "success" & mtool.length != 0) {
+                    $("#MTID").val(ID);
+                    $("#NAME").val(mtool[0].MATOLNAME);
+                    $("#TYPE").val(mtool[0].MATOLTYPE);
+                    $("#WORKER").val(mtool[0].WORKER);
+                    $("#PERIOD").val(mtool[0].PERIOD);
+                    $("#PHONE").val(mtool[0].PHONE);
+                    $("#TIME").val(kendo.toString(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                }
+            });
+
+        });
+        var validatable = $("#myform").kendoValidator().data("kendoValidator");
+        function submitForm() {
+            if (validatable.validate()) {
+                var payload = {
+                    "MTID": $("#MTID").val(),
+                    "TIME": $("#TIME").val(),
+                    "WORKER": $("#WORKER").val(),
+                    "PHONE": $("#PHONE").val(),
+                    "PERIOD": $("#PERIOD").val(),
+                    "CONTENT": $("#CONTENT").val(),
+                }
+                $.post("/api/HS_MAINTAIN/Create", payload, function (data) {
+                    if (data.error) {
+                        alert(data.error);
+                        window.location.reload();
+                    } else {
+                        alert("保存成功！" + "\n" + JSON.stringify(data, null, 4));
+                        window.location.assign("/users/login")
+                    }
+                }).error(function () {
+                    alert("保存错误！");
+                    window.location.reload();
+                });
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

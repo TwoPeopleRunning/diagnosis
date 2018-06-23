@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Basic usage</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+
+    <link href="views.css" rel="stylesheet">
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+
+</head>
+
+<body ng-app="myApp" ng-controller="DetailCtrl">
+
+    <div id="window">
+        <!-- 标题内容-->
+        <div style="background-color: orange;">
+            <p style="font-family: sans-serif;font-size: 20px;display: inline-block"> 设备信息: </p>
+            <p style="font-family: sans-serif;font-size: 20px;display: inline-block">{{mt.MATOLNAME}} ({{mt.MATOLIP}})</p>
+
+            <div style="text-align: left;margin: 10px 0px">
+                <p style="font-family: sans-serif;font-size: 20px;display: inline-block;margin: auto;position:absolute;margin: 10px 0px 5px 0px">
+                    设备状态:</p>
+                <br/>
+                <p style="display: inline-block;padding-left: 90px">
+                    <button ng-if="mt.params.STATUS=='ALARM'" type="button" style="float: left; margin:5px 5px; height: 40px;background-color: red">报警中</button>
+                    <button ng-if="mt.params.STATUS=='ONLINE'" type="button" style="float: left; margin:5px 5px; height: 40px;background-color: yellow">暂停中</button>
+                    <button ng-if="mt.params.STATUS=='RUNNING'" type="button" style="float: left; margin:5px 5px ; height: 40px;background-color: green">运行中</button>
+                </p>
+
+
+
+            </div>
+            <table style="width: 100%">
+                <tr>
+                    <td style="width: 33%; font-size:18px;">操作模式：{{mt.params.ControllerMode}}</td>
+                    <td style="width: 33%; font-size:18px;">程序名称：{{mt.params.Program}}</td>
+                    <td style="width: 33%; font-size:18px;">当前刀号：{{mt.params.ToolId}}</td>
+                </tr>
+            </table>
+        </div>
+        <!-- 界面1-->
+        <div id="tabstrip">
+
+            <ul>
+                <li class="k-state-active">
+                    基本信息
+                </li>
+                <!-- <li>
+                    报警信息
+                </li>
+                <li>
+                    详细信息
+                </li>
+                <li>
+                    功率信息
+                </li> -->
+            </ul>
+
+            <script>
+                $(document).ready(function () {
+                    $("#tabstrip").kendoTabStrip();
+                });
+            </script>
+
+            <div>
+                <!-- 框1 -->
+                <div style="border-style: solid;border-width: 1px;width: 100%;float: left;">
+                    <p style="font-weight: bold;">主轴转速S</p>
+                    <br>
+                    <table style="width: 40%;float: left; " cellpadding="10px">
+
+                        <tr>
+                            <td>当前值：</td>
+                            <td>{{mt.params.RotaryVelocity}}</td>
+                        </tr>
+                        <tr>
+                            <td>设定值：</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>设定比：</td>
+                            <td>0</td>
+                        </tr>
+                    </table>
+
+                    <!-- 仪表盘1 -->
+                    <!-- <div id="gauge-container1" style=" width: 40%; float: right;margin-top: -4%;">
+                        <div id="gauge1" data-scale="{ min:0, max: 200}"> </div>
+                        <input id="gauge-value1" value="0">
+                    </div> -->
+
+                </div>
+
+                <!-- 框3 -->
+                <!-- <div style="border-style: solid;border-width: 1px;width: 24%;height:400px;float:right;margin:0 auto"> -->
+
+                <!--    温度计  -->
+                <!-- <div id="example" style="margin-top: 100px">
+                        <div data-role="lineargauge" data-scale="{ min:0, max: 150, vertical: true}" data-bind="visible:isVisible,value:selectedNumber"></div>
+
+                        <div style="width: 100%;text-align: center;">
+                            <h4>Value</h4>
+                            <input data-role="slider" data-show-buttons="false" data-min="0" data-max="150" data-small-step="20" data-large-step="50"
+                                data-bind="value: selectedNumber">
+                        </div>
+                        <br>
+                        <p style="text-align: center;font-size:2px;font-family: serif;">主轴功率</p>
+                        <script>
+                            function createGauge() {
+                                var viewModel = kendo.observable({
+                                    selectedNumber: 10,
+                                    isVisible: true
+                                });
+                                kendo.bind($("#example"), viewModel);
+                            }
+                            $(document).ready(createGauge).bind("kendo:skinChange", createGauge);
+                        </script>
+                    </div>
+                </div> -->
+
+                <!-- 框2 -->
+                <div style="border-style: solid;border-width: 1px; width: 100%;float: left; margin-top: 10px;">
+                    <p style="font-weight: bold;">进给速度F</p>
+                    <div>
+                        <br>
+                        <table style="width: 40%;float: left;" cellpadding="10px">
+                            <tr>
+                                <td>当前值：</td>
+                                <td>{{mt.params.PathFeedrate}}</td>
+                            </tr>
+                            <tr>
+                                <td>设定值：</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>设定比：</td>
+                                <td>0</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- 仪表盘2-->
+                    <!-- <div id="gauge-container2" style=" width: 40%; float: right;margin-top: -4%;">
+                        <div id="gauge2"> </div>
+                        <input id="gauge-value2" value="0">
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="js/detail.js"></script>
+<script src="/js/angular.min.js"></script>
+
+<script>
+    var app = angular.module('myApp', []);
+    app.controller('DetailCtrl', function ($scope, $http, $rootScope) {
+        console.log("DetailCtrl init")
+        var _devices;
+        var _indexes = {};
+        //设备状态更新上传
+        const GenQueryPayload = function (mt, params) {
+            //{"action":"update","apikey":"e8039c44-5483-4166-91ee-ba6790f39afb","deviceid":41,"params":{"status":"ONLINE"}}
+            var payload = { action: 'query', "userAgent": "web" };
+            payload.apikey = mt.MATOLGRPID;
+            payload.deviceid = mt.ID;
+            payload.params = params;
+            console.log('GenUpdatePayload:', (new Date()).toLocaleString(), payload);
+            return payload;
+        }
+
+        function WSConnect(devices) {
+            if ("WebSocket" in window) {
+                // 打开一个 web socket
+                var ws = new WebSocket("ws://<%=BACK.HOST%>:<%=BACK.PORT%>/api/ws");
+                ws.binaryType = "arraybuffer";
+                var _pending = {};
+                var _send = function (data, successCallback, errorCallback) {
+                    if (!angular.isObject(data)) {
+                        return;
+                    }
+
+                    data.sequence = data.deviceid.toString() + Date.now();
+                    _pending[data.sequence] = {
+                        success: successCallback,
+                        error: errorCallback
+                    };
+                    // console.log("ws send:",JSON.stringify(data));
+                    ws.send(JSON.stringify(data));
+                };
+
+                ws.onopen = function () {
+                    // ws.send("发送数据");
+                    console.log("Web Socket 已连接上");
+                    setInterval(function () {
+                        devices.forEach(function (mt) {
+                            var params = ['all'];
+                            // var params = ['key','STATUS','BEGINTIME'];
+                            _send(GenQueryPayload(mt, params), function (data) {
+                                mt.params = mt.params || {};
+                                angular.extend(mt.params, data.params);
+                                $rootScope.$apply();
+                            }, function (error) {
+                                console.log(mt.ID, error);
+                            });
+                        }, this);
+                    }, 1000);
+                };
+
+                ws.onmessage = function (evt) {
+                    console.log(evt.data);
+                    var data = JSON.parse(evt.data);
+
+                    // request
+                    if ('action' in data) {
+                        var _device = _indexes[data.deviceid.toString()];
+                        if (!_device) return;
+
+                        if (data.action === 'sysmsg') {
+                            if ('online' in data.params) {
+                                _device.online = data.params.online;
+                                //注释以下，因为设备在线后设备首先会上传其状态，APP会收到更新，无需设备在线查询其状态
+                                if (_device.online) { //设备在线查询所有状态
+                                    _send(GenQueryPayload(_device, ["any_not_exist_property"]), function (data) {
+                                        _device.params = _device.params || {};
+                                        angular.extend(_device.params, data.params);
+                                        $rootScope.$apply();
+                                        // console.log(JSON.stringify(_device));
+                                    }, function (error) {
+                                        console.log(_device.deviceid, error);
+                                    });
+                                }
+                            }
+
+                            // manually trigger AngularJS digest
+                            // so modified device property will be visible on UI
+                            $rootScope.$apply();
+                            return;
+                        }
+
+                        if (data.action === 'update') {
+                            _device.params = _device.params || {};
+                            angular.extend(_device.params, data.params);
+                            // manually trigger AngularJS digest
+                            // so modified device property will be visible on UI
+                            $rootScope.$apply();
+                        }
+                    }
+
+                    // response
+                    else if ('error' in data) {
+                        // dummy query response
+                        if (!('sequence' in data)) return;
+
+                        var _callback = _pending[data.sequence];
+                        if (!_callback) return;
+
+                        if (data.error) {
+                            _callback.error(data.error);
+                        }
+                        else {
+                            _callback.success(data);
+                        }
+                    }
+                };
+
+                ws.onclose = function () {
+                    console.log("Web Socket 连接已关闭...");
+                };
+            }
+
+            else {
+                // 浏览器不支持 WebSocket
+                alert("您的浏览器不支持 WebSocket!");
+            }
+        }
+
+        $http({
+            method: 'GET',
+            url: '/api/MDC_MACHINETOOLS?ID=<%=ID%>'
+        }).then(function successCallback(res) {
+            console.log(res.data);
+            _devices = res.data;
+            angular.forEach(_devices, function (_device) {
+                _device.params = _device.params || {};
+                _indexes[_device.ID.toString()] = _device;
+            });
+            $scope.devices = _devices;
+            $scope.mt = $scope.devices[0];
+            console.log($scope.mt);
+            WSConnect($scope.devices);
+        }, function errorCallback(res) {
+            console.log(res);
+        });
+    });
+
+</script>
+
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>公式配置</title>
+    <meta charset="utf-8">
+    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+
+</head>
+<body>
+    <div>
+        <p >当前设定的设备为:<%=name %></p>
+    </div>
+       <div id="tabstrip">
+        <ul>
+            <li class="k-state-active">
+                基本公式
+            </li>
+            <li>
+                自定义公式   
+            </li>
+        </ul>
+        <div class="box-col">
+            <div style="margin: 0px" id="grid1" data-role="grid" class="k-grid k-widget k-editable">
+                <div class="k-header k-grid-toolbar">
+                <a class="k-button k-button-icontext k-grid-add" href="#"><span class="k-icon k-i-add"></span>添加</a>
+                <a class="k-button k-button-icontext" href="#" >设备映射选择</a>
+                </div>
+                <div class="k-grid-header" style="padding-right: 10px;">
+                    <div class="k-grid-header-wrap k-auto-scrollable">
+                        <table role="grid">
+                        <thead role="rowgroup">
+                            <tr role="row">
+                                <th scope="col" role="columnheader" align=center rowspan="1" data-index="1" id="symbol" class="k-header"><p style="text-align: center;">标识</p></th>
+                                <th scope="col" role="columnheader" rowspan="1" data-index="2" id="name" class="k-header"><p style="text-align: center;">名称</p></th>
+                                <th scope="col" role="columnheader" rowspan="1" data-index="3" id="color" class="k-header"><p style="text-align: center;">颜色</p></th>
+                                <th scope="col" role="columnheader" rowspan="1" data-index="4" id="content" class="k-header"><p style="text-align: center;">内容</p></th>
+                                <th scope="col" role="columnheader" rowspan="1" data-index="5" id="neg_name" class="k-header"><p style="text-align: center;">反状态名称</p></th>
+                                <th scope="col" role="columnheader" rowspan="1" data-index="6" id="neg_color" class="k-header"><p style="text-align: center;">反状态颜色</p></th>
+                                <th scope="col" role="columnheader" rowspan="1" data-index="7" id="discribe" class="k-header"><p style="text-align: center;">描述</p></th>
+                                <th scope="col" id="other1" rowspan="1" data-index="8" width=250px class="k-header">&nbsp;</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="k-grid-content k-auto-scrollable" style="height: 343px;">
+                <table role="grid" style="height: auto;">
+                <tbody role="rowgroup">
+                    <tr data-uid="toolifo" role="row" class="k-grid-edit-row" data-role="editable">
+                        <td role="gridcell" data-container-for="symbol1" ><input class="k-input k-textbox" name="symbol1" data-bind="value:symbol1" type="text"></td>
+                        <td role="gridcell" data-container-for="name1"><input class="k-input k-textbox" name="name1" data-bind="value:name1" type="text"></td>
+                        <td role="gridcell" data-container-for="color1"><input class="k-input k-textbox" name="color1" data-bind="value:color1" type="text"></td>
+                        <td role="gridcell" data-container-for="content1"><input class="k-input k-textbox" name="content1" data-bind="value:content1" type="text"></td>
+                        <td role="gridcell" data-container-for="neg_name1"><input class="k-input k-textbox" name="neg_name1" data-bind="value:neg_name1" type="text"></td>
+                        <td role="gridcell" data-container-for="neg_color1"><input class="k-input k-textbox" name="neg_color1" data-bind="value:neg_color1" type="text"></td>
+                        <td role="gridcell" data-container-for="discribe1"><input class="k-input k-textbox" name="discribe1" data-bind="value:discribe1" type="text"></td>
+                        <td role="gridcell">
+                            <a class="k-button k-button-icontext k-primary k-grid-update" href="#"><span class="k-icon k-i-update"></span>Update</a>
+                            <a class="k-button k-button-icontext k-grid-cancel" href="#"><span class="k-icon k-i-cancel"></span>Cancel</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="k-pager-wrap k-grid-pager k-widget k-floatwrap" data-role="pager"><a href="#" aria-label="Go to the first page" title="Go to the first page" class="k-link k-pager-nav k-pager-first k-state-disabled"
+            data-page="1" tabindex="-1"><span class="k-icon k-i-seek-w"></span></a>
+            <a href="#" aria-label="Go to the previous page" title="Go to the previous page" class="k-link k-pager-nav  k-state-disabled"
+            data-page="1" tabindex="-1"><span class="k-icon k-i-arrow-w"></span></a>
+            <ul class="k-pager-numbers k-reset">
+                <li class="k-current-page"><span class="k-link k-pager-nav">1</span></li>
+                <li><span class="k-state-selected">1</span></li>
+            </ul><a href="#" aria-label="Go to the next page" title="Go to the next page" class="k-link k-pager-nav  k-state-disabled"
+            data-page="1" tabindex="-1"><span class="k-icon k-i-arrow-e"></span></a>
+            <a href="#" aria-label="Go to the last page" title="Go to the last page" class="k-link k-pager-nav k-pager-last k-state-disabled"
+            data-page="1" tabindex="-1"><span class="k-icon k-i-seek-e"></span></a>
+            <a href="#" class="k-pager-refresh k-link" title="Refresh"><span class="k-icon k-i-refresh">Refresh</span></a>
+            <span class="k-pager-info k-label">1 - 1 of 1 items</span>
+        </div>
+    </div>
+</div>
+<div class="box-col">
+    <!--                 <div style="width: 700px" id="grid"></div> -->
+    <div style="margin: 0px" id="grid2" data-role="grid" class="k-grid k-widget k-editable">
+        <div class="k-header k-grid-toolbar"><a class="k-button k-button-icontext k-grid-add" href="#"><span class="k-icon k-i-add"></span>添加</a>
+        <a class="k-button k-button-icontext" href="#">设备映射选择</a>
+        </div>
+        <div class="k-grid-header" style="padding-right: 10px;">
+            <div class="k-grid-header-wrap k-auto-scrollable">
+                <table role="grid">
+                    <colgroup>
+                    <col style="width:120px">
+                    <col style="width:120px">
+                    <col style="width:120px">
+                    <col style="width:120px">
+                    <col style="width:120px">
+                    <col style="width:120px">
+                    <col style="width:120px">
+                    <col style="width:120px">
+                </colgroup>
+                <thead role="rowgroup">
+                    <tr role="row">
+                        <th scope="col" role="columnheader" align=center rowspan="1" data-index=""1 id="symbol" class="k-header"><p style="text-align: center;">标识</p></th>
+                        <th scope="col" role="columnheader" rowspan="1" data-index="2" id="name" class="k-header"><p style="text-align: center;">名称</p></th>
+                        <th scope="col" role="columnheader" rowspan="1" data-index="3" id="color" class="k-header"><p style="text-align: center;">颜色</p></th>
+                        <th scope="col" role="columnheader" rowspan="1" data-index="4" id="content" class="k-header"><p style="text-align: center;">内容</p></th>
+                        <th scope="col" role="columnheader" rowspan="1" data-index="5" id="neg_name" class="k-header"><p style="text-align: center;">反状态名称</p></th>
+                        <th scope="col" role="columnheader" rowspan="1" data-index="6" id="neg_color" class="k-header"><p style="text-align: center;">反状态颜色</p></th>
+                        <th scope="col" role="columnheader" rowspan="1" data-index="7" id="discribe" class="k-header"><p style="text-align: center;">描述</p></th>
+                        <th scope="col" id="other1" rowspan="1" data-index="8" width=250px class="k-header">&nbsp;</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div class="k-grid-content k-auto-scrollable" style="height: 343px;">
+        <table role="grid" style="height: auto;">
+        <tbody role="rowgroup">
+            <tr data-uid="toolifo_usr" role="row" class="k-grid-edit-row" data-role="editable">
+               <td role="gridcell" data-container-for="symbol2" ><input class="k-input k-textbox" name="symbol2" data-bind="value:symbol2" type="text"></td>
+                <td role="gridcell" data-container-for="name2"><input class="k-input k-textbox" name="name2" data-bind="value:name2" type="text"></td>
+                <td role="gridcell" data-container-for="color2"><input class="k-input k-textbox" name="color2" data-bind="value:color2" type="text"></td>
+                <td role="gridcell" data-container-for="content2"><input class="k-input k-textbox" name="content2" data-bind="value:content2" type="text"></td>
+                <td role="gridcell" data-container-for="neg_name2"><input class="k-input k-textbox" name="neg_name2" data-bind="value:neg_name2" type="text"></td>
+                <td role="gridcell" data-container-for="neg_color2"><input class="k-input k-textbox" name="neg_color2" data-bind="value:neg_color2" type="text"></td>
+                <td role="gridcell" data-container-for="discribe2"><input class="k-input k-textbox" name="discribe2" data-bind="value:discribe2" type="text"></td>
+                <td role="gridcell">
+                    <a class="k-button k-button-icontext k-primary k-grid-update" href="#"><span class="k-icon k-i-update"></span>Update</a>
+                    <a class="k-button k-button-icontext k-grid-cancel" href="#"><span class="k-icon k-i-cancel"></span>Cancel</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="k-pager-wrap k-grid-pager k-widget k-floatwrap" data-role="pager"><a href="#" aria-label="Go to the first page" title="Go to the first page" class="k-link k-pager-nav k-pager-first k-state-disabled"
+    data-page="1" tabindex="-1"><span class="k-icon k-i-seek-w"></span></a>
+    <a href="#" aria-label="Go to the previous page" title="Go to the previous page" class="k-link k-pager-nav  k-state-disabled"
+    data-page="1" tabindex="-1"><span class="k-icon k-i-arrow-w"></span></a>
+    <ul class="k-pager-numbers k-reset">
+        <li class="k-current-page"><span class="k-link k-pager-nav">1</span></li>
+        <li><span class="k-state-selected">1</span></li>
+    </ul><a href="#" aria-label="Go to the next page" title="Go to the next page" class="k-link k-pager-nav  k-state-disabled"
+    data-page="1" tabindex="-1"><span class="k-icon k-i-arrow-e"></span></a>
+    <a href="#" aria-label="Go to the last page" title="Go to the last page" class="k-link k-pager-nav k-pager-last k-state-disabled"
+    data-page="1" tabindex="-1"><span class="k-icon k-i-seek-e"></span></a>
+    <a href="#" class="k-pager-refresh k-link" title="Refresh"><span class="k-icon k-i-refresh">Refresh</span></a>
+    <span class="k-pager-info k-label">1 - 1 of 1 items</span>
+</div>
+</div>
+</div>
+</div>   
+
+<style>
+    #tabstrip h2 {
+        font-weight: lighter;
+        font-size: 5em;
+        line-height: 1;
+        padding: 0 0 0 30px;
+        margin: 0;
+    }
+
+    #tabstrip h2 span {
+        background: none;
+        padding-left: 2px;
+        font-size: .2em;
+        vertical-align: top;
+    }
+
+    #tabstrip p {
+
+        text-align: center;
+    }
+</style>
+
+
+<script>
+    $(document).ready(function() {
+        $("#tabstrip").kendoTabStrip({
+            animation:  {
+                open: {
+                    effects: "fadeIn"
+                }
+            }
+        });
+    });
+    var dataSource1 = new kendo.data.DataSource({
+        offlineStorage: "<%=name %>"+"offline-kendo-demo1",
+        batch: true,
+        pageSize: 10,
+        schema: {
+            model: {
+                id: "toolformula",
+                fields: {
+                    symbol1: { type: "text" },
+                    name1: { type: "text"},
+                    color1: { type: "text"},
+                    content1: { type: "text"},
+                    neg_name1: { type: "text"},
+                    neg_color1: { type: "text"},
+                    discribe1: { type: "text"},
+                    // UnitsInStock: { type: "number", validation: { min: 0, required: true } }
+                }
+            }
+        }
+    });
+    var dataSource2 = new kendo.data.DataSource({
+        offlineStorage: "<%=name %>"+"toolformula_usr",
+        batch: true,
+        pageSize: 10,
+        schema: {
+            model: {
+                id: "toolid_usr",
+                fields: {
+                    symbol2: { type: "text" },
+                    name2: { type: "text"},
+                    color2: { type: "text"},
+                    content2: { type: "text"},
+                    neg_name2: { type: "text"},
+                    neg_color2: { type: "text"},
+                    discribe2: { type: "text"},
+                    // UnitsInStock: { type: "number", validation: { min: 0, required: true } }
+                }
+            }
+        }
+    });
+            dataSource1.online(false);
+            dataSource2.online(false);
+    $("#grid1").kendoGrid({
+        dataSource: dataSource1,
+        pageable: {
+            refresh: true
+        },
+        height: 600,
+        toolbar: [ "create" ],
+        columns: [
+        "symbol1",
+        "name1",
+        "color1",
+        "content1",
+        "neg_name1",
+        "neg_color1",
+        "discribe1",
+        { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+        ],
+        editable: "inline"
+    });
+    $("#grid2").kendoGrid({
+        dataSource: dataSource2,
+        pageable: {
+            refresh: true
+        },
+        height: 600,
+        toolbar: [ "create" ],
+        columns: [
+        "symbol2",
+        "name2",
+        "color2",
+        "content2",
+        "neg_name2",
+        "neg_color2",
+        "discribe2",
+        { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+        ],
+        editable: "inline"
+    });
+</script>
+</body>
+
+</html>

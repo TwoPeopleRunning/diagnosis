@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="../../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../../js/jquery.min.js"></script>
+    <script src="../../../js/jszip.min.js"></script>
+    <script src="../../../js/kendo.all.min.js"></script>
+    <script src="../../content/shared/js/console.js"></script>
+    <script>
+        
+    </script>
+</head>
+<html>
+<body>
+<div id="grid"></div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var products = [{
+            name : "VMC850P-274",
+            number : "02071270101274",
+            ip : "10.202.196.27",
+            port: 8193,
+            collect_type: "FANUC",
+            yes_no: true
+        },
+        {
+            name : "VMC850P-276",
+            number : "02071270101274",
+            ip : "10.202.196.27",
+            port: 8193,
+            collect_type: "FANUC",
+            yes_no: true
+        },
+        {
+            name : "VMC850P-281",
+            number : "02071270101274",
+            ip : "10.202.196.27",
+            port: 8193,
+            collect_type: "FANUC",
+            yes_no: true
+        },
+        {
+            name : "VX500Z-284",
+            number : "02071270101274",
+            ip : "10.202.196.27",
+            port: 8193,
+            collect_type: "FANUC",
+            yes_no: true
+        },
+        {
+            name : "VX500Z-288",
+            number : "02071270101274",
+            ip : "10.202.196.27",
+            port: 8193,
+            collect_type: "FANUC",
+            yes_no: true
+        },
+        {
+            name : "VX500Z-291",
+            number : "02071270101274",
+            ip : "10.202.196.27",
+            port: 8193,
+            collect_type: "FANUC",
+            yes_no: true
+        },
+        {
+            name : "VX500Z-292",
+            number : "02071270101274",
+            ip : "10.202.196.27",
+            port: 8193,
+            collect_type: "FANUC",
+            yes_no: true
+        },
+        {
+            name : "VX500Z-288",
+            number : "02071270101274",
+            ip : "10.202.196.27",
+            port: 8193,
+            collect_type: "FANUC",
+            yes_no: true
+        }];
+        $("#grid").kendoGrid({
+            dataSource: {
+                data: products,
+                schema: {
+                    model: {
+                        fields: {
+                            name: { type: "string" },
+                            number: { type: "string" },
+                            ip: { type: "string" },
+                            port: { type: "number" },
+                            collect_type: { type: "string" },
+                            yes_no: { type: "boolean" }
+
+                        }
+                    }
+                },
+                pageSize: 8
+            },
+            scrollable: true,
+            sortable: true,
+            filterable: true,
+            pageable: {
+                input: true,
+                numeric: false
+            },
+            columns: [
+            { field: "name", title: "名称" },
+            { field: "number", title: "编码" },
+            { field: "ip", title: "IP" },
+            { field: "port", title:"端口" },
+            { field: "collect_type", title:"采集类型" },
+            { field: "yes_no", title:"是否启用监控" },
+            ]
+        });
+
+    });
+</script>
+</body>
+</html>

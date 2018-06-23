@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>幻灯片</title>
+    <link rel="stylesheet" href="/css/jquery.fullPage.css">
+    <style>
+        .section {
+            text-align: center;
+            font: 50px "Microsoft Yahei";
+            color: #fff;
+        }
+        
+        .iframe {
+            margin-top: 10%;
+            margin: 0 auto;
+            height: 100%;
+            width: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dowebok">
+        <div class="section" style="background-color:blanchedalmond">
+            <div class="iframe">
+                <iframe height="50%" width="50%" scrolling=no src="/analysis/alarm_info/alarm_info?mtid=41,42,44&&BEGINTIME=2016-02-04T12:22:33Z&&ENDTIME=2016-02-06T12:22:33Z"> 
+             </iframe>
+            </div>
+        </div>
+
+        <div class="section ">
+            <div class="iframe">
+                <iframe scrolling=no src="/analysis/meta_analysis/meta_analysis?mtid=41,42,44&&BEGINTIME=2016-02-04T12:22:33Z&&ENDTIME=2016-02-06T12:22:33Z"> 
+             </iframe>
+            </div>
+        </div>
+        <div class="section iframe">
+            <div class="iframe">
+                <iframe scrolling=no src="/analysis/effct_analysis/opert_efficiency?mtid=41,42,44&&BEGINTIME=2016-02-04T12:22:33Z&&ENDTIME=2016-02-06T12:22:33Z"> 
+             </iframe>
+            </div>
+        </div>
+        <div class="section iframe">
+            <div class="iframe">
+                <iframe scrolling=no src="/analysis/effct_analysis/utiliz_efficiency?mtid=41,42,44&&BEGINTIME=2016-02-04T12:22:33Z&&ENDTIME=2016-02-06T12:22:33Z"> 
+             </iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.fullPage.min.js"></script>
+    <script>
+        $(function() {
+            $('#dowebok').fullpage({
+                // sectionsColor: ['#1bbc9b', '#4BBFC3', '#7BAABE', '#f90'],
+                continuousVertical: true
+            });
+
+            setInterval(function() {
+                $.fn.fullpage.moveSectionDown();
+            }, 5000);
+        });
+    </script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>历史状态图</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script src="/js/echarts.js"></script>
+</head>
+
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div>当前时间：
+        <input id="datepicker" />
+    </div>
+    <div id="newDialog" style="width:900px;height:450px;font-size:12px"></div>
+
+
+
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('newDialog'));
+
+        function get_cookie(Name) {
+            var search = Name + "=" //查询检索的值
+            var returnvalue = ""; //返回值
+            if (parent.window.document.cookie.length > 0) {
+                sd = parent.window.document.cookie.indexOf(search);
+                if (sd != -1) {
+                    sd += search.length;
+                    end = parent.window.document.cookie.indexOf(";", sd);
+                    if (end == -1)
+                        end = parent.window.document.cookie.length;
+                    //unescape() 函数可对通过 escape() 编码的字符串进行解码。
+                    returnvalue = unescape(parent.window.document.cookie.substring(sd, end))
+                }
+            }
+            return returnvalue;
+        };
+
+        $("#datepicker").kendoDatePicker({
+            value: new Date(),
+            change: updateBar
+        });
+
+        var types = [{
+            name: 'Running',
+            color: '#006030'
+        }, {
+            name: 'ONLINE',
+            color: '#FFD306'
+        }, {
+            name: 'ALRAM',
+            color: '#EA0000'
+        }, {
+            name: 'OFFLINE',
+            color: '#8E8E8E'
+        }];
+
+        function getColor(typename) {
+            if (typename == "RUNNING") {
+                return types[0].color;
+            };
+            if (typename == "ONLINE") {
+                return types[1].color;
+            }
+            if (typename == "ALRAM") {
+                return types[2].color;
+            }
+            if (typename == "OFFLINE") {
+                return types[3].color;
+            }
+        };
+        //时间转换
+        var convertTime = function (date) {
+            var timestamp = Date.parse(date);
+            return timestamp / 1000;
+        };
+        //数据端时间判断
+        var Jugetime = function (data, BEGINTIME, ENDTIME) {
+            if (data.BEGINTIME < BEGINTIME & BEGINTIME < data.ENDTIME) {
+                data.DURATION = convertTime(data.ENDTIME) - convertTime(BEGINTIME);
+                data.BEGINTIME = BEGINTIME;
+            }
+            if (data.BEGINTIME < ENDTIME & ENDTIME < data.ENDTIME) {
+                data.DURATION = convertTime(ENDTIME) - convertTime(data.BEGINTIME);
+                data.ENDTIME = ENDTIME
+            }
+            return [data.DURATION, data.BEGINTIME, ENDTIME]
+        }
+        // 基于准备好的dom，初始化echarts实例
+        function updateBar() {
+
+            Start = new Date($("#datepicker").val()).getTime();
+            End = new Date(Start + 86400000);
+            Tools = JSON.parse(get_cookie("checked"));
+            var machines = [];
+            var StatusData = [];
+            var machines_data = [];
+            var baseTime = Start;
+            var flag = 0;
+            var totallength = 0;
+
+
+
+            Tools.forEach(function (Mtool, index) {
+                var payload = {
+                    'MTID': Mtool.id,
+                    'BEGINTIME': new Date(Start),
+                    'ENDTIME': End,
+                };
+
+                $.post("/api/MDC_MDSTATUS", payload, function (data, resp) {
+                    if (resp == "success" && data.length != 0) {
+                        StatusData.push(data);
+                        machines.push(Mtool.name);
+                        totallength += data.length;
+                    }
+                    if (data.length == 0) {
+                        flag += 1;
+                    }
+                    while (StatusData.length == Tools.length - flag) {
+                        // console.log(StatusData.length);
+                        if (StatusData.length == 0) {
+                            // console.log("无当日数据，请重新选择");
+                            alert("无当日数据，请重新选择");
+                            break;
+                        }
+                        for (var i = 0; i < StatusData.length; i++) {
+                            StatusData[i].forEach(function (status, index) {
+                                if ([status.DURATION, status.BEGINTIME, status.ENDTIME] = Jugetime(status, new Date(Start), End)) {
+                                    machines_data.push({
+                                        name: status.STATUS,
+                                        value: [
+                                            i,
+                                            (new Date(status.BEGINTIME)).getTime(),
+                                            (new Date(status.ENDTIME)).getTime(),
+                                            status.DURATION * 1000
+                                        ],
+                                        itemStyle: {
+                                            normal: {
+                                                color: getColor(status.STATUS)
+                                            }
+                                        }
+                                    });
+                                }
+
+
+                                while (machines_data.length == totallength) {
+                                    option = {
+                                        tooltip: {
+                                            formatter: function (params) {
+                                                return params.name + ': ' + params.value[3] / 1000 + ' s';
+                                            }
+                                        },
+                                        title: {
+                                            text: '设备运行状态大数据画像',
+                                            left: 'center',
+                                            top: 0,
+                                        },
+                                        legend: {
+                                            show: true,
+                                            orient: 'horizontal',
+                                            x: 'center',
+                                            y: 'bottom',
+                                            data: ['运行', '空闲', '报警', '关机'],
+                                        },
+
+
+
+                                        //    //区域缩放
+                                        dataZoom: [{
+                                            type: 'slider',
+                                            filterMode: 'weakFilter',
+                                            showDataShadow: false,
+                                            top: 400,
+                                            height: 10,
+                                            borderColor: 'transparent',
+                                            backgroundColor: '#e2e2e2',
+                                            handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
+                                            handleSize: 20,
+                                            handleStyle: {
+                                                shadowBlur: 6,
+                                                shadowOffsetX: 1,
+                                                shadowOffsetY: 2,
+                                                shadowColor: '#aaa'
+                                            },
+                                            labelFormatter: ''
+                                        }, {
+                                            type: 'inside',
+                                            filterMode: 'weakFilter'
+                                        }],
+
+                                        grid: {
+                                            height: 300
+                                        },
+                                        xAxis: {
+                                            min: Start,
+                                            scale: true,
+                                            axisLabel: {
+                                                formatter: function (val) {
+                                                    return new Date(val).toLocaleTimeString();
+                                                }
+                                            }
+                                        },
+
+                                        yAxis: {
+                                            data: machines,
+                                        },
+                                        series: [{
+                                            type: 'custom',
+                                            renderItem: renderItem,
+                                            itemStyle: {
+                                                normal: {
+                                                    opacity: 0.8
+                                                }
+                                            },
+                                            encode: {
+                                                x: [0, 2],
+                                                y: 0
+                                            },
+                                            data: machines_data
+                                        }, {
+                                            type: "bar",
+                                            name: "运行",
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#006030'
+                                                }
+                                            }
+                                        }, {
+                                            type: "bar",
+                                            name: "空闲",
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#FFD306'
+                                                }
+                                            }
+                                        }, {
+                                            type: "bar",
+                                            name: "报警",
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#EA0000'
+                                                }
+                                            }
+                                        }, {
+                                            type: "bar",
+                                            name: "关机",
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#8E8E8E'
+                                                }
+                                            }
+                                        }]
+                                    };
+                                    myChart.clear();
+                                    myChart = echarts.init(document.getElementById('newDialog'));
+                                    myChart.setOption(option);
+                                    // console.log(machines)
+                                    break;
+                                }
+                            })
+                        }
+                        // console.log(machines_data)
+
+
+
+                        break;
+                    }
+                });
+            });
+        }
+
+        function renderItem(params, api) {
+            var categoryIndex = api.value(0);
+            var start = api.coord([api.value(1), categoryIndex]);
+            var end = api.coord([api.value(2), categoryIndex]);
+            var height = api.size([0, 1])[1] * 0.6;
+
+
+            return {
+                type: 'rect',
+                shape: echarts.graphic.clipRectByRect({
+                    x: start[0],
+                    y: start[1] - height / 2,
+                    width: end[0] - start[0],
+                    height: height
+                }, {
+                        x: params.coordSys.x,
+                        y: params.coordSys.y,
+                        width: params.coordSys.width,
+                        height: params.coordSys.height
+                    }),
+                style: api.style()
+            };
+        };
+        updateBar();
+        // 使用刚指定的配置项和数据显示图表。
+    </script>
+</body>
+
+</html>

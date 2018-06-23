@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/analysis/css/outline.css" />
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+
+</head>
+
+<body>
+    <div class="top">
+        总利用率=运行时间/自然时间
+    </div>
+    <!-- <div>
+				<select id="machine_tool_list">
+					<option>选择设备</option>
+				</select>
+			</div> -->
+    <div class="charts">
+        <div>
+            <div class="pillar" id="pillar"></div>
+            <!-- <div class="pipe" id="pipe"></div> -->
+        </div>
+        <div class="gaue3">
+            <div class="gaue" id="guae1"></div>
+            <div class="gaue" id="guae2"></div>
+            <div class="gaue" id="guae3"></div>
+        </div>
+    </div>
+</body>
+<script src="/js/echarts.js"></script>
+<script src="/analysis/js/statement.js"></script>
+<script src="/analysis/js/perf_analysis.js"></script>
+<script>
+
+    var guae1 = echarts.init(document.getElementById('guae1'));
+    var guae2 = echarts.init(document.getElementById('guae2'));
+    var guae3 = echarts.init(document.getElementById('guae3'));
+    var pillar = echarts.init(document.getElementById('pillar'));
+
+    // //用于使chart自适应高度和宽度,通过窗体高宽计算容器高宽
+    var resizeMainContainer = function () {
+        document.getElementById('guae1').style.width = 0.32 * window.innerWidth + 'px';
+        document.getElementById('guae2').style.width = 0.32 * window.innerWidth + 'px';
+        document.getElementById('guae3').style.width = 0.32 * window.innerWidth + 'px';
+        document.getElementById('pillar').style.width = window.innerWidth + 'px';
+    };
+    //设置div容器高宽
+    resizeMainContainer();
+    // // 初始化图表
+    // var mainChart = echarts.init(mainContainer);
+
+    $(window).on('resize', function () {//
+        //屏幕大小自适应，重置容器高宽
+        resizeMainContainer();
+        guae1.resize();
+        guae2.resize();
+        guae3.resize();
+        pillar.resize();
+    });
+
+
+    var Interval2 = setInterval(function () {
+        while (Eff_result.length != 0) {
+            showCharts();
+            window.clearInterval(Interval2);
+            break;
+        }
+    }, 100)
+
+
+    //显示图表   该方法中的var变量更改即可
+    function showCharts() {
+        //所有设备利用率
+        //toolName 设备名称数组  toolEff 设备利用率数组
+        var toolName = [];
+        var toolEff = [];
+        Result.forEach(function (mtool) {
+            toolName.push(mtool.MTNAME);
+            toolEff.push(kendo.toString(mtool.UseRatio * 100, "n2"))
+        });
+        //不需要加%
+
+        machineListEff(toolName, toolEff);
+        //设备开机率 onPro开机率  onNum 开机数量 offNum关机数量
+        // var onPro = "83%",
+        //     onNum = 5,
+        //     offNum = 8;
+        // machineOnPro(onPro, onNum, offNum);
+
+        //不需要加%
+        var max = kendo.toString(Eff_result[7] * 100, "n2"),
+            avg = kendo.toString(Eff_result[11] * 100, "n2"),
+            min = kendo.toString(Eff_result[9] * 100, "n2");
+        //最高利用率
+        maxGuae(max);
+        //平均利用率
+        avgGuae(avg);
+        //最低利用率
+        minGuae(min);
+    };
+
+    function maxGuae(max) {
+        option = {
+            series: [{
+                name: '最高利用率',
+                type: 'gauge',
+                detail: {
+                    formatter: '{value}%',
+                    textStyle: {
+                        fontSize: 15,
+                    },
+                },
+                title: {
+                    textStyle: {
+                        fontSize: 12,
+                    },
+                },
+                data: [{
+                    value: max,
+                    name: "最高利用率\n" + Eff_result[8]
+                }]
+            }],
+            // legend: {
+            //     show: true,
+            //     orient: 'horizontal',
+            //     x: 'center',
+            //     y: 'bottom',
+            //     data: ['最高利用率'],
+            // }
+        };
+        guae1.setOption(option);
+    };
+
+    function avgGuae(avg) {
+        option = {
+            series: [{
+                name: '平均利用率',
+                type: 'gauge',
+                detail: {
+                    formatter: '{value}%',
+                    textStyle: {
+                        fontSize: 15,
+                    },
+                },
+                title: {
+                    textStyle: {
+                        fontSize: 12,
+                    },
+                },
+                data: [{
+                    value: avg,
+                    name: "平均利用率"
+                }]
+            }],
+        };
+        guae2.setOption(option);
+    };
+
+    function minGuae(min) {
+        option = {
+            series: [{
+                name: '最低利用率',
+                type: 'gauge',
+                detail: {
+                    formatter: '{value}%',
+                    textStyle: {
+                        fontSize: 15,
+                    },
+                },
+                title: {
+                    textStyle: {
+                        fontSize: 12,
+                    },
+                },
+                data: [{
+                    value: min,
+                    name: "最低利用率\n" + Eff_result[10]
+                }]
+            }],
+
+        };
+        guae3.setOption(option);
+    };
+
+    // function machineOnPro(onPro, onNum, offNum) {
+    //     var pipe = echarts.init(document.getElementById('pipe'));
+    //     option = {
+    //         title: {
+    //             text: '设备开机率',
+    //             subtext: onPro,
+    //             x: 'center'
+    //         },
+    //         series: [{
+    //             name: '访问来源',
+    //             type: 'pie',
+    //             radius: '55%',
+    //             center: ['50%', '60%'],
+    //             data: [{
+    //                 value: onNum,
+    //                 name: '开机数量'
+    //             }, {
+    //                 value: offNum,
+    //                 name: '不开机数量'
+    //             }],
+    //             itemStyle: {
+    //                 emphasis: {
+    //                     shadowBlur: 10,
+    //                     shadowOffsetX: 0,
+    //                     shadowColor: 'rgba(0, 0, 0, 0.5)'
+    //                 }
+    //             }
+    //         }]
+    //     };
+    //     pipe.setOption(option);
+    // };
+
+    function machineListEff(toolName, toolEff) {
+        option = {
+            title: {
+                text: '设备利用率统计图'
+            },
+            color: ['#3398DB'],
+            tooltip: {
+                formatter: '{c}%',
+                trigger: 'axis',
+                axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                    type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '15%',
+                containLabel: true
+            },
+            xAxis: [{
+                type: 'category',
+                data: toolName,
+                axisLabel: {
+                    interval: 0,
+                    rotate: 45,
+                },
+                axisTick: {
+                    alignWithLabel: true
+                },
+                // nameLocation: "middle",
+                // nameGap: 20
+            }],
+            yAxis: [{
+                axisLabel: {
+                    formatter: '{value}%'
+                },
+                type: 'value',
+                name: '利用率',
+            }],
+            series: [{
+                name: '设备利用率',
+                type: 'bar',
+                barWidth: '60%',
+                data: toolEff
+            }]
+        };
+        pillar.setOption(option);
+    }
+</script>
+
+</html>

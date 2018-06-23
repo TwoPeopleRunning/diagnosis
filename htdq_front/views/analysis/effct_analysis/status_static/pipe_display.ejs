@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>machine detail</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.dataviz.min.css" rel="stylesheet">
+    <link href="/styles/kendo.dataviz.default.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script>
+    </script>
+</head>
+
+<body>
+    <div id="example">
+        <div class="wide">
+            <div id="chart" style="background: center no-repeat url();"></div>
+        </div>
+    </div>
+    <div>
+        <table id="grid">
+            <colgroup>
+                <col style="width:35%" />
+                <col style="width:35%" />
+                <col style="width:35%" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th data-field="StausName" style="width:35%">状态名称</th>
+                    <th data-field="time" style="width:35%">时间（小时）</th>
+                    <th data-field="percent" style="width:35%">百分比</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="b" style="width:20%">运行时间</td>
+                    <td style="width:20%" class="TotalRun"></td>
+                    <td style="width:20%" class="AvaUse"></td>
+                </tr>
+                <tr>
+                    <td class="b" style="width:20%">空闲时间</td>
+                    <td style="width:20%" class="TotalOnline"></td>
+                    <td style="width:20%" class="AvaOnline"></td>
+                </tr>
+                <tr>
+                    <td class="b" style="width:20%">报警时间</td>
+                    <td style="width:20%" class="TotalAlarm"></td>
+                    <td style="width:20%" class="AvaAlarm"></td>
+                    <tr>
+                        <td class="b" style="width:20%">关机时间</td>
+                        <td style="width:20%" class="TotalOffline"></td>
+                        <td style="width:20%" class="AvaOffline"></td>
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $(".TotalRun").text(kendo.toString(Eff_result[5], "n2"));
+            $(".AvaUse").text(kendo.toString(Eff_result[11], "p2"));
+            $(".TotalOnline").text(kendo.toString(Eff_result[18], "n2"));
+            $(".TotalAlarm").text(kendo.toString(Eff_result[19], "n2"));
+            $(".TotalOffline").text(kendo.toString(Eff_result[20], "n2"));
+            $(".AvaOnline").text(kendo.toString(Eff_result[21], "p2"));
+            $(".AvaAlarm").text(kendo.toString(Eff_result[22], "p2"));
+            $(".AvaOffline").text(kendo.toString(Eff_result[23], "p2"));
+
+            $("#grid").kendoGrid({
+                sortable: true
+            });
+            $("#chart").kendoChart({
+                // title: {
+                //     position: "bottom",
+                //     text: "时间段：2017-07-26 07:00:00 至 2017-07-26 19:00:00"
+                // },
+                legend: {
+                    visible: false
+                },
+                chartArea: {
+                    background: ""
+                },
+                seriesDefaults: {
+                    labels: {
+                        visible: true,
+                        background: "transparent",
+                        template: "#= category #: \n #= value#%"
+                    }
+                },
+                series: [{
+                    type: "pie",
+                    startAngle: 150,
+                    data: [{
+                        category: "运行",
+                        value: kendo.toString(Eff_result[11] * 100, "n2"),
+                        color: "#006030",
+                    }, {
+                        category: "空闲",
+                        value: kendo.toString(Eff_result[21] * 100, "n2"),
+                        color: '#FFD306',
+                    }, {
+                        category: "报警",
+                        value: kendo.toString(Eff_result[22] * 100, "n2"),
+                        color: "#EA0000",
+                    }, {
+                        category: "关机",
+                        value: kendo.toString(Eff_result[23] * 100, "n2"),
+                        color: "#8E8E8E",
+                    }, ]
+                }],
+                tooltip: {
+                    visible: true,
+                    format: "{0:p2}%"
+                }
+            });
+        });
+        // $(document).bind("kendo:skinChange", createChart);
+    </script>
+</body>
+
+</html>

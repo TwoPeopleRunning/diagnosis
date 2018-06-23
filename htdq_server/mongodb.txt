@@ -1,0 +1,1 @@
+db.getCollection('MDC_MDSTATUS').remove({"MTID" : 46,"BEGINTIME": {$gt : ISODate("2017-07-29T01:34:21.398Z")}})

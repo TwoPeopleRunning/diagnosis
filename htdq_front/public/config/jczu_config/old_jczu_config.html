@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>系统配置</title>
+    <meta charset="utf-8">
+    <link href="../../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../../js/jquery.min.js"></script>
+    <script src="../../../js/jszip.min.js"></script>
+    <script src="../../../js/kendo.all.min.js"></script>
+    <script src="../../content/shared/js/console.js"></script>
+    <script>
+        
+    </script>
+    
+    
+</head>
+    <div id="example">
+        <div id="window">
+            <div>
+
+                <div class="MainContainer">
+                    <!--left sidebar-->
+                    <div class="sidebar">
+                        <button class="k-button" id="expand_collapse_AllNodes">···</button>
+                        <button class="k-button" id="removeNode">-</button>
+                        <input id="appendNodeText" class="k-textbox"/ >
+                        <button class="k-button" id="appendNodeToSelected">+</button> 
+
+                        <div id="treeview"></div>
+                        
+                    </div>
+                    <!--container-->
+                    <div id="main" class="main">
+                        <!--内容-->
+                        <iframe id="iframeId" src="" width="850px" height="700px" frameborder="0"></iframe>
+                    </div>           
+                </div>
+            </div>            
+        </div>
+        <div class="responsive-message"></div>            
+        <script>
+            $(document).ready(function() {
+                /*window*/
+                var myWindow = $("#window");
+                function onClose() {
+                    window.location.assign("../../index.html")
+                }
+                myWindow.kendoWindow({
+                    width: "1100px",
+                    title: "设备（组）设置",
+                    visible: false,
+                    actions: [
+                    "Minimize",
+                    "Maximize",
+                    "Close"
+                    ],
+                    close: onClose
+                }).data("kendoWindow").center().open();
+                /*treeview*/
+                var treeview;
+                if (localStorage.jstrtreeview == undefined ) {
+                    treeview = $("#treeview").kendoTreeView({
+                        dataSource: {
+                            data: [
+                            { text: "设备管理", expanded: true, items: [
+                            { text: "设备(组)管理", items: [
+                            { text: "二厂" , items: [
+                            { text: "加工中心组" }
+                            ]}
+                            ] },
+                            { text: "设备管理", items: [
+                            { text: "VMC850P-274" },
+                            { text: "VMC850P-276" },
+                            { text: "VMC850P-281" },
+                            { text: "VX500Z-284" },
+                            { text: "VX500Z-288" },
+                            { text: "VX500Z-291" },
+                            { text: "VX500Z-292" },
+                            { text: "VX500Z-298" }
+                            ] }
+                            ] }
+                            ]
+                        },
+                        loadOnDemand: false
+                    }).data("kendoTreeView");
+                    localStorage.jstrtreeview = JSON.stringify(treeview);
+
+                } else {
+                    treeview = JSON.parse(localStorage.jstrtreeview);
+                    treeview = $("#treeview").kendoTreeView({
+                        dataSource: {
+                            data: treeview.options.dataSource.data
+                        }
+                    }).data("kendoTreeView");
+                }
+
+                var handleTextBox = function(callback) {
+                    return function(e) {
+                        if (e.type != "keypress" || kendo.keys.ENTER == e.keyCode) {
+                            callback(e);
+                        }
+                    };
+                };
+                /*removeNode*/
+                $("#removeNode").click(function() {
+                    var selectedNode = treeview.select();
+                    treeview.remove(selectedNode);
+                });
+                /*expandNode*/
+                var i=0;
+                $("#expand_collapse_AllNodes").click(function() {
+                    if (i%2) {
+                        treeview.expand(".k-item");
+                    } else {
+                        treeview.collapse(".k-item");
+                    }
+                    i++;
+                });
+                /*addNode*/
+                var append = handleTextBox(function(e) {
+                    var selectedNode = treeview.select();
+
+                            // passing a falsy value as the second append() parameter
+                            // will append the new node to the root group
+                            if (selectedNode.length == 0) {
+                                selectedNode = null;
+                            }
+
+                            treeview.append({
+                                text: $("#appendNodeText").val()
+                            }, selectedNode);
+
+                            ///////////
+                            //var re = $("#treeview").data("kendoTreeView");
+                            //localStorage.jstrtreeview = JSON.stringify(re);
+                            ///////////
+                });
+                $("#appendNodeToSelected").click(append);
+                $("#appendNodeText").keypress(append);
+
+
+
+                //jump to other's htmlPage
+                function tree_change(e) {
+                    //console.log("Change", this.select());
+                    $.get("http://localhost:3000/jc_conf",function(data,status){
+
+                    });
+
+                    var Data;
+                    $.get('/api/MDC_MACHINETOOLS',function(data,status){
+                        if (status == "success") {
+                            Data = data;
+                        }
+                    });
+
+                    
+
+
+                    $("#iframeId").attr("src","./jc_list.html");
+
+                }
+
+                treeview.bind("change", tree_change);
+            });                            
+        </script>
+        <style>
+            #example
+            {
+                min-height:500px;
+            }
+
+            media screen and (max-width: 1023px) {
+                div.k-window {
+                    display: none !important;
+                }
+            }
+
+            .MainContainer{min-width:960px;max-width:1600px; }
+            .sidebar{width:180px;float:left;margin-right:-180px;border-right:1px solid #ccc;min-height:700px;padding:5px;}
+            .main{float:left;margin-left:200px;padding:5px;}
+
+
+            .k-textbox {
+                width: 80px;
+            }
+        </style>
+    </div>    
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Basic usage</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script>
+    </script>
+
+
+</head>
+
+<body>
+
+
+
+
+    <div id="example">
+        <div id="window">
+            <div>
+                <center style="font-size:16px">
+                    <strong>工业大数据融合与分析系统 v1.0</strong>
+                </center>
+                <br/>
+                <center>贵州大学“互联网+”重点实验室开发</center>
+                <center>
+                    <table>
+                        <tr>
+                            <td>李少波</td>
+                            <td>胡建军</td>
+                            <td>张安思</td>
+                        </tr>
+                        <tr>
+                            <td>高 宗</td>
+                            <td>陈济楠</td>
+                            <td>李政杰</td>
+                        </tr>
+                        <tr>
+                            <td>邹 旺</td>
+                            <td>江厚明</td>
+                            <td>边霄翔</td>
+                        </tr>
+                        <tr>
+                            <td>王巾侠</td>
+                        </tr>
+                    </table>
+                </center>
+                <br/>
+                <center>联系方式：zong209@163.com</center>
+                <center>Copyright©2017 航天电器&贵州大学机械工程学院 版权所有</center>
+
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                var myWindow = $("#window"),
+                    undo = $("#undo");
+
+                undo.click(function () {
+                    myWindow.data("kendoWindow").open();
+                    undo.fadeOut();
+                });
+
+                function onClose() {
+                    undo.fadeIn();
+                    window.location.assign("../");
+                }
+
+                myWindow.kendoWindow({
+                    width: "40%",
+                    // title: "About Alvar Aalto",
+                    visible: false,
+                    position: {
+                        top: "15%",
+                        left: "30%"
+                    },
+                    actions: [
+                        "Pin",
+                        "Close"
+                    ],
+                    close: onClose
+                }).data("kendoWindow").open();
+            });
+
+
+        </script>
+    </div>
+
+</body>
+
+</html>

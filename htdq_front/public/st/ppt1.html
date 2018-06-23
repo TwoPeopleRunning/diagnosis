@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/css/jquery.fullPage.css">
+    <style>
+        .section {
+            text-align: center;
+            font: 50px "Microsoft Yahei";
+            color: #fff;
+        }
+        
+        .iframe {
+            margin: 5% auto;
+            height: 600px;
+            width: 1200px
+        }
+        /* .page1 {
+            background-color: #1bbc9b;
+        }
+        
+        .page2 {
+            background-color: #FF7F50;
+        }
+        
+        .page3 {
+            background-color: #4BBFC3;
+        }
+        
+        .page4 {
+            background-color: #f90;
+        } */
+    </style>
+</head>
+<style>
+
+</style>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.fullPage.min.js"></script>
+<!-- <script>
+    $(function() {
+        $('.main').onepage_scroll({
+            sectionContainer: '.page',
+            loop: true,
+            keyboard: true,
+            // direction: horizontal,
+            // easing: linear
+        });
+    });
+</script> -->
+</head>
+
+<body>
+    <div class="main" id='dowebok'>
+        <div class="section">
+            <div class="iframe">
+                <iframe width=100% height=100% scrolling=no src="/analysis/alarm_info/alarm_info?mtid=41,42,44&&BEGINTIME=2016-02-04T12:22:33Z&&ENDTIME=2016-02-06T12:22:33Z"> 
+             </iframe>
+            </div>
+            <div class="section">
+                <div class="iframe">
+                    <iframe width=100% height=100% scrolling=no src="/analysis/meta_analysis/meta_analysis?mtid=41,42,44&&BEGINTIME=2016-02-04T12:22:33Z&&ENDTIME=2016-02-06T12:22:33Z"> 
+             </iframe>
+                </div>
+            </div>
+            <div class="section">
+                <div class="iframe">
+                    <iframe width=100% height=100% scrolling=no src="/analysis/effct_analysis/opert_efficiency?mtid=41,42,44&&BEGINTIME=2016-02-04T12:22:33Z&&ENDTIME=2016-02-06T12:22:33Z"> 
+             </iframe>
+                </div>
+            </div>
+            <div class="section">
+                <p class="title">第四屏</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function() {
+            $('#dowebok').fullpage({
+                continuousVertical: true,
+                resize: true,
+                sectionsColor: ['#1bbc9b', '#4BBFC3', '#7BAABE', '#f90'],
+            });
+            setInterval(function() {
+                $.fn.fullpage.moveSectionDown();
+            }, 10000);
+            // setTimeout(function() {
+            //         $.fn.fullpage.moveTo(2);
+            //     }, 5000)
+            //         // $.fn.fullpage.moveSectionDown();
+            //     setInterval(function() {
+            //         $.fn.fullpage.moveSectionDown();
+            //         setTimeout(function() {
+            //             $.fn.fullpage.moveTo(2)
+            //         }, 5000)
+            //     }, 10000);
+        });
+    </script>
+
+</body>
+
+</html>

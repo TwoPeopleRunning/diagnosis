@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>组织结构</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="/styles/zTreecss/demo.css" type="text/css">
+    <link rel="stylesheet" href="/styles/zTreecss/metroStyle/metroStyle.css" type="text/css">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script type="text/javascript" src="/js/jquery.ztree.all.min.js"></script>
+</head>
+
+<body>
+    <div id="window">
+        <!--left sidebar-->
+        <div class="sidebar">
+            <div style="text-align:center;" id="trtitle">组织架构</div>
+            <div id="treeDemo" class="ztree"></div>
+        </div>
+        <input style="display:none" type="text" id="SelecttreeNode">
+        <!--container-->
+        <div id="main" class="main">
+            <iframe name="framename" id="iframeId" src="" frameborder="0" scrolling="no"></iframe>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript">
+    // zTree 初始配置
+    var setting = {
+        view: {
+            addHoverDom: addHoverDom,
+            removeHoverDom: removeHoverDom,
+            selectedMulti: false
+        },
+        edit: {
+            enable: true,
+            editNameSelectAll: true,
+            showRemoveBtn: showRemoveBtn,
+            showRenameBtn: showRenameBtn,
+            removeTitle: "删除",
+            renameTitle: "重命名"
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            // beforeEditName: beforeEditName,
+            beforeRemove: beforeRemove,
+            beforeRename: beforeRename,
+            onRemove: onRemove,
+            onRename: onRename,
+            onClick: onClick
+        }
+    };
+
+    // 全局变量
+    var preNodeName;
+    var zNodes = [{
+        id: 1,
+        pId: 0,
+        name: "组织架构管理",
+        open: true,
+        collection: ""
+    },
+    {
+        id: 12,
+        pId: 1,
+        name: "工厂管理",
+        open: true,
+        isParent: true,
+        collection: ""
+    },
+    // {
+    //     id: 13,
+    //     pId: 1,
+    //     name: "角色管理",
+    //     open: true,
+    //     isParent: true,
+    //     collection: ""
+    // }, {
+    //     id: 131,
+    //     pId: 13,
+    //     name: "系统管理员",
+    //     collection: ""
+    // }, {
+    //     id: 132,
+    //     pId: 13,
+    //     name: "普通用户",
+    //     collection: ""
+    // }, 
+    {
+        id: 14,
+        pId: 1,
+        name: "用户管理",
+        open: true,
+        isParent: true,
+        collection: ""
+    }
+    ];
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // 判断是否为父节点
+    function isParentNode(treeNode) {
+        return (treeNode.isParent ? true : false);
+    }
+    // 获取新节点id
+    function getNewId(pNode) {
+        var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+        var ndObj = treeObj.transformToArray(treeObj.getNodes());
+        var idArray = [];
+        for (var i = 0; i < ndObj.length; i++) {
+            if (ndObj[i].pId == pNode.id) {
+                idArray.push(ndObj[i].id);
+            }
+        }
+        if (idArray.length == 0) {
+            return pNode.id * 10 + 1;
+        } else {
+            // 降序
+            idArray.sort(function (a, b) {
+                return b - a
+            });
+            return idArray[0] + 1;
+        }
+    }
+    // 删除函数
+    function beforeRemove(treeId, treeNode) {
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        zTree.selectNode(treeNode);
+        return confirm("确认删除 " + treeNode.name + " 吗？");
+    }
+
+    function onRemove(e, treeId, treeNode) {
+        console.log("onRemove : " + treeNode.name);
+        var url = "/api/" + treeNode.collection + "/Destroy";
+        var payload = {
+            "NAME": treeNode.name
+        }
+        $.post(url, payload, function (data) {
+            console.log(data);
+            window.location.reload();
+        }, "json").error(function () {
+            alert("删除错误！");
+            window.location.reload();
+        });
+    }
+    // 重命名函数
+    function beforeRename(treeId, treeNode, newName, isCancel) {
+        console.log("beforeRename : " + treeNode.name);
+        preNodeName = treeNode.name;
+        if (newName.length == 0) {
+            setTimeout(function () {
+                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                zTree.cancelEditName();
+                alert("节点名称不能为空.");
+            }, 0);
+            return false;
+        }
+        return true;
+    }
+
+    function onRename(e, treeId, treeNode, isCancel) {
+        console.log("onRename : " + treeNode.name);
+        // console.log("onRename : " + treeNode.collection);
+        var treeinfo = {
+            "name": treeNode.name,
+            "id": treeNode.id,
+            "pId": treeNode.pId,
+            "isParent": treeNode.isParent,
+            "open": treeNode.open,
+            "collection": treeNode.collection
+
+        };
+        treeinfo = JSON.stringify(treeinfo);
+        var payload = {
+            "NAME": treeNode.name,
+            "TREENODEINFO": treeinfo
+        };
+        var url = "/api/" + treeNode.collection + "/Update?NAME=" + preNodeName;
+        if (treeNode.collection) {
+            $.post(url, payload, function (data) {
+                console.log(data);
+            }, "json").error(function () {
+                alert("保存错误！");
+                window.location.reload();
+            });
+        } else {
+            alert("此节点找不到所属的集合！");
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            zTree.cancelEditName();
+        }
+    }
+    // 显示编辑, 重命名, button
+    function showRemoveBtn(treeId, treeNode) {
+        if (treeNode.id == 1 || treeNode.pId == 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function showRenameBtn(treeId, treeNode) {
+        if (treeNode.id == 1 || treeNode.pId == 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    // 增加节点
+    function addHoverDom(treeId, treeNode) {
+        var ID;
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        zTree = zTree.transformToArray(zTree.getNodes());
+        for (var i = 0; i < zTree.length; i++) {
+            if (treeNode.pId == zTree[i].id && zTree[i].pId == 12) {
+                ID = treeNode.id;
+                break;
+            }
+        }
+        if (isParentNode(treeNode) && treeNode.id != 1 && treeNode.id != ID) {
+            var sObj = $("#" + treeNode.tId + "_span");
+            if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) return;
+            var addStr = "<span class='button add' id='addBtn_" + treeNode.tId +
+                "' title='添加' onfocus='this.blur();'></span>";
+            sObj.after(addStr);
+            var btn = $("#addBtn_" + treeNode.tId);
+            if (btn) btn.bind("click", function () {
+                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                var collection;
+                // 判断增加的节点所隶属的集合
+                if (treeNode.id == 12) {
+                    collection = "MDC_FACTORY"
+                }
+                if (treeNode.pId == 12) {
+                    collection = "MDC_MTGROUP"
+                }
+                if (treeNode.id == 14) {
+                    collection = "GD_USER"
+                }
+                if (treeNode.id == 12 || treeNode.pId == 12) {
+                    var newNode = zTree.addNodes(
+                        treeNode, {
+                            id: getNewId(treeNode),
+                            pId: treeNode.id,
+                            isParent: true,
+                            collection: collection,
+                            open: true
+                        }
+                    );
+
+                    zTree.editName(newNode[0]);
+                    return false;
+                } else {
+                    var newNode = zTree.addNodes(
+                        treeNode, {
+                            id: getNewId(treeNode),
+                            pId: treeNode.id,
+                            isParent: false,
+                            collection: collection,
+                            open: false
+                        }
+                    );
+
+                    zTree.editName(newNode[0]);
+                    return false;
+                }
+            });
+        } else {
+            return false;
+        }
+    };
+    // 删除节点
+    function removeHoverDom(treeId, treeNode) {
+        $("#addBtn_" + treeNode.tId).unbind().remove();
+    };
+
+    function selectAll() {
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        // zTree.setting.edit.editNameSelectAll =  $("#selectAll").attr("checked");
+        zTree.setting.edit.editNameSelectAll = true;
+
+    }
+    // 点击节点响应
+    // 根据不同节点响应不同页面
+    function onClick(event, treeId, treeNode) {
+        console.log("onClick : " + treeNode.name);
+        $("#SelecttreeNode").val(treeNode.name);
+        // console.log($("#SelecttreeNode").val())
+        if (treeNode.id == 12) {
+            $("#iframeId").attr("src", "/manage/factory_list");
+        }
+        if (treeNode.pId == 12) {
+            $("#iframeId").attr("src", "/manage/factory_info?id=" + treeNode.id);
+        }
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        zTree = zTree.transformToArray(zTree.getNodes());
+        for (var i = 0; i < zTree.length; i++) {
+            if (treeNode.pId == zTree[i].id && zTree[i].pId == 12) {
+                $("#iframeId").attr("src", "/manage/group_info?id=" + treeNode.id);
+                break;
+            }
+        }
+        // 用户管理
+        if (treeNode.pId == 14) {
+            $("#iframeId").attr("src", "/manage/user/adduser.html");
+        }
+    };
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    $(document).ready(function () {
+        // 左侧树状图边栏
+        $.get("/api/MDC_FACTORY", function (FACTORY, status) {
+            if (status == "success") {
+                $.get("/api/MDC_MTGROUP", function (MTGROUP, status) {
+                    if (status == "success") {
+                        $.get("/api/GD_USER", function (GDUSER, status) {
+                            if (status == "success") {
+                                if (FACTORY.length != 0) {
+                                    for (var i = 0; i < FACTORY.length; i++) {
+                                        if (FACTORY[i].TREENODEINFO) {
+                                            zNodes.push(FACTORY[i].TREENODEINFO);
+
+                                            if (MTGROUP.length != 0) {
+                                                for (var j = 0; j < MTGROUP.length; j++) {
+                                                    if (MTGROUP[j].TREENODEINFO.pId == FACTORY[i].TREENODEINFO.id) {
+                                                        zNodes.push(MTGROUP[j].TREENODEINFO);
+
+                                                    }
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                }
+
+                                if (GDUSER.length != 0) {
+                                    for (var k = 0; k < GDUSER.length; k++) {
+                                        if (GDUSER[k].TREENODEINFO) {
+                                            zNodes.push(GDUSER[k].TREENODEINFO);
+                                        }
+                                    }
+                                }
+                                // zTree 部分
+                                $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+                                selectAll();
+                            } else {
+                                alert("读取GD_USER数据失败！")
+                            }
+                        });
+
+                    } else {
+                        alert("读取MDC_MTGROUP数据失败！");
+                    }
+                });
+            } else {
+                alert("读取MDC_FACTORY数据失败！");
+            }
+        });
+
+        // Window
+        var myWindow = $("#window");
+
+        function onClose() {
+            window.location.assign("/")
+        }
+        myWindow.kendoWindow({
+            width: "60%",
+            title: "组织架构管理",
+            visible: false,
+            position: {
+                top: "5%",
+                left: "20%"
+            },
+            actions: [
+                "Refresh",
+                "Maximize",
+                "Close"
+            ],
+            close: onClose
+        }).data("kendoWindow").open();
+
+    });
+
+</script>
+<style>
+    body {
+        font-family: 'Microsoft Yahei', '微软雅黑', Arial, sans-serif;
+    }
+
+    .sidebar {
+        width: 25%;
+        float: left;
+        border-right: 1px solid #ccc;
+        min-height: 600px;
+        margin-right: 20px;
+    }
+
+    .ztree {
+        margin-left: -4px;
+    }
+
+    #trtitle {
+        background-color: darkgrey;
+        margin: 0 auto 1em;
+        border-radius: 5px;
+    }
+
+    .main {
+        height: 600px;
+    }
+
+    .k-textbox {
+        width: 80px;
+    }
+
+    #iframeId {
+        width: 70%;
+        height: 100%;
+    }
+</style>
+
+</html>

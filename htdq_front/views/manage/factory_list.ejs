@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+
+</head>
+<body>
+    <div id="grid1"></div>
+
+<style>
+</style>
+
+
+<script>
+$(document).ready(function() {
+ 
+    var dataSource1 = new kendo.data.DataSource({
+        batch: true,
+        pageSize: 20,
+        transport:{
+            read:{
+                url:"/api/MDC_FACTORY",
+                type:"get",
+                dataType:"json"
+            },
+            parameterMap: function(options, operation) {
+                if (operation !== "read" && options.models) {
+                    return options.models[0];
+                }else{
+                    var parameter={
+                        page:options.page,
+                    }
+                    return parameter;
+                }
+            }
+        },
+        schema: {
+            model: {
+                id:"ID",
+                fields: {
+                       ID:  { type: "number" },
+                       NAME: { type: "string" },
+                       ADDRESS: { type: "string" },
+                       TEL: { type: "string" }
+                }
+            }
+        }
+    });
+    $("#grid1").kendoGrid({
+        dataSource: dataSource1,
+        pageable: {
+            refresh: true,
+            input: true,
+            numeric: false
+        },
+        scrollable: true,
+        sortable: true,
+        filterable: false,
+        columns: [
+        {field:"ID",title:"ID"},
+        {field:"NAME",title:"工厂"},
+        {field:"ADDRESS",title:"地址"},
+        {field:"TEL",title:"电话"}
+        ]
+    });
+});
+</script>
+</body>
+
+</html>

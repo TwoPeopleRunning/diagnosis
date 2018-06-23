@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WS</title>
+    <meta charset="utf-8">
+</head>
+
+<body onload="getWs()">
+    <center>
+        <h3>Welcome to WebSocket Test!</h3>
+    </center>
+    <input size="50" id="msg" placeholder="请输入聊天内容">
+    <input type="submit" value="发送" id="show" onclick="sendWs()">
+</body>
+<script>
+    var ws = null;
+    function getWs() {
+        //ws = new WebSocket("ws://"+window.location.hostname+":8080");/ip访问  
+        ws = new WebSocket("ws://127.0.0.1:9988/api/ws");
+        ws.onopen = function () {
+            //console.log("ws open");
+        }
+        ws.onmessage = function (event) {
+            var div = document.createElement("div");
+            div.textContent = event.data;
+            document.body.appendChild(div);
+        }
+        ws.onclose = function () {
+            //console.log("ws close");
+        }
+        ws.onerror = function () {
+            console.error("ws error");
+        }
+    }
+    function sendWs() {
+        var msg = document.getElementById("msg");
+        if (msg.value == '') {
+            alert('聊天内容不能为空');
+        } else {
+            var date = new Date();
+            var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+            ws.send("[" + time + "] " + msg.value);
+            msg.value = '';
+        }
+    }
+
+</script>
+
+</html>

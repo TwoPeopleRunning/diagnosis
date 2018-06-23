@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>设备状态大数据分析</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+    <script>
+        function stateChangeIE(_frame) {
+            var loader = document.getElementById("LoadDiv");
+            //loader.innerHTML = "加载中";
+            loader.style.display = "none";
+            _frame.style.display = "block";
+            // _frame.style.display = "block"
+        };
+    </script>
+</head>
+
+<body>
+    <a id="logo" href='/'></a>
+    <div class="demo-section k-content wide">
+        <center>
+            <div>
+                <ul id="menu-images"></ul>
+                <button type="button" id="imageButton1">概览</button>
+                <button type="button" id="imageButton2">效能分析</button>
+                <button type="button" id="imageButton3">综合分析</button>
+                <button type="button" id="imageButton4">走势图</button>
+                <button type="button" id="imageButton5">报警信息 </button>
+                <button type="button" id="imageButton6">加工信息</button>
+            </div>
+
+            <div class="detail">
+
+                <button id="primaryTextButton11" class="k-primary">设备运行效率</button>
+                <button id="primaryTextButton12" class="k-primary">设备总利用率</button>
+                <button id="primaryTextButton13" class="k-primary">设备总开机率</button>
+                <button id="primaryTextButton21" class="k-primary">设备运行效率</button>
+                <button id="primaryTextButton22" class="k-primary">设备总利用率</button>
+                <button id="primaryTextButton23" class="k-primary">设备总开机率</button>
+                <button id="primaryTextButton24" class="k-primary">设备状态统计</button>
+                <button id="primaryTextButton41" class="k-primary">设备运行效率</button>
+                <button id="primaryTextButton42" class="k-primary">设备总利用率</button>
+                <button id="primaryTextButton43" class="k-primary">设备总开机率</button>
+            </div>
+        </center>
+    </div>
+    <!--left sidebar-->
+    <div class="sidebar">
+        <div style="padding:7px 0 7px">
+            开始时间：
+            <input id="start" />
+        </div>
+        <div style="padding:7px 0 7px">
+            结束时间：
+            <input id="end" />
+        </div>
+        <input id="timesize" />
+        <button type="button" class="k-button" id="primaryTextButton5">确定</button>
+        <div style="text-align:center;" id="trtitle">设备列表</div>
+        <div id="treeview" class="treeview"></div>
+    </div>
+    <input style="display:none" type="text" id="transData">
+    <!--container-->
+    <div class="main">
+        <!--内容-->
+        <iframe id="iframeId" src="outline/running_eff" frameborder="0" scrolling="no" onload="stateChangeIE(this)" style="display: none">
+        </iframe>
+        <div id="LoadDiv" align="center">
+            <img src="/images/loading.gif" style="height:100px;width:100px;margin-top:10%">
+        </div>
+    </div>
+    <div class="<resp></resp>onsive-message"></div>
+</body>
+<script>
+        // function get_cookie(Name) {
+        //     var search = Name + "=" //查询检索的值
+        //     var returnvalue = ""; //返回值
+        //     if (document.cookie.length > 0) {
+        //         sd = document.cookie.indexOf(search);
+        //         if (sd != -1) {
+        //             sd += search.length;
+        //             end = document.cookie.indexOf(";", sd);
+        //             if (end == -1)
+        //                 end = document.cookie.length;
+        //             //unescape() 函数可对通过 escape() 编码的字符串进行解码。
+        //             returnvalue = unescape(document.cookie.substring(sd, end))
+        //         }
+        //     }
+        //     return returnvalue;
+        // }
+
+        function reloadFrame() {
+            iframe = document.getElementById('iframeId');
+            var loader = document.getElementById("LoadDiv");
+            iframe.style.display = 'none';
+            loader.style.display = 'block';
+            onCheck();
+            if (iframe.contentWindow.location.reload(true)) {
+                loader.style.display = 'none';
+                iframe.style.display = 'block';
+            };
+        }
+        // function stateChangeFirefox(_frame) {
+        //     var loader = document.getElementById("LoadDiv");
+        //     //loader.innerHTML = "加载中";
+        //     loader.style.display = "none";
+        //     _frame.style.visibility = "visible";
+        //     _frame.style.display = "block"
+        // };
+
+
+        /*treeview*/
+
+
+        function fn(data, pid) {
+            var result = [],
+                temp;
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].pid == pid) {
+                    if (data[i].isParent == false) {
+                        var obj = {
+                            "ID": data[i].ID,
+                            "isParent": data[i].isParent,
+                            "text": data[i].name,
+                            "checked": true
+                        };
+                    } else {
+                        var obj = {
+                            "isParent": data[i].isParent,
+                            "text": data[i].name,
+                            "checked": false
+                        };
+                    }
+                    temp = fn(data, data[i].id);
+                    if (temp.length > 0) {
+                        obj.items = temp;
+                    }
+                    result.push(obj);
+                }
+            }
+            return result;
+        }
+
+        function checkedNodeIds(nodes, checkedNodes) {
+            for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].checked) {
+                    if (nodes[i].isParent == false) {
+                        checkedNodes.push({
+                            id: nodes[i].ID,
+                            name: nodes[i].text
+                        });
+                    }
+                }
+                if (nodes[i].hasChildren) {
+                    checkedNodeIds(nodes[i].children.view(), checkedNodes);
+                }
+            }
+        }
+
+        var convertTime = function (date) {
+            var timestamp = Date.parse(date);
+            return timestamp / 1000;
+        };
+
+
+
+
+
+        onCheck = function () {
+            var checked = [];
+            var Nodes = [];
+            var checkedNodes = [];
+            var Result = [];
+            var nodelength = 0;
+            var nodataNodes = [];
+            var mtid = new Array();
+
+            var treeView = $("#treeview").data("kendoTreeView");
+            checkedNodeIds(treeView.dataSource.view(), checked);
+            // console.log(treeView.dataSource.view()[0])
+            if (checked.length > 0) {
+                for (var index = 0; index < checked.length; index++) {
+                    mtid.push(checked[index].id);
+                }
+
+                var BEGINTIME = (new Date($("#start").val()));
+                var ENDTIME = (new Date($("#end").val()));
+
+                var payload = {
+                    "MTID": JSON.stringify(mtid),
+                    "BEGINTIME": BEGINTIME,
+                    "ENDTIME": ENDTIME
+                }
+                $.post("/api/STATICS", payload, function (data, resp) {
+                    if (resp == "success") {
+                        Result = data.RESULT;
+                        nodataNodes = data.nodataNodes;
+                        if (nodataNodes.length != 0) {
+                            message = "";
+                            nodataNodes.forEach(function (node) {
+                                message += node + ","
+                            })
+                            alert("查询不到" + message + "设备数据,只显示可查询到的数据或请重新选择查询条件(设备列表/时间区间)");
+                        }
+                    } else {
+                        alert("请检查查询条件后重试！")
+                        window.stop();
+                    }
+
+                });
+
+            } else {
+                console.log("No nodes checked.");
+            }
+        };
+
+
+
+
+
+        $(document).ready(function () {
+            $("#imageButton1").kendoButton({
+                imageUrl: "/content/shared/icons/sports/snowboarding.png"
+            });
+            $("#imageButton2").kendoButton({
+                imageUrl: "/content/shared/icons/sports/swimming.png"
+            });
+            $("#imageButton3").kendoButton({
+                imageUrl: "/content/shared/icons/sports/baseball.png"
+            });
+            $("#imageButton4").kendoButton({
+                imageUrl: "/content/shared/icons/16/speaker.png"
+            });
+            $("#imageButton5").kendoButton({
+                imageUrl: "/content/shared/icons/16/photo.png"
+            });
+            $("#imageButton6").kendoButton({
+                imageUrl: "/content/shared/icons/sports/golf.png"
+            });
+            $("#imageButton7").kendoButton({
+                imageUrl: "/content/shared/icons/16/star.png"
+            });
+            $("#imageButton8").kendoButton({
+                imageUrl: "/content/shared/icons/16/video.png"
+            });
+            $("#primaryTextButton11").kendoButton();
+            $("#primaryTextButton12").kendoButton();
+            $("#primaryTextButton13").kendoButton();
+            $("#primaryTextButton21").kendoButton();
+            $("#primaryTextButton22").kendoButton();
+            $("#primaryTextButton23").kendoButton();
+            $("#primaryTextButton24").kendoButton();
+            $("#primaryTextButton41").kendoButton();
+            $("#primaryTextButton42").kendoButton();
+            $("#primaryTextButton43").kendoButton();
+            // //
+            $(".k-primary").hide();
+            $("#imageButton1").click(function () {
+                $(".k-primary").hide();
+                $("#primaryTextButton11").show();
+                $("#primaryTextButton12").show();
+                $("#primaryTextButton13").show();
+            });
+            $("#imageButton2").click(function () {
+                $(".k-primary").hide();
+                $("#primaryTextButton21").show();
+                $("#primaryTextButton22").show();
+                $("#primaryTextButton23").show();
+                $("#primaryTextButton24").show();
+            });
+            $("#imageButton1").click();
+            $("#imageButton3").click(function () {
+                $(".k-primary").hide();
+            });
+            $("#imageButton4").click(function () {
+                $(".k-primary").hide();
+                $("#primaryTextButton41").show();
+                $("#primaryTextButton42").show();
+                $("#primaryTextButton43").show();
+            });
+            $("#imageButton5").click(function () {
+                $(".k-primary").hide();
+            });
+            $("#imageButton6").click(function () {
+                $(".k-primary").hide();
+            });
+            $("#primaryTextButton5").click(function () {
+                // console.log($("#start").val());
+                // console.log($("#end").val())
+                $("#transData").val("");
+                reloadFrame();
+            });
+
+            $("#timesize").kendoDropDownList({
+                dataSource: [{
+                    name: "",
+                    value: 0
+                }, {
+                    name: "最近24小时",
+                    value: 1
+                }, {
+                    name: "最近三天",
+                    value: 2
+                }, {
+                    name: "最近一周",
+                    value: 3
+                }, {
+                    name: "最近30天",
+                    value: 4
+                }, {
+                    name: "最近三个月",
+                    value: 5
+                },],
+                dataTextField: "name",
+                dataValueField: "value",
+                value: "",
+                change: function (e) {
+                    Now = new Date();
+                    // times = Now.getTime();
+                    // console.log(times)
+                    var value = this.value();
+                    switch (value) {
+                        case "0":
+                            break;
+                        case "1":
+                            $("#end").kendoDateTimePicker({
+                                value: Now,
+                            }).data("kendoDateTimePicker");
+                            $("#start").kendoDateTimePicker({
+                                value: new Date(Now.setDate(Now.getDate() - 1)),
+                            }).data("kendoDateTimePicker");
+                            break;
+                        case "2":
+                            $("#end").kendoDateTimePicker({
+                                value: Now,
+                            }).data("kendoDateTimePicker");
+                            $("#start").kendoDateTimePicker({
+                                value: new Date(Now.setDate(Now.getDate() - 3)),
+                            }).data("kendoDateTimePicker");
+                            break;
+                        case "3":
+                            $("#end").kendoDateTimePicker({
+                                value: Now,
+                            }).data("kendoDateTimePicker");
+                            $("#start").kendoDateTimePicker({
+                                value: new Date(Now.setDate(Now.getDate() - 7)),
+                            }).data("kendoDateTimePicker");
+                            break;
+                        case "4":
+                            $("#end").kendoDateTimePicker({
+                                value: Now,
+                            }).data("kendoDateTimePicker");
+                            $("#start").kendoDateTimePicker({
+                                value: new Date(Now.setDate(Now.getDate() - 30)),
+                            }).data("kendoDateTimePicker");
+                            break;
+                        case "5":
+                            $("#end").kendoDateTimePicker({
+                                value: Now,
+                            }).data("kendoDateTimePicker");
+                            $("#start").kendoDateTimePicker({
+                                value: new Date(Now.setDate(Now.getDate() - 90)),
+                            }).data("kendoDateTimePicker");
+                            break;
+                    }
+
+                }
+            });
+            $.get("/api/MDC_FACTORY", function (data, status) {
+                if (status == "success") {
+                    $.get("/api/MDC_MTGROUP", function (data1, status) {
+                        if (status == "success") {
+                            $.get("/api/MDC_MACHINETOOLS", function (data2, status) {
+                                if (status == "success") {
+                                    var resolve = [];
+                                    resolve.push({
+                                        id: 12,
+                                        pid: 0,
+                                        name: "工厂"
+                                    });
+                                    for (var i = 0; i < data.length; i++) {
+                                        resolve.push({
+                                            id: data[i].TREENODEINFO.id,
+                                            pid: data[i].TREENODEINFO.pId,
+                                            name: data[i].TREENODEINFO.name,
+                                            isParent: data[i].TREENODEINFO.isParent
+                                        });
+                                    }
+                                    for (var i = 0; i < data1.length; i++) {
+                                        resolve.push({
+                                            id: data1[i].TREENODEINFO.id,
+                                            pid: data1[i].TREENODEINFO.pId,
+                                            name: data1[i].TREENODEINFO.name,
+                                            isParent: data1[i].TREENODEINFO.isParent
+                                        });
+                                    }
+                                    for (var i = 0; i < data2.length; i++) {
+                                        resolve.push({
+                                            ID: data2[i].ID,
+                                            id: data2[i].TREENODEINFO.id,
+                                            pid: data2[i].TREENODEINFO.pId,
+                                            name: data2[i].TREENODEINFO.name,
+                                            isParent: data2[i].TREENODEINFO.isParent
+                                        });
+                                    }
+
+                                    // console.log(fn(nodes, 0));
+                                    dataSource = fn(resolve, 0);
+                                    // kendoTreeView 函数
+                                    $("#treeview").kendoTreeView({
+                                        checkboxes: {
+                                            checkChildren: true
+                                        },
+                                        dataSource: dataSource,
+                                        // check: onCheck
+                                    });
+                                    var treeview = $("#treeview").data("kendoTreeView");
+                                    treeview.expand(".k-item");
+                                    // 先执行一遍onCheck()函数
+                                    onCheck();
+
+
+                                    var handleTextBox = function (callback) {
+                                        return function (e) {
+                                            if (e.type != "keypress" || kendo.keys.ENTER == e.keyCode) {
+                                                callback(e);
+                                            }
+                                        };
+                                    };
+                                    // overview 概览
+                                    $("#imageButton1").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                    });
+                                    $("#primaryTextButton11").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "outline/running_eff");
+                                    });
+                                    $("#primaryTextButton12").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "outline/use_ratio");
+                                    });
+                                    $("#primaryTextButton13").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "outline/on_ratio");
+                                    });
+                                    // effct_analysis 效能分析
+                                    $("#imageButton2").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                    });
+                                    $("#primaryTextButton21").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "effct_analysis/opert_efficiency");
+                                    });
+                                    $("#primaryTextButton22").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "effct_analysis/utiliz_efficiency");
+                                    });
+                                    $("#primaryTextButton23").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "effct_analysis/turnon_efficiency");
+                                    });
+                                    $("#primaryTextButton24").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "effct_analysis/mnt_status");
+                                    });
+                                    // meta_analysis 综合分析
+                                    $("#imageButton3").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "meta_analysis/meta_analysis");
+                                    });
+                                    // run_chart 走势图
+                                    $("#imageButton4").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                    });
+                                    $("#primaryTextButton41").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "run_chart/operation_rate");
+                                    });
+                                    $("#primaryTextButton42").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "run_chart/use_rate");
+                                    });
+                                    $("#primaryTextButton43").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "run_chart/on_rate");
+                                    });
+                                    // alarm_info 报警信息
+                                    $("#imageButton5").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "alarm_info/alarm_info");
+                                    });
+                                    // process_info 加工信息
+                                    $("#imageButton6").click(function () {
+                                        $("#iframeId").attr("src", "");
+                                        $("#iframeId").attr("src", "process_info/process_info");
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            var today = new Date();
+
+            var start = $("#start").kendoDateTimePicker({
+                value: new Date(today.setDate(today.getDate() - 3)),
+                change: startChange,
+                parseFormats: ["MM/dd/yyyy"]
+            }).data("kendoDateTimePicker");
+
+            var end = $("#end").kendoDateTimePicker({
+                value: new Date(),
+                change: endChange,
+                parseFormats: ["MM/dd/yyyy"]
+            }).data("kendoDateTimePicker");
+            // 时间区间选择
+            function startChange() {
+                var startDate = start.value(),
+                    endDate = end.value();
+
+                if (startDate) {
+                    startDate = new Date(startDate);
+                    startDate.setDate(startDate.getDate());
+                    end.min(startDate);
+                } else if (endDate) {
+                    start.max(new Date(endDate));
+                } else {
+                    endDate = new Date();
+                    start.max(endDate);
+                    end.min(endDate);
+                }
+                // $("#timesize").val("");
+                // onCheck();
+            }
+
+            function endChange() {
+                var endDate = end.value(),
+                    startDate = start.value();
+
+                if (endDate) {
+                    endDate = new Date(endDate);
+                    endDate.setDate(endDate.getDate());
+                    start.max(endDate);
+                } else if (startDate) {
+                    end.min(new Date(startDate));
+                } else {
+                    endDate = new Date();
+                    start.max(endDate);
+                    end.min(endDate);
+                }
+                // document.getElementById('timesize').value = null;
+                // console.log($("#start").val())
+            }
+            start.max(end.value());
+            end.min(start.value());
+        });
+</script>
+<style>
+    #logo {
+        position: fixed;
+        height: 50px;
+        width: 300px;
+        left: 20px;
+        top: 20px;
+        z-index: 9;
+        background: url('/images/logo_rb.png') no-repeat center 0;
+        background-size: 100%;
+    }
+
+    .demo-section {
+        position: fixed;
+        height: 44px;
+        width: 100%;
+        z-index: 8;
+    }
+
+    .demo-section .k-button {
+        margin-right: 20px;
+    }
+
+    .k-button .k-image {
+        height: 16px;
+    }
+
+    .detail {
+        margin: 1em auto;
+        padding: 1em auto;
+    }
+
+    .detail .k-button {
+        margin-right: 0px;
+    }
+
+    #trtitle {
+        background-color: gray;
+        margin: 2em auto 1em;
+    }
+
+    .sidebar {
+        width: 250px;
+        float: left;
+        padding-top: 150px;
+        margin-left: 2em;
+        margin-right: 20px;
+        border-right: 1px solid #ccc;
+        min-height: 640px;
+    }
+
+    .main {
+        margin-top: -20px;
+        height: 640px;
+    }
+
+    .k-textbox {
+        width: 80px;
+    }
+
+    #iframeId {
+        width: 75%;
+        height: 100%;
+        padding-top: 160px;
+    }
+
+    html {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+</style>
+
+</html>

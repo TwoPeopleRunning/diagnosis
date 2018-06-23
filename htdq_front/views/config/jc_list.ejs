@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
+</head>
+<html>
+<input type="text" id="MTID" value="<%= ID%>" style="display: none;">
+<div id="framebody">
+    <form id="form">
+        <table>
+            <tr>
+                <td>
+                    <pre>名       称：</pre>
+                </td>
+                <td>
+                    <input disabled="true" type="text" class="k-textbox" name="NAME" id="name" style="width: 80%;" value="<%= MATOLNAME%>">
+                </td>
+                <td>
+                    <pre>图       片：</pre>
+                </td>
+                <td>
+                    <img id="imgSrc" src="" alt="待定图片" style="height: 250px;width: 250px;position: absolute;">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>编       号：</pre>
+                </td>
+                <td>
+                    <input name="MATOLCODE" id="MATOLCODE" class="k-textbox" style="width: 80%;" value="<%= MATOLCODE%>">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>采集类型：</pre>
+                </td>
+                <td>
+                    <input name="MATOLTYPE" class="k-textbox" style="width: 80%;" value="<%= MATOLTYPE%>">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>报警模板：</pre>
+                </td>
+                <td>
+                    <input name="SYSTEMTYPE" id="SYSTEMTYPE" class="k-textbox" style="width: 80%;" value="<%= SYSTEMTYPE%>">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>IP  地  址：</pre>
+                </td>
+                <td>
+                    <input type="" name="MATOLIP" id="MATOLIP" class="k-textbox" style="width: 80%;" value="<%= MATOLIP%>">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>端       口：</pre>
+                </td>
+                <td>
+                    <input id="numeric" type="number" step="1" style="width: 80%;" name="MATOLPORT" value="<%= MATOLPORT%>">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>设备类型：</pre>
+                </td>
+                <td>
+                    <input type="" id="MATOLTYPE" name="MATOLTYPE" class="k-textbox" style="width: 80%;" value="<%= MATOLTYPE%>">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>维修人员：</pre>
+                </td>
+                <td>
+                    <input type="" id="WORKER" name="WORKER" class="k-textbox" style="width: 80%;" value="<%= WORKER%>">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>维修周期：</pre>
+                </td>
+                <td>
+                    <input type="" id="PERIOD" name="PERIOD" class="k-textbox" style="width: 80%;" value="<%= PERIOD%>">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <pre>联系方式：</pre>
+                </td>
+                <td>
+                    <input type="" id="PHONE" name="PHONE" class="k-textbox" style="width: 80%;" value="<%= PHONE%>">
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <div id="dialog"></div>
+    <button id="choosePic">选择上传图片</button>
+
+    <div id="tabstrip">
+        <ul>
+            <li class="k-state-active">
+                所属人员
+            </li>
+            <!-- <li>
+                所属分组
+            </li> -->
+        </ul>
+
+        <table id="grid"></table>
+    </div>
+    <br />
+    <p style="text-align: center">
+        <a>
+            <button class="k-button" id="save">保存</button>
+        </a>
+        <a>
+            <button class="k-button" id="del">删除</button>
+        </a>
+    </p>
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#numeric").kendoNumericTextBox({
+            format: "{0:n0}"
+        });
+
+        $("#tabstrip").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            }
+        });
+        var dataSource1 = new kendo.data.DataSource({
+            batch: true,
+            pageSize: 20,
+            transport: {
+                read: {
+                    url: "/api/GD_USER",
+                    type: "get",
+                    dataType: "json"
+                },
+                parameterMap: function (options, operation) {
+                    if (operation !== "read" && options.models) {
+                        return options.models[0];
+                    } else {
+                        var parameter = {
+                            page: options.page,
+                        }
+                        return parameter;
+                    }
+                }
+            },
+            schema: {
+                model: {
+                    id: "ID",
+                    fields: {
+                        NAME: { type: "string" },
+                        EDITDATE: { type: "string" },
+                        NOTE: { type: "string" }
+                    }
+                }
+            }
+        });
+        $("#grid").kendoGrid({
+            dataSource: dataSource1,
+            scrollable: true,
+            sortable: true,
+            filterable: false,
+            pageable: {
+                input: true,
+                numeric: false
+            },
+            columns: [
+                { field: "NAME", title: "姓名" },
+                { field: "NAME", title: "登录名" },
+                { field: "EDITDATE", title: "创建时间" },
+                { field: "NOTE", title: "备注" }
+            ]
+        });
+
+        $("#save").click(function () {
+            // alert($("#name").val());
+            var url = "/api/MDC_MACHINETOOLS/Update?NAME=" + encodeURIComponent($("#name").val());
+            // console.log($("#form").serialize());
+            var payload = {
+                "NAME": $("#name").val(),
+                "MATOLCODE": $("#MATOLCODE").val(),
+                "MATOLTYPE": $("#MATOLTYPE").val(),
+                "SYSTEMTYPE": $("#SYSTEMTYPE").val(),
+                "MATOLIP": $("#MATOLIP").val(),
+                "MATOLPORT": $("#numeric").val(),
+                "WORKER": $("#WORKER").val(),
+                "PERIOD": $("#PERIOD").val(),
+                "PHONE": $("#PHONE").val(),
+
+            };
+            $.post(url, payload, function (data) {
+                if (data.error) {
+                    alert(data);
+                    window.location.reload();
+                } else {
+                    alert("保存成功！" + "\n" + JSON.stringify(data, null, 4));
+                }
+            }).error(function () {
+                alert("保存错误！");
+                window.location.reload();
+            });
+        });
+        $("#del").click(function () {
+            var url = "/api/MDC_MACHINETOOLS/Destroy";
+            $.post(url, { "NAME": $("#name").val() }, function (data) {
+                if (data.error) {
+                    alert(data);
+                    window.location.reload();
+                } else {
+                    alert("删除成功！" + "\n" + JSON.stringify(data, null, 4));
+                    parent.window.location.reload();
+                }
+            }).error(function () {
+                alert("删除错误！");
+                window.location.reload();
+            });
+        });
+
+
+        $.get("/api/MDC_DSSLAYOUT?MTID=" + $("#MTID").val(), function (DSSLAYOUT, status) {
+            if (status == "success") {
+                if (DSSLAYOUT[0]) {
+                    $("#imgSrc").attr("src", DSSLAYOUT[0].SRC);
+                } else {
+                    $("#imgSrc").attr("src", "/images/MTdefaultPic.jpg");
+                }
+            } else {
+                $("#imgSrc").attr("src", "/images/MTdefaultPic.jpg");
+            }
+        });
+        var dialog = $("#dialog").kendoDialog({
+            width: "260px",
+            height: "350px",
+            visible: false,
+            title: "上传设备图片",
+            closable: true,
+            modal: true,
+            content: "<form id='upload' enctype='multipart/form-data' target='nm_iframe'>" +
+                "<input id='upInput' type='file' name='MTPicture'>" +
+                "<br /><br />" +
+                "<input type='text' name='MTID' value='<%= ID%>' style='display: none;'>" +
+                "<input type='text' name='MTNAME' value='<%= MATOLNAME%>' style='display: none;'>" +
+                "<div id='box' style='border: 1px solid #ccc;width: 230px;height: 220px;'>" +
+                "<img id='preView' src='' alt='' style='height: 220px;width: 230px;'>" +
+                "</div>" +
+                "<button id='btnUp' name='btnUp' style='text-align:center;'>上传图片</button>" +
+                "</form>" +
+                "<iframe id='id_iframe' name='nm_iframe' style='display:none;'></iframe>",
+        });
+        $("#choosePic").kendoButton({
+            click: openDialog
+        });
+        function openDialog(e) {
+            $("#dialog").data("kendoDialog").open();
+        }
+
+        var input = document.getElementById("upInput");
+        input.onchange = function () {
+            var upImg = document.getElementById('upInput').files[0];
+            $("#preView").attr("src", window.URL.createObjectURL(upImg));
+        };
+
+        $("#btnUp").click(function () {
+            $.ajax({
+                url: "/upload",
+                type: "POST",
+                cache: false,
+                data: new FormData($("#upload")[0]),
+                processData: false,
+                contentType: false
+            }).done(function (res) {
+                console.log(JSON.stringify(res));
+                if (!res.err) {
+                    alert("上传成功！");
+                    window.location.reload();
+                } else {
+                    alert("存储失败！");
+                    window.location.reload();
+                }
+            }).fail(function (res) {
+                alert("上传失败！");
+                window.location.reload();
+            });
+        });
+    });
+
+</script>
+<style type="text/css">
+    framebody {
+        height: 600px;
+        width: 700px;
+    }
+
+    td {
+        margin-right: 20px;
+        margin-left: 20px;
+    }
+
+    pre {
+        font-family: 'Microsoft Yahei', '微软雅黑', Arial, sans-serif;
+        font-size: 10px;
+    }
+
+    #grid {
+        height: 20%;
+    }
+
+    #choosePic {
+        position: absolute;
+        right: 10%;
+        top: 20px;
+    }
+</style>
+
+</html>

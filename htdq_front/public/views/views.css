@@ -1,0 +1,63 @@
+body {
+  background:white;
+}
+
+.active {
+  background:skyblue;
+}
+.inactive {
+  background:gray;
+}
+
+.MTALARM {
+  background:red;
+}
+
+.MTRUNNING {
+  background:green;
+}
+
+.MTONLINE {
+  background:yellow;
+}
+
+
+#gauge-container1 {
+    background: transparent url("/content/dataviz/gauge/gauge-container-partial2.png") no-repeat 50% 50%;
+    width: 193px;
+    height: 193px;
+    text-align: center;
+    margin: 0 auto 0px auto;
+    padding-bottom: 18px;
+}
+
+#gauge-container2 {
+    background: transparent url("/content/dataviz/gauge/gauge-container-partial2.png") no-repeat 50% 50%;
+    width: 193px;
+    height: 193px;
+    text-align: center;
+    margin: 0 auto 0px auto;
+    padding-bottom: 18px;
+}
+
+#gauge1 {
+    width: 175px;
+    height: 175px;
+    margin: 0 auto;
+}
+
+#gauge2 {
+    width: 175px;
+    height: 175px;
+    margin: 0 auto;
+}
+
+#gauge-container1 .k-slider {
+    margin-top: -500px;
+    width: 70px;
+}
+
+#gauge-container2 .k-slider {
+    margin-top: -500px;
+    width: 70px;
+}

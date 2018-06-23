@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>幻灯片</title>
+    <link rel="stylesheet" href="/bower_components/fullpage.js/dist/jquery.fullpage.min.css">
+    <style>
+        .section {
+            text-align: center;
+            font: 50px "Microsoft Yahei";
+            color: #fff;
+        }
+
+        .iframe {
+            margin: 0 auto;
+            height: 800px;
+            width: 90%
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dowebok">
+    </div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/bower_components/fullpage.js/dist/jquery.fullpage.min.js"></script>
+    <script>
+        $(function () {
+            $.get("/api/PPTCONFIG", function (data, resp) {
+                if (resp == "success" && data.length != 0) {
+                    var nodeid = data[0].NODEID;
+                    var URL = data[0].CONTENT;
+                    var timeout = data[0].TIMESETTING * 1000;
+                    var color = ['#1bbc9b', '#4BBFC3', '#7BAABE', '#f90'];
+                    var ind = 0;
+                    var percent = data[0].DISPLAYPERCENT.replace(/\s/g, "");
+                    var hasStm = $.inArray("statement", nodeid);
+                    var hasErc = $.inArray("elecborad", nodeid);
+                    var hasOvl = $.inArray("overall", nodeid);
+                    if (hasStm != -1) {
+                        URL.forEach(function (url, index) {
+                            if (RegExp("^\/analysis\/.*").test(url)) {
+                                var lastUrl = url + '?' + "MTID=" + data[0].MTID[index] + "&&BEGINTIME=" + data[0].BEGINTIME + "&&ENDTIME=" + data[0].ENDTIME;
+                                $('#dowebok').prepend('<div class="section"' + ' style="background-color:' + color[ind] + '"><div class="iframe"><iframe width=' + '"' + percent + '"' + 'height=800' + 'scrolling=no src=' + lastUrl + '> </iframe></div></div>');
+                                ind += 1;
+                                if (ind >= color.length) {
+                                    ind = 0;
+                                }
+                            };
+                        });
+                    }
+                    // + percent + '"' + 'height=' + '"' + 700 * numpercent + '"'
+                    if (hasErc != -1) {
+                        URL.forEach(function (url, index) {
+                            if (RegExp("^\/views\/.*").test(url)) {
+                                var lastUrl = url + '?' + "ID=" + data[0].MTID[index];
+                                $('#dowebok').prepend('<div class="section"' + ' style="background-color:' + color[ind] + '"><div class="iframe"><iframe width=' + '"' + percent + '"' + 'height=800;' + 'scrolling=no src=' + lastUrl + '> </iframe></div></div>');
+                                ind += 1;
+                                if (ind >= color.length) {
+                                    ind = 0;
+                                }
+                            };
+                        });
+                    };
+                    if (hasOvl != -1) {
+                        $('#dowebok').prepend('<div class="section"' + ' style="background-color:#C2C287' + '"><div class="iframe"><iframe width=' + '"' + percent + '"' + 'height=800' + 'scrolling=no src=' + data[0].LAYOUT + '> </iframe></div></div>');
+                    };
+                    $('#dowebok').fullpage({
+                        continuousVertical: true
+                    });
+
+                    setInterval(function () {
+                        $.fn.fullpage.moveSectionDown();
+                    }, timeout);
+                }
+            });
+
+        });
+    </script>
+
+
+
+</body>
+
+</html>

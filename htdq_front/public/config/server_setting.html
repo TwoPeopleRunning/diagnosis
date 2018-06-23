@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>服务器配置</title>
+    <meta charset="utf-8">
+    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+
+</head>
+
+<body>
+    <div id="window">
+        <div id="tabstrip" style="margin: 0px">
+            <ul>
+                <li class="k-state-active">
+                    <p style="text-align: center;"><img src="../../images/server.jpg" height="30px" width="30px"></p>
+                    同步服务器设置
+                </li>
+                <li>
+                    <p style="text-align: center;"><img src="../../images/monitor.jpg" height="30px" width="30px"></p>
+                    监控服务设置
+                </li>
+            </ul>
+            <div class="box-col">
+                <div style="margin: 0px" id="grid1" data-role="grid" class="k-grid k-widget k-editable">
+                    <div class="k-header k-grid-toolbar"><a class="k-button k-button-icontext k-grid-add" href="#"><span class="k-icon k-i-add"></span>添加</a>
+                        <p style="float: right;width: 60%;text-align: left;font-size: 1.0em">客户端同步服务</p>
+                    </div>
+                </div>
+            </div>
+            <div class="box-col">
+                <!--                 <div style="width: 700px" id="grid"></div> -->
+                <div style="margin: 0px" id="grid2" data-role="grid" class="k-grid k-widget k-editable">
+                    <div class="k-header k-grid-toolbar"><a class="k-button k-button-icontext k-grid-add" href="#"><span class="k-icon k-i-add"></span>添加</a>
+                        <p style="float: right;width: 60%;text-align: left; font-size: 1.0em;">设备监控服务</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <span id="undo" style="display:none" class="k-button hide-on-narrow">Click here to open the window.</span> -->
+    <style>
+        #undo {
+            text-align: center;
+            position: absolute;
+            white-space: nowrap;
+            padding: 0em;
+            cursor: pointer;
+        }
+
+        .armchair {
+            float: left;
+            margin: 30px 30px 120px 30px;
+            text-align: center;
+        }
+
+        .armchair img {
+            display: block;
+            margin-bottom: 10px;
+        }
+        /*media screen and (max-width: 1023px) {
+        div.k-window {
+            display: none !important;
+        }
+    }*/
+
+        #tabstrip h2 {
+            font-weight: lighter;
+            font-size: 5em;
+            line-height: 1;
+            padding: 0 0 0 30px;
+            margin: 0;
+        }
+
+        #tabstrip h2 span {
+            background: none;
+            padding-left: 2px;
+            font-size: .2em;
+            vertical-align: top;
+        }
+
+        #tabstrip p {
+            text-align: center;
+        }
+    </style>
+
+
+    <script>
+        function getCookie(name) {
+            var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+
+            if (arr = document.cookie.match(reg))
+
+                return unescape(arr[2]);
+            else
+                return null;
+        }
+        $(document).ready(function () {
+            // $.ajaxSetup({
+            //     headers: {
+            //         "x-access-token": token
+            //     }
+            // });
+            var myWindow = $("#window"),
+                undo = $("#undo");
+
+            undo.click(function () {
+                myWindow.data("kendoWindow").open();
+                undo.fadeOut();
+            });
+
+            function onClose() {
+                window.location.assign("../../");
+            }
+            myWindow.kendoWindow({
+                width: "1200px",
+                title: "服务设置",
+                visible: false,
+                actions: [
+                    "Minimize",
+                    "Maximize",
+                    "Close"
+                ],
+                close: onClose
+            }).data("kendoWindow").center().open();
+            $("#tabstrip").kendoTabStrip({
+                animation: {
+                    open: {
+                        effects: "fadeIn"
+                    }
+                }
+            });
+        });
+        var token = getCookie("Token");
+        var dataSource1 = new kendo.data.DataSource({
+            batch: true,
+            pageSize: 20,
+            transport: {
+                read: {
+                    url: "/api/MDC_SYSVR",
+                    type: "get",
+                    dataType: "json",
+                    // headers: {
+                    //     "x-access-token": token
+                    // }
+                },
+                create: {
+                    url: "/api/MDC_SYSVR/Create",
+                    type: "post",
+                    dataType: "json"
+                },
+                update: {
+                    url: "/api/MDC_SYSVR/Update",
+                    type: "post",
+                    dataType: "json"
+                },
+                destroy: {
+                    url: "/api/MDC_SYSVR/Destroy",
+                    type: "post",
+                    dataType: "json"
+                },
+                parameterMap: function (options, operation) {
+                    if (operation !== "read" && options.models) {
+                        return options.models[0];
+                    } else {
+                        var parameter = {
+                            page: options.page,
+                        }
+                        return parameter;
+                    }
+                }
+            },
+            schema: {
+                model: {
+                    id: "ID",
+                    fields: {
+                        ID: {
+                            type: "number",
+                            editable: false,
+                            nullable: true
+                        },
+                        SYSVRPORT: {
+                            type: "number",
+                            validation: {
+                                required: true
+                            }
+                        },
+                        SYSVRIP: {
+                            validation: {
+                                required: true
+                            }
+                        },
+                        SYSVRNAME: {
+                            validation: {
+                                required: true
+                            }
+                        },
+                    }
+                },
+                errors: "error" // twitter's response is { "error": "Invalid query" }
+            },
+            error: function (e) {
+                alert(e.errors);
+                window.location.assign("/users/login");
+            }
+        });
+        var dataSource2 = new kendo.data.DataSource({
+            batch: true,
+            pageSize: 20,
+            transport: {
+                read: {
+                    url: "/api/MDC_MNT",
+                    type: "get",
+                    dataType: "json",
+                },
+                create: {
+                    url: "/api/MDC_MNT/Create",
+                    type: "post",
+                    dataType: "json"
+                },
+                update: {
+                    url: "/api/MDC_MNT/Update",
+                    type: "post",
+                    dataType: "json"
+                },
+                destroy: {
+                    url: "/api/MDC_MNT/Destroy",
+                    type: "post",
+                    dataType: "json"
+                },
+                parameterMap: function (options, operation) {
+                    if (operation !== "read" && options.models) {
+                        return options.models[0];
+                    } else {
+                        var parameter = {
+                            page: options.page,
+                        }
+                        return parameter;
+                    }
+                }
+            },
+            schema: {
+                model: {
+                    id: "ID",
+                    fields: {
+                        ID: {
+                            type: "number",
+                            editable: false,
+                            nullable: true
+                        },
+                        SVRPORT: {
+                            type: "number",
+                            validation: {
+                                required: true
+                            }
+                        },
+                        EXPAND: {
+                            validation: {
+                                required: true
+                            }
+                        },
+                        SVRIP: {
+                            validation: {
+                                required: true
+                            }
+                        },
+                        SVRNAME: {
+                            validation: {
+                                required: true
+                            }
+                        },
+                        MNTNAME: {
+                            validation: {
+                                required: true
+                            }
+                        },
+                        MNTDESC: {
+                            validation: {
+                                required: true
+                            }
+                        },
+                    }
+                }
+            }
+        });
+        $("#grid1").kendoGrid({
+            dataSource: dataSource1,
+            pageable: {
+                refresh: true
+            },
+            height: 800,
+            toolbar: ["create"],
+            columns: [{
+                field: "SYSVRNAME",
+                title: "服务器名称"
+            }, {
+                field: "SYSVRIP",
+                title: "服务器IP"
+            }, {
+                field: "SYSVRPORT",
+                title: "服务器端口"
+            }, {
+                command: ["edit", "destroy"],
+                title: "&nbsp;",
+                width: "250px"
+            }],
+            editable: "popup",
+        });
+
+        $("#grid2").kendoGrid({
+            dataSource: dataSource2,
+            pageable: {
+                refresh: true
+            },
+            height: 800,
+            toolbar: ["create"],
+            columns: [{
+                field: "MNTNAME",
+                title: "监控器名称"
+            }, {
+                field: "SVRNAME",
+                title: "服务器名称"
+            }, {
+                field: "SVRIP",
+                title: "服务器IP"
+            }, {
+                field: "SVRPORT",
+                title: "服务器端口"
+            }, {
+                command: ["edit", "destroy"],
+                title: "&nbsp;",
+                width: "250px"
+            }],
+            editable: "popup",
+        });
+    </script>
+</body>
+
+</html>

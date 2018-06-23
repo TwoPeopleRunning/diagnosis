@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+ <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title> 编辑布局图 </title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script> 
+
+<script type="text/javascript">
+
+	$.fn.extend({	
+		dragging:function(data){
+			var $this = $(this);
+			var xPage;
+			var yPage;
+			var X;
+			var Y;
+			var xRand = 0;
+			var yRand = 0;
+			var father = $this.parent();
+			var defaults = {
+				move : 'both',
+				randomPosition : true ,
+				hander:1
+			}
+			var opt = $.extend({},defaults,data);
+			var movePosition = opt.move; // 'both'
+			var random = opt.randomPosition; // true
+			var hander = opt.hander; // 1
+            var initLoc = opt.initLoc;
+            var lock = opt.lock;
+			if(hander == 1){
+				hander = $this;
+			}else{
+				hander = $this.find(opt.hander);
+			}
+			// 父级元素框
+			father.css({"position":"relative","overflow":"hidden"});
+			// 所选元素
+			$this.css({"position":"absolute"});
+			// 鼠标形状
+			hander.css({"cursor":"move"});
+			// 取父级元素宽度
+			var faWidth = father.width();
+			// 取父级元素高度
+			var faHeight = father.height();
+			// 所选元素宽度
+			var thisWidth = $this.width()+parseInt($this.css('padding-left'))+parseInt($this.css('padding-right'));
+			// 所选元素高度
+			var thisHeight = $this.height()+parseInt($this.css('padding-top'))+parseInt($this.css('padding-bottom'));
+			var mDown = false;
+			var positionX;
+			var positionY;
+			var moveX ;
+			var moveY ;
+			
+			if(random){
+				$thisRandom();
+			} else {
+				$thisFromDB();
+			}
+			function $thisRandom(){
+				$this.each(function(index, obj){
+					// console.log(obj);
+					console.log($(this).attr("id"));
+					// 元素的起始随机位置X
+					var randY = parseInt(Math.random()*(faHeight-thisHeight));
+					// 元素的起始随机位置Y
+					var randX = parseInt(Math.random()*(faWidth-thisWidth));
+					if(movePosition.toLowerCase() == 'x'){
+						$(this).css({
+							left:randX
+						});
+					}else if(movePosition.toLowerCase() == 'y'){
+						$(this).css({
+							top:randY
+						});
+					}else if(movePosition.toLowerCase() == 'both'){
+						$(this).css({
+							top:randY,
+							left:randX
+						});
+					}
+				});
+			}
+			function $thisFromDB(){
+				$this.each(function(index){
+					var i;
+					for (i in initLoc) {
+						if (initLoc[i].MTID.toString() == $(this).attr("id")) {
+							var randX = initLoc[i].XSERIES;
+							var randY = initLoc[i].YSERIES;
+							break;
+						}
+					}
+					
+					if(movePosition.toLowerCase() == 'x'){
+						$(this).css({
+							left:randX
+						});
+					}else if(movePosition.toLowerCase() == 'y'){
+						$(this).css({
+							top:randY
+						});
+					}else if(movePosition.toLowerCase() == 'both'){
+						$(this).css({
+							top:randY,
+							left:randX
+						});
+					}
+					
+				});	
+			}
+			
+			hander.mousedown(function(e){
+				// 其他图片设置被覆盖
+				father.children().css({"zIndex":"0"});
+				// 所选图片堆叠优先权最高
+				$this.css({"zIndex":"1"});
+				mDown = true;
+				// 显示指针位置
+				X = e.pageX;
+				Y = e.pageY;
+				positionX = $this.position().left;
+				positionY = $this.position().top;
+				// console.log('(' + positionX + ', ' + positionY + ')');
+				return false;
+			});
+				
+			$(document).mouseup(function(e){
+				mDown = false;
+			});
+				
+			$(document).mousemove(function(e){
+				xPage = e.pageX;
+				// 移动后的位置
+				moveX = positionX+xPage-X;
+				yPage = e.pageY;
+                moveY = positionY+yPage-Y;
+                if (lock) {
+                    return;
+                }
+				function thisXMove(){
+					if(mDown == true){
+						$this.css({"left":moveX});
+					}else{
+						return;
+					}
+					if(moveX < 0){
+						$this.css({"left":"0"});
+					}
+					if(moveX > (faWidth-thisWidth)){
+						$this.css({"left":faWidth-thisWidth});
+					}
+					return moveX;
+				}
+				function thisYMove(){
+					if(mDown == true){
+						$this.css({"top":moveY});
+					}else{
+						return;
+					}
+					if(moveY < 0){
+						$this.css({"top":"0"});
+					}
+					if(moveY > (faHeight-thisHeight)){
+						$this.css({"top":faHeight-thisHeight});
+					}
+					return moveY;
+				}
+				// 将移动元素限制在 box 中
+				function thisAllMove(){
+					if(mDown == true){
+						$this.css({"left":moveX,"top":moveY});
+					}else{
+						return;
+					}
+					if(moveX < 0){
+						$this.css({"left":"0"});
+					}
+					if(moveX > (faWidth-thisWidth)){
+						$this.css({"left":faWidth-thisWidth});
+					}
+
+					if(moveY < 0){
+						$this.css({"top":"0"});
+					}
+					if(moveY > (faHeight-thisHeight)){
+						$this.css({"top":faHeight-thisHeight});
+					}
+				}
+
+				if(movePosition.toLowerCase() == "x"){
+					thisXMove();
+				}else if(movePosition.toLowerCase() == "y"){
+					thisYMove();
+				}else if(movePosition.toLowerCase() == 'both'){
+					thisAllMove();
+				}
+			});
+		}
+	});
+</script>
+</head>
+ <body>
+	<p>设备布局图</p>
+	<div id="dialog"></div>
+	<div id="tool" style="text-align: center">
+		<button type="button" id="button4">锁定位置</button>
+		<button id="primaryTextButton1" class="k-primary">提交位置信息</button>
+		<button id="chgBck" class="k-primary">更换车间背景</button>
+	</div>
+	<div class='box'>
+        <% for(var i = 0; i < data.length; i++){ %>
+            <dl id=<%= data[i].MTID.toString() %>><div style="text-align: center;"><img src=<%= data[i].SRC %> width=50px height=50px title=<%= data[i].MTNAME %>> <p style="font-size: 5px;"><%= data[i].MTNAME %></p></div></dl>
+        <% } %>
+	</div>
+ </body>
+<script>
+	$(document).ready(function() {
+		$("#button4").kendoButton();
+        $("#primaryTextButton1").kendoButton();
+        // 初始位置
+        var initLoc;
+        var clickCnt = 1;
+        // 是否锁定
+        var lock = false;
+        $("#button4").click(function(){
+            if (clickCnt % 2){
+                $(this).text("取消锁定位置");
+                lock = true;
+            } else {
+                $(this).text("锁定位置");
+                lock = false;
+            }
+            clickCnt++;
+        });
+
+        $.get("/api/MDC_DSSLAYOUT", function(dt, status){
+            if (status == 'success') {
+                initLoc = dt;
+                $('.box dl').each(function(){
+                    $(this).dragging({
+                        move : 'both',
+                        randomPosition : false,
+                        initLoc: initLoc,
+                        lock: lock
+                    });
+                });
+            }
+        });
+		$("#primaryTextButton1").click(function () {
+			var i;
+			for (i in initLoc) {
+                (function(i){
+                    $.post( "/api/MDC_DSSLAYOUT/Update",
+                    {
+                        MTID: initLoc[i].MTID,
+                        XSERIES: $("#" + initLoc[i].MTID.toString()).position().left,
+                        YSERIES: $("#" + initLoc[i].MTID.toString()).position().top
+                    },
+                    function( data ) {
+                        // console.log(i);
+                        // console.log(data);
+                        if(i==initLoc.length-1){
+                            alert("提交成功！");
+                            document.location.reload();
+                        }
+                        
+                    });
+                    // console.log($("#" + initLoc[i].id.toString()).position().left);
+                })(i);
+			}
+		});
+
+		// 更换背景
+        var dialog = $("#dialog").kendoDialog({
+            width: "400px",
+            height: "450px",
+            visible: false,
+            title: "上传设备图片",
+            closable: true,
+            modal: true,
+            content: "<form id='upload' enctype='multipart/form-data'>" +
+                "<input id='upInput' type='file' name='MTPicture'>" +
+                "<br /><br />" +
+                "<div style='border: 1px solid #ccc;width: 365px;height: 320px;'>" +
+                "<img id='preView' src='' alt='' style='height: 320px;width: 365px;'>" +    
+                "</div>" +
+                "<button id='btnUp' name='btnUp' style='text-align:center;'>上传图片</button>" +
+                "</form>"
+        });
+        $("#chgBck").kendoButton({
+            click: openDialog
+        });
+        function openDialog(e) {
+            $("#dialog").data("kendoDialog").open();
+        }
+
+        var input = document.getElementById("upInput");
+        input.onchange = function(){
+            var upImg=document.getElementById('upInput').files[0];
+            $("#preView").attr("src", window.URL.createObjectURL(upImg));
+		};
+		
+        $.get("/api/MDC_MACHINELAYOUT", function(MDC_MACHINELAYOUT, status){
+            if (status == "success") {
+                if (MDC_MACHINELAYOUT[0]) {
+					console.log(MDC_MACHINELAYOUT[0].SRC);
+                    $(".box").css({"background-image": "url(" + MDC_MACHINELAYOUT[0].SRC + ")"});
+                }
+            }
+        });
+        $("#btnUp").click(function(){
+            $.ajax({
+                url: "/uploadGRP",
+                type: "POST",
+                cache: false,
+                data: new FormData($("#upload")[0]),
+                processData: false,
+                contentType: false
+            }).done(function(res){
+                console.log(JSON.stringify(res));
+                alert("上传成功！");
+
+            }).fail(function(res){
+                alert("上传失败！");
+            });
+        });
+	});
+</script>
+
+<style>
+	.box {
+		width:1000px;
+		margin:2em auto 0;
+		height:500px;
+		/* background:url(/images/MTGRPimg/2.png);  */
+		border:5px solid darkgrey;
+		background-size: 1100px 600px;
+		border-radius:10px;
+	}
+	p {
+		font-size:20px;
+		color:#333;
+		text-align:center;
+		margin:5px 0 10px;
+	}
+</style>
+ </html>

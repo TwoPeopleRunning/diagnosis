@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>采集关系配置</title>
+    <meta charset="utf-8">
+    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+
+
+</head>
+
+<body>
+    <div id="windows">
+        <div id="collect" style="height:805px">
+            <fieldset style="height:205px;border: 1px solid #CCCCCC;">
+                <legend style="font-size:1.3em;">监控服务器</legend>
+                <div id="treeview" style="font-size:1.2em;"></div>
+            </fieldset>
+            <div style="border: 1px solid #000;">
+                <div class="divbox">
+                    <table id="inputdiv" cellpadding="20" align="left" style="margin:2% auto">
+                        <tr>
+                            <td>监控端名称:&nbsp;<input class="k-input" type="text" id="mname" name="mname" readonly></td>
+                            <td>服务器名称:&nbsp;<input class="k-input" type="text" id="sname" name="sname" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>服务器IP:&nbsp;<input class="k-input" type="text" id="ip" name="ip" readonly></td>
+                            <td>端口:&nbsp;<input class="k-input" type="text" id="port" name="port" readonly></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="tabstrip">
+                    <ul>
+                        <li class="k-state-active">
+                            <p>采集关系</p>
+                        </li>
+                    </ul>
+                    <div class="box-col">
+                        <div id="grid1" data-role="grid" class="k-grid k-widget">
+                        </div>
+                    </div>
+                    <!--<div class="selectbox">-->
+                    <!--<input type="checkbox" id="all">-->
+                    <!--<input type="button" value="全选" id="selectAll">  
+            <input type="button" value="全不选" id="unSelect">  
+            <input type="button" value="反选" id="reverse"> 
+        </div>-->
+        <span style="float: right;font-size: 1.2em;margin:3px 3% 0 0;">
+            <button  class="btn" id="relate" > 关联</button> 
+            <!--<input type="button" value="关联" class="btn" id="relate" > -->
+            <button  class="btn" id="remove" > 移除</button> 
+        </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <style>
+        .divbox {
+            border: 1px solid #000;
+            height: 200px;
+            text-align: right;
+            background-color: #eeeeee;
+        }
+        
+        .tablediv {
+            border: 1px solid #000;
+            height: 600px;
+        }
+        
+        .selectbox {
+            float: left;
+            margin-left: 5%;
+            margin-top: 1%;
+        }
+        
+        .btn {
+            height: 40px;
+            width: 70px;
+        }
+        
+        #inputdiv td {
+            font-size: 1.2em;
+            width: 379px;
+        }
+        
+        #tabstrip p {
+            margin: 10px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+    </style>
+
+
+    <script>
+        $(document).ready(function() {
+            var Data;
+            var Data1;
+            var selectedItem;
+            var mntid;
+            $.get("/api/MDC_MNT", function(data, status) {
+                if (status == "success") {
+                    Data = data;
+                    // console.log(Data);
+                    var dataSource = new kendo.data.HierarchicalDataSource({
+                        data: Data,
+                        schema: {
+                            model: {
+                                id: "ID",
+                                fields: {
+                                    ID: {
+                                        type: "number",
+                                        editable: false,
+                                        nullable: true
+                                    },
+                                    SVRPORT: {
+                                        type: "number",
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    EXPAND: {
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    SVRIP: {
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    SVRNAME: {
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    MNTNAME: {
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    MNTDESC: {
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                }
+                            }
+                        }
+                    });
+
+                    //树状图
+                    $("#treeview").kendoTreeView({
+                        dataSource: dataSource,
+                        dataTextField: "MNTNAME",
+                        change: function(e) {
+                            selectedItem = this.dataItem(this.select());
+                            // console.log(selectedItem)
+                            $("#mname").val(selectedItem.MNTNAME);
+                            $("#sname").val(selectedItem.SVRNAME);
+                            $("#ip").val(selectedItem.SVRIP);
+                            $("#port").val(selectedItem.SVRPORT);
+                        }
+                    });
+                } else {
+                    alert("获取数据失败 !");
+                }
+            });
+
+            $("#tabstrip").kendoTabStrip({
+                animation: {
+                    open: {
+                        effects: "fadeIn"
+                    }
+                }
+            });
+
+
+            $("#collect").kendoSplitter({
+                panes: [{
+                    size: "15%",
+                    collapsible: true
+                }, {
+                    collapsible: true
+                }]
+            });
+
+            function onClose() {
+                window.location.assign("../../");
+            }
+            $("#windows").kendoWindow({
+                width: "1200px",
+                actions: ["Minimize", "Maximize", "Close"],
+                close: onClose
+            }).data("kendoWindow").center().open();
+            var dialog = $("#windows").data("kendoWindow");
+            // dialog.maximize();
+
+
+            //设备信息数据
+
+            $.get("/api/MDC_MACHINETOOLS", function(data, status) {
+                if (status == "success") {
+                    Data1 = data;
+                    // console.log(Data1);
+
+                    var dataSource1 = new kendo.data.DataSource({
+                        data: Data1,
+                        batch: true,
+                        pageSize: 20,
+                        schema: {
+                            model: {
+                                id: "ID",
+                                fields: {
+                                    ID: {
+                                        type: "number",
+                                        editable: false,
+                                        nullable: true
+                                    },
+                                    MATOLCODE: {
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    MATOLNAME: {
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    MATOLTYPE: {
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    // MATOLGRPID: { validation: {  required: true } },
+                                    // DEPTID: { validation: {  required: true } },
+                                    // COLSERVERID: { type: "number", validation: { required: true }},
+                                    // MATOLIP: { validation: {  required: true } },
+                                    // MATOLPORT: { type: "number", validation: { required: true }},
+                                    // INSTIME: { validation: {  required: true } },
+                                    // EXPAND: { validation: {  required: true } },
+                                    // ACTIVE:{ type: "number", validation: { required: true }},
+                                    // SYSTEMTYPE: { validation: {  required: true } },
+                                }
+                            }
+                        }
+                    });
+                    // console.log(dataSource1);
+                    $("#grid1").kendoGrid({
+                        dataSource: dataSource1,
+                        pageable: {
+                            refresh: true
+                        },
+                        height: 420,
+                        selectable: "multiple, row",
+                        sortable: true,
+                        columns: [{
+                                field: "MATOLCODE",
+                                title: "设备编号"
+                            }, {
+                                field: "MATOLNAME",
+                                title: "名称"
+                            }, {
+                                field: "MATOLTYPE",
+                                title: "设备类型"
+                            }, {
+                                field: "COLSERVERID",
+                                title: "关联监控器ID"
+                            },
+                            // { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+                        ]
+                    });
+                    var grid = $("#grid1").data("kendoGrid");
+                    $("#relate").click(function() {
+                        var row = grid.select();
+                        var postData = {};
+                        postData.isArray = true;
+                        postData.data = [];
+                        for (var i = 0; i < row.length; i++) {
+                            var relatedata = grid.dataItem(row[i]);
+                            relatedata.COLSERVERID = selectedItem.ID;
+                            postData.data[i] = {
+                                ID: relatedata.ID,
+                                COLSERVERID: relatedata.COLSERVERID,
+                            };
+                            // console.log(relatedata.ID);
+                            // console.log(mntid);    
+                        }
+
+                        $.post("/api/MDC_MACHINETOOLS/Update", JSON.stringify(postData), function(data, status) {
+                            if (status == "success") {
+                                console.log("关联成功 !");
+                                grid.refresh();
+                            } else {
+                                alert("关联失败 !")
+                            }
+                        }, "json");
+                    });
+
+                    $("#remove").click(function() {
+                        var row = grid.select();
+                        var postData = {};
+                        postData.isArray = true;
+                        postData.data = [];
+                        for (var i = 0; i < row.length; i++) {
+                            var relatedata = grid.dataItem(row[i]);
+                            relatedata.COLSERVERID = "0";
+                            postData.data[i] = {
+                                ID: relatedata.ID,
+                                COLSERVERID: relatedata.COLSERVERID,
+                            };
+                            // console.log(relatedata.ID);
+                            // console.log(mntid);
+                        }
+
+
+                        $.post("/api/MDC_MACHINETOOLS/Update", JSON.stringify(postData), function(data, status) {
+                            if (status == "success") {
+                                console.log("移除成功 !");
+                                grid.refresh();
+                            } else {
+                                alert("移除失败 !")
+                            }
+                        }, "json");
+                        // newdata=$.toJSON(postData)
+                        // console.log(newdata);
+                        console.log(postData);
+                        //  $.ajax({  
+                        //     url : "/api/MDC_MACHINETOOLS/Update",  
+                        //     type : 'POST',  
+                        //     data : JSON.stringify(postData),  
+                        //     dataType : 'json',  
+                        //     contentType : 'application/json',  
+                        //     success : function(data, status, xhr) {  
+                        //         console.log("移除成功 !");
+                        //         grid.refresh();
+                        //     },  
+                        //     Error : function(xhr, error, exception) {  
+                        //         // handle the error.    
+                        //         alert(exception.toString());  
+                        //     }  
+                        // });  
+                    });
+                } else {
+                    alert("获取数据失败 !");
+                }
+
+            });
+        });
+    </script>
+</body>
+
+</html>
