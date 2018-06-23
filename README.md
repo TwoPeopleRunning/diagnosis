@@ -1,0 +1,2 @@
+# diagnosis
+Bearing fault diagnosis
