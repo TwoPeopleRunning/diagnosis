@@ -20,6 +20,8 @@ var CACULATE = require('./CACULATE');
 var PPTCONFIG = require('./PPTCONFIG');
 var LOGRECORD = require('./LOGRECORD');
 var ONEHOUR = require('./ONEHOUR');
+var MDC_BEARING = require('./MDC_BEARING');
+var INSPECT_HIS = require('./INSPECT_HIS');
 // var ADD = require('./ADD');
 /**
  * Exports
@@ -62,4 +64,6 @@ exports.MDC_DSSLAYOUT = MDC_DSSLAYOUT;
 exports.MDC_MACHINELAYOUT = MDC_MACHINELAYOUT;
 exports.LOGRECORD = LOGRECORD;
 exports.ONEHOUR = ONEHOUR;
+exports.MDC_BEARING = MDC_BEARING;
+exports.INSPECT_HIS = INSPECT_HIS;
 // exports.ADD = ADD;

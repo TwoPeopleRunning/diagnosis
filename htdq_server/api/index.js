@@ -37,6 +37,8 @@ var MDC_MACHINELAYOUT = require('./MDC_MACHINELAYOUT');
 var LOGRECORD = require('./LOGRECORD');
 var STATICS = require('./STATICS');
 var ONEHOUR = require('./ONEHOUR');
+var MDC_BEARING = require('./MDC_BEARING');
+var INSPECT_HIS = require('./INSPECT_HIS');
 
 /**
  * Private variables and functions
@@ -205,4 +207,6 @@ api.use('/MDC_DSSLAYOUT', MDC_DSSLAYOUT);
 api.use('/MDC_MACHINELAYOUT', MDC_MACHINELAYOUT);
 api.use('/STATICS', STATICS);
 api.use('/ONEHOUR', ONEHOUR);
+api.use('/MDC_BEARING', MDC_BEARING);
+api.use('/INSPECT_HIS', INSPECT_HIS);
 module.exports = api;
