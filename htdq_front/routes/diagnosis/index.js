@@ -2,7 +2,7 @@
  * Dependencies
  */
 var express = require('express');
-var config = require('../../config');
+// var config = require('../../config');
 
 
 /**
@@ -17,6 +17,17 @@ exports.get('/', function (req, res, next) {
     if (req.cookies.Token) {
         // console.log(req.signedCookies.user, req.signedCookies.passwd);
         res.render('diagnosis/index', {});
+    } else {
+        res.redirect('/users/login');
+        return;
+    }
+});
+
+exports.get('/config', function (req, res, next) {
+    if (req.cookies.Token) {
+        // console.log(req.signedCookies.user, req.signedCookies.passwd);
+        // mtid = req.params.mtid;
+        res.render('diagnosis/config', {});
     } else {
         res.redirect('/users/login');
         return;

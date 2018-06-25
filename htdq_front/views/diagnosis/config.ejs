@@ -1,7 +1,126 @@
+<!DOCTYPE html>
 <html>
 
-<body>
+<head>
+    <title>轴承诊断分析系统</title>
+    <meta charset="utf-8">
+    <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.min.css" rel="stylesheet">
+    <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jszip.min.js"></script>
+    <script src="/js/kendo.all.min.js"></script>
+    <script src="/content/shared/js/console.js"></script>
 
+</head>
+
+<body>
+    <div class='backlayout'>
+        <div class='tool-show'>
+            <div style="width: 30%;float: left;min-width: 300px;">
+                <img src="/images/MTimg/GX1000-49.jpg" alt="" id='toolPic' class='toolPic'>
+                <table style="float: left;height: 90px;width: 50%;padding: 8px" id="toolinfo">
+                    <tr>
+                        <td>机床编号</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>机床名称</td>
+                        <td>GTX1000</td>
+                    </tr>
+                    <tr>
+                        <td>轴承数目</td>
+                        <td>4</td>
+                    </tr>
+
+                </table>
+            </div>
+
+            <div style="width: 54%;float: left;">
+                <table style="float: left;padding: 14px;background-color:gainsboro;width: 100%" id='bearinginfo'>
+                    <tr>
+                        <td>
+                            轴承编号：
+                        </td>
+                        <td>
+                            1_1
+                        </td>
+                        <td>
+                            1_2
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>轴承状态：</td>
+                        <td>
+                            <button type="button" class='bearing'>状态正常</button>
+                        </td>
+                        <td>
+                            <button type="button" class='bearing'>状态正常</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="width: 12%;float: right;padding: 5px;text-align: center">
+                <div>
+                    <img src="/diagnosisImg/right.jpg" width="60px" alt="">
+                </div>
+
+                <div style="font-size: 10px">
+                    最近一次检测时间：
+                    <br> 2018-06-25 11:00:00
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
+<script>
+    $(".bearing").kendoButton()
+
+</script>
+
+<style>
+    body html {
+        height: 100%;
+        width: 100%;
+    }
+
+    .backlayout {
+        width: 60%;
+        height: 100%;
+    }
+
+    .tool-show {
+        border: 1px solid black;
+        min-width: 915px;
+        width: 100%;
+        height: 100px;
+    }
+
+    .toolPic {
+        float: left;
+        height: 90px;
+        margin: 5px 5px;
+    }
+
+    #toolinfo td {
+        padding: 5px 5px;
+        text-align: center;
+    }
+
+    #bearinginfo td {
+        padding: 5px 10px;
+        text-align: center;
+        width: 8%
+    }
+
+    .bearing {
+        font-size: 15px;
+        padding: 2px;
+    }
+</style>
 
 </html>

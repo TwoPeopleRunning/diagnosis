@@ -14,6 +14,7 @@ var lastID = 0;
  */
 var schema = new Schema({
   mtid: { type: Number, required: true },
+  toolname: { type: String, required: true, default: "" },
   position: { type: String, required: true, default: "" },
   kind: { type: String, required: true, default: "" },
   serialNumber: {
