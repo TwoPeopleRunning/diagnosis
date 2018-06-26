@@ -14,13 +14,13 @@
     <script src="/js/kendo.all.min.js"></script>
     <script src="/content/shared/js/console.js"></script>
     <script>
-        function stateChangeIE(_frame) {
-            var loader = document.getElementById("LoadDiv");
-            //loader.innerHTML = "加载中";
-            loader.style.display = "none";
-            _frame.style.display = "block";
-            // _frame.style.display = "block"
-        };
+        // function stateChangeIE(_frame) {
+        //     var loader = document.getElementById("LoadDiv");
+        //     //loader.innerHTML = "加载中";
+        //     loader.style.display = "none";
+        //     _frame.style.display = "block";
+        //     // _frame.style.display = "block"
+        // };
     </script>
 </head>
 
@@ -37,53 +37,207 @@
             </div>
         </div>
     </div>
+    <!--left sidebar-->
 
     <!--container-->
-    <div class="main">
-        <!--内容-->
-        <iframe id="iframeId" src="" frameborder="0" scrolling="no" onload="stateChangeIE(this)" style="display: none" class="iframe">
-        </iframe>
-        <div id="LoadDiv" align="center">
+
+    <div class="sidebar">
+        <button type="button" class="k-button" id="primaryTextButton5">提交选择</button>
+        <div style="text-align:center;" id="trtitle">设备列表</div>
+        <div id="treeview" class="treeview"></div>
+    </div>
+    <!--内容-->
+    <iframe id="iframeId" src="" frameborder="0" scrolling="no" onload="" class="iframe">
+    </iframe>
+
+    <!-- <div id="LoadDiv" align="center">
             <img src="/images/loading.gif" style="height:100px;width:100px;margin-top:15%">
             <p>加载中...</p>
-        </div>
-    </div>
+        </div> -->
+
     <div class="<resp></resp>onsive-message"></div>
 </body>
 <script>
-    setTimeout(function () {
-        iframe = document.getElementById('iframeId');
-        if (iframe.style.display == "none") {
-            document.getElementById("LoadDiv").style.display = 'none';
-            alert('加载失败，请退出后重新登录');
-            window.stop();
-        }
-    }, 120000)
+    // setTimeout(function () {
+    //     iframe = document.getElementById('iframeId');
+    //     if (iframe.style.display == "none") {
+    //         document.getElementById("LoadDiv").style.display = 'none';
+    //         alert('加载失败，请退出后重新登录');
+    //         window.stop();
+    //     }
+    // }, 120000)
 
+    // 闭包, 点击按钮变换样式
+    var hlClickButton = function () {
+        var eleIdTmp = ""
+        function hlClickButtonCls(element) {
+            if (eleIdTmp != "") {
+                $("#" + eleIdTmp).css("background-color", "")
+            }
+            eleIdTmp = element.id
+            $("#" + eleIdTmp).css("background-color", "#ff9900")
+        }
+        return hlClickButtonCls
+    }
+
+    // treeview
+    function fn(data, pid) {
+        var result = [],
+            temp;
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].pid == pid) {
+                if (data[i].isParent == false) {
+                    var obj = {
+                        "ID": data[i].ID,
+                        "isParent": data[i].isParent,
+                        "text": data[i].name,
+                        "checked": true
+                    };
+                } else {
+                    var obj = {
+                        "isParent": data[i].isParent,
+                        "text": data[i].name,
+                        "checked": false
+                    };
+                }
+                temp = fn(data, data[i].id);
+                if (temp.length > 0) {
+                    obj.items = temp;
+                }
+                result.push(obj);
+            }
+        }
+        return result;
+    }
+
+    function checkedNodeIds(nodes, checkedNodes) {
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].checked) {
+                if (nodes[i].isParent == false) {
+                    checkedNodes.push({
+                        id: nodes[i].ID,
+                        name: nodes[i].text
+                    });
+                }
+            }
+            if (nodes[i].hasChildren) {
+                checkedNodeIds(nodes[i].children.view(), checkedNodes);
+            }
+        }
+    }
+
+    function onCheck() {
+        var checked = []
+        var treeView = $("#treeview").data("kendoTreeView")
+        checkedNodeIds(treeView.dataSource.view(), checked)
+        console.log(checked)
+    }
 
     $(document).ready(function () {
-        $("#imageButton1").kendoButton({
-            imageUrl: "/content/shared/icons/new/outline.png",
-        });
-        $("#imageButton2").kendoButton({
-            imageUrl: "/content/shared/icons/new/display.png",
-        });
-        $("#imageButton3").kendoButton({
-            imageUrl: "/content/shared/icons/new/energy.png",
-        });
-        $("#imageButton4").kendoButton({
-            imageUrl: "/content/shared/icons/new/meta.png",
-        });
+        // 左侧树状图
+        $.get("/api/MDC_FACTORY", function (data, status) {
+            if (status == "success") {
+                $.get("/api/MDC_MTGROUP", function (data1, status) {
+                    if (status == "success") {
+                        $.get("/api/MDC_MACHINETOOLS", function (data2, status) {
+                            if (status == "success") {
+                                var resolve = []
+                                resolve.push({
+                                    id: 12,
+                                    pid: 0,
+                                    name: "工厂"
+                                })
+                                for (var i = 0; i < data.length; i++) {
+                                    resolve.push({
+                                        id: data[i].TREENODEINFO.id,
+                                        pid: data[i].TREENODEINFO.pId,
+                                        name: data[i].TREENODEINFO.name,
+                                        isParent: data[i].TREENODEINFO.isParent
+                                    })
+                                }
+                                for (var i = 0; i < data1.length; i++) {
+                                    resolve.push({
+                                        id: data1[i].TREENODEINFO.id,
+                                        pid: data1[i].TREENODEINFO.pId,
+                                        name: data1[i].TREENODEINFO.name,
+                                        isParent: data1[i].TREENODEINFO.isParent
+                                    })
+                                }
+                                for (var i = 0; i < data2.length; i++) {
+                                    resolve.push({
+                                        ID: data2[i].ID,
+                                        id: data2[i].TREENODEINFO.id,
+                                        pid: data2[i].TREENODEINFO.pId,
+                                        name: data2[i].TREENODEINFO.name,
+                                        isParent: data2[i].TREENODEINFO.isParent
+                                    })
+                                }
 
-        $("#imageButton1").click(function () {
-            $("#iframeId").attr('src', 'diagnosis/config')
+                                // console.log(fn(nodes, 0));
+                                dataSource = fn(resolve, 0)
+                                // kendoTreeView 函数
+                                $("#treeview").kendoTreeView({
+                                    checkboxes: {
+                                        checkChildren: true
+                                    },
+                                    dataSource: dataSource,
+                                    // check: onCheck
+                                })
+                                var treeview = $("#treeview").data("kendoTreeView")
+                                treeview.expand(".k-item")
+
+                                ////////
+                                onCheck()
+
+                                var handleTextBox = function (callback) {
+                                    return function (e) {
+                                        if (e.type != "keypress" || kendo.keys.ENTER == e.keyCode) {
+                                            callback(e);
+                                        }
+                                    };
+                                };
+
+                                // 顶端按钮选项
+                                var hlButton = hlClickButton()
+                                $("#imageButton1").kendoButton({
+                                    imageUrl: "/content/shared/icons/new/outline.png",
+                                });
+                                $("#imageButton2").kendoButton({
+                                    imageUrl: "/content/shared/icons/new/display.png",
+                                });
+                                $("#imageButton3").kendoButton({
+                                    imageUrl: "/content/shared/icons/new/energy.png",
+                                });
+                                $("#imageButton4").kendoButton({
+                                    imageUrl: "/content/shared/icons/new/meta.png",
+                                });
+
+                                $("#imageButton1").click(function () {
+                                    hlButton(this)
+                                    $("#iframeId").attr('src', 'http://www.baidu.com')
+                                })
+                                $("#imageButton2").click(function () {
+                                    hlButton(this)
+                                    $("#iframeId").attr('src', 'diagnosis/bearing')
+                                })
+                                $("#imageButton3").click(function () {
+                                    hlButton(this)
+                                    $("#iframeId").attr('src', 'diagnosis/inspect')
+                                })
+                                $("#imageButton4").click(function () {
+                                    hlButton(this)
+                                    $("#iframeId").attr('src', '')
+                                })
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        $("#primaryTextButton5").click(function () {
+            onCheck()
         })
-        $("#imageButton2").click(function () {
-            $("#iframeId").attr('src', 'diagnosis/bearing')
-        })
-        $("#imageButton3").click(function () {
-            $("#iframeId").attr('src', 'diagnosis/inspect')
-        })
+
     });
 </script>
 <style>
@@ -140,7 +294,8 @@
 
     .main {
         height: 800px;
-        border: 1px solid black;
+        width: 100%;
+        /* border: 1px solid black; */
     }
 
     .k-textbox {
@@ -148,12 +303,13 @@
     }
 
     #iframeId {
-        position: relative;
-        width: 100%;
+        /* position: relative; */
+        width: 80%;
         height: 100%;
-        top: 118px;
-        overflow: hidden;
-        /* padding-top: 160px; */
+
+        float: right;
+        /* overflow: hidden; */
+        padding-top: 160px;
     }
 
     html {
