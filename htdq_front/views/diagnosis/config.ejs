@@ -19,8 +19,10 @@
     <div id='mainshow'></div>
 </body>
 <script>
-
-    checkednode = [{ 'mtid': 1, 'toolname': 'GTX-1000' }, { 'mtid': 2, 'toolname': 'GTX1000-48' }, { 'mtid': 3, 'toolname': 'GTX1000-49' }];
+    // checkednode = [{ 'mtid': 1, 'toolname': 'GTX-1000' }, { 'mtid': 2, 'toolname': 'GTX1000-48' }, { 'mtid': 3, 'toolname': 'GTX1000-49' }];
+    checkednode = parent.checkednode
+    console.log("child page")
+    console.log(parent.checkednode)
     for (let index = 0; index < checkednode.length; index++) {
         const node = checkednode[index];
         $('#mainshow').append(
@@ -37,7 +39,7 @@
             '</tr>' +
             '<tr>' +
             '<td>轴承数目</td>' +
-            '<td>4</td>' +
+            '<td></td>' +
             '</tr>' +
             '</table>' +
             '</div>' +
@@ -111,7 +113,7 @@
 
     .tool-show {
         border: 1px solid black;
-        min-width: 960px;
+        min-width: 1000px;
         width: 100%;
         height: 100px;
     }
@@ -119,7 +121,7 @@
     .tool {
         width: 30%;
         float: left;
-        min-width: 320px;
+        min-width: 360px;
     }
 
     .toolPic {
