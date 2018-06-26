@@ -37,9 +37,6 @@
             </div>
         </div>
     </div>
-    <!--left sidebar-->
-
-    <!--container-->
 
     <div class="sidebar">
         <button type="button" class="k-button" id="primaryTextButton5">提交选择</button>
@@ -47,8 +44,10 @@
         <div id="treeview" class="treeview"></div>
     </div>
     <!--内容-->
-    <iframe id="iframeId" src="" frameborder="0" scrolling="no" onload="" class="iframe">
-    </iframe>
+    <div class="main">
+        <iframe id="iframeId" src="" frameborder="0" scrolling="no" onload="" class="iframe">
+        </iframe>
+    </div>
 
     <!-- <div id="LoadDiv" align="center">
             <img src="/images/loading.gif" style="height:100px;width:100px;margin-top:15%">
@@ -130,7 +129,17 @@
         var checked = []
         var treeView = $("#treeview").data("kendoTreeView")
         checkedNodeIds(treeView.dataSource.view(), checked)
-        console.log(checked)
+        // console.log(checked)
+        return checked
+    }
+
+    var checkednode = []
+    function generateCheckedNodes() {
+        checkednode = []
+        var checked = onCheck()
+        for (var i = 0; i < checked.length; i++) {
+            checkednode.push({ "mtid": checked[i].id, "toolname": checked[i].name })
+        }
     }
 
     $(document).ready(function () {
@@ -214,10 +223,12 @@
 
                                 $("#imageButton1").click(function () {
                                     hlButton(this)
-                                    $("#iframeId").attr('src', 'http://www.baidu.com')
+                                    generateCheckedNodes()
+                                    $("#iframeId").attr('src', 'diagnosis/config')
                                 })
                                 $("#imageButton2").click(function () {
                                     hlButton(this)
+                                    generateCheckedNodes()
                                     $("#iframeId").attr('src', 'diagnosis/bearing')
                                 })
                                 $("#imageButton3").click(function () {
@@ -235,9 +246,10 @@
             }
         });
         $("#primaryTextButton5").click(function () {
-            onCheck()
+            generateCheckedNodes()
+            console.log(checkednode)
+            document.getElementById('iframeId').contentWindow.location.reload(true)
         })
-
     });
 </script>
 <style>
@@ -293,8 +305,8 @@
     }
 
     .main {
-        height: 800px;
-        width: 100%;
+        height: 1000px;
+        min-height: 640px;
         /* border: 1px solid black; */
     }
 
@@ -304,12 +316,13 @@
 
     #iframeId {
         /* position: relative; */
-        width: 80%;
+        width: 77%;
         height: 100%;
 
-        float: right;
+        /* float: right; */
         /* overflow: hidden; */
         padding-top: 160px;
+        /* border: 1px solid red; */
     }
 
     html {
