@@ -62,7 +62,7 @@ function bearHealth(savedata) {
 //mtid为机床id，如果有serialNumber就是修改信息，如果没有serialNumber就是创建轴承信息，serialNumber格式mtid_id
 exports.route('/Create').post(function (req, res) {
     if (!req.body.mtid || !req.body.position || !req.body.kind) {
-        res.send("mtid、position、kind is necessary")
+        res.send({ 'error': "mtid、position、kind is necessary" })
     } else {
         MDC_MACHINETOOLS.findOne({ ID: req.body.mtid }, function (toolerr, tool) {
             if (toolerr) {

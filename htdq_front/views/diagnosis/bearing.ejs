@@ -5,6 +5,7 @@
     <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
     <link href="/styles/kendo.default.min.css" rel="stylesheet">
     <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/font_awesome/css/font-awesome.min.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/jszip.min.js"></script>
     <script src="/js/kendo.all.min.js"></script>
@@ -14,121 +15,217 @@
 <html>
 
 <body>
-    <div id='showBearing' class='show-bearing'>
-        <form id="form" class="form">
-            <img src="/images/MTimg/GX1000-49.jpg" alt="" style="height: 80px;float: left;">
-            <table class="table-info">
-                <tr>
-                    <td>
-                        <p>轴承编号：</p>
-                    </td>
-                    <td>
-                        <input type="text" name="" id="" value="1_1" disabled>
-                    </td>
-
-                </tr>
-                <tr>
-                    <td>
-                        <p>轴承类型：</p>
-                    </td>
-                    <td>
-                        <input type="text" name="" id="" value="滚珠轴承" disabled>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>轴承位置：</p>
-                    </td>
-                    <td>
-                        <input type="text" name="" id="" value="主轴轴承" disabled>
-                    </td>
-                </tr>
-
-            </table>
-        </form>
-        <table id='edit-table' class="edit-table">
-            <tr>
-                <td>
-                    <button>编辑</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button>删除</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button>保存</button>
-                </td>
-            </tr>
-        </table>
-
-        <table id='diagnosis-table' class="diagnosis-table">
-            <tr>
-                <th style="text-align: left">
-                    故障诊断结果：
-                </th>
-                <td style="text-align: right">2018-06-23</td>
-                <td style="text-align: left">11:22:33</td>
-            </tr>
-            <tr>
-                <td>
-                    <p>轴承正常</p>
-                    <input type="text" value="0.92" disabled>
-                </td>
-                <td>
-                    <p>外圈故障</p>
-                    <input type="text" value="0.92" disabled>
-                </td>
-                <td>
-                    <p>内圈故障</p>
-                    <input type="text" value="0.92" disabled>
-                </td>
-                <td>
-                    <p>滚珠故障</p>
-                    <input type="text" value="0.92" disabled>
-                </td>
-            </tr>
-        </table>
+    <div id="toolbar" class="toolbar">
+        <button id='createBar'>
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            新建</button>
+    </div>
+    <div id='mainBearings'>
     </div>
 
 </body>
 <script>
-    $('.edit-table button').kendoButton();
-    // console.log($('.edit-table button')[0]);
 
-    //编辑按钮
-    $('.edit-table button')[0].onclick = function () {
-        $('form input')[1].disabled = false
-        $('form input')[1].focus()
-        $('form input')[2].disabled = false
+    checkedNode = { 'mtid': 1 };
+    var bearNum = 0;
+    function bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem) {
+        return '<div id="showBearing' + String(index) + '" class="show-bearing">' +
+            '<form id="form' + String(index) + '" class="form">' +
+            '<img src="/images/MTimg/GX1000-49.jpg" alt="" style="height: 80px;float: left;">' +
+            '<table class="table-info">' +
+            '<tr>' +
+            '<td>' +
+            '<p>轴承编号：</p>' +
+            '</td>' +
+            '<td>' +
+            '<input type="text" name="" id="" value="' + serialNumber + '" disabled>' +
+            '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>' +
+            '<p>轴承类型：</p>' +
+            '</td>' +
+            '<td>' +
+            '<input type="text" name="" id="" value="' + kind + '" disabled>' +
+            '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>' +
+            '<p>轴承位置：</p>' +
+            '</td>' +
+            '<td>' +
+            '<input type="text" name="" id="" value="' + position + '" disabled>' +
+            '</td>' +
+            '</tr>' +
+            '</table>' +
+            '</form>' +
+            '<table id="edit-table' + String(index) + '" class="edit-table">' +
+            ' <tr>' +
+            ' <td>' +
+            ' <button>编辑</button>' +
+            ' </td>' +
+            ' </tr>' +
+            ' <tr>' +
+            ' <td>' +
+            ' <button>删除</button>' +
+            ' </td>' +
+            ' </tr>' +
+            ' <tr>' +
+            ' <td>' +
+            ' <button>保存</button>' +
+            ' </td>' +
+            ' </tr>' +
+            '</table>' +
+            '<table id="diagnosis-table' + String(index) + '" class="diagnosis-table">' +
+            '<tr>' +
+            '<th style="text-align: left">' +
+            ' 故障诊断结果：' +
+            '</th>' +
+            '<td style="text-align: right">' + new Date(lastInspect).format("yyyy-MM-DD") + '</td>' +
+            '<td style="text-align: left">' + new Date(lastInspect).format("HH:mm:SS") + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>' +
+            ' <p>轴承正常</p>' +
+            ' <input type="text" value="' + good + '" disabled>' +
+            '</td>' +
+            '<td>' +
+            ' <p>外圈故障</p>' +
+            ' <input type="text" value="' + outProblem + '" disabled>' +
+            '</td>' +
+            '<td>' +
+            ' <p>内圈故障</p>' +
+            ' <input type="text" value="' + innerProblem + '" disabled>' +
+            '</td>' +
+            '<td>' +
+            ' <p>滚珠故障</p>' +
+            ' <input type="text" value="' + ballProblem + '" disabled>' +
+            '</td>' +
+            '</tr>' +
+            '</table>' +
+            '</div>'
     }
-    //删除按钮
-    $('.edit-table button')[1].onclick = function () {
-        remove = confirm('确定要删除该轴承么？')
-        if (remove) {
-            $('#showBearing').remove()
+
+    function addEdit(index, newflag) {
+        //编辑按钮
+        $('#edit-table' + String(index) + ' button')[0].onclick = function () {
+            console.log($('#form' + String(index) + ' input'))
+            $('#form' + String(index) + ' input')[1].disabled = false
+            $('#form' + String(index) + ' input')[1].focus()
+            $('#form' + String(index) + ' input')[2].disabled = false
+        }
+        //删除按钮
+        $('#edit-table' + String(index) + ' button')[1].onclick = function () {
+            remove = confirm('确定要删除该轴承么？')
+            if (remove) {
+                serialNumber = $('#form' + String(index) + ' input')[0].value;
+                $.get('/api/MDC_BEARING/Delete/' + serialNumber, function (deleteData, status) {
+                    if (status == 'success' && !deleteData.error) {
+                        $('#showBearing' + String(index)).remove();
+                        alert('删除成功')
+                    } else {
+                        console.log(deleteData)
+                        alert('删除失败，请重新登录后再试！')
+                    }
+                })
+            }
+        }
+        //保存按钮
+        $('#edit-table' + String(index) + ' button')[2].onclick = function () {
+            if (newflag) {
+                var payload = {
+                    'mtid': checkedNode.mtid,
+                    'kind': $('#form' + String(index) + ' input')[1].value,
+                    'position': $('#form' + String(index) + ' input')[2].value
+                }
+            } else {
+                var payload = {
+                    'mtid': ($('#form' + String(index) + ' input')[0].value).split('_')[0],
+                    'serialNumber': $('#form' + String(index) + ' input')[0].value,
+                    'kind': $('#form' + String(index) + ' input')[1].value,
+                    'position': $('#form' + String(index) + ' input')[2].value
+                }
+            }
+            $.post('/api/MDC_BEARING/Create', payload, function (updateData, status) {
+                if (status == 'success' && !updateData.error) {
+                    alert('保存成功')
+                    window.location.reload();
+                } else {
+                    console.log(updateData)
+                    alert('保存失败，请重新登录后再试！')
+                }
+            })
         }
     }
-    //保存按钮
-    $('.edit-table button')[2].onclick = function () {
-        var payload = {
-            'serialNumber': $('form input')[0].value,
-            'kind': $('form input')[1].value,
-            'position': $('form input')[2].value
+
+
+    $.get('/api/MDC_BEARING/' + checkedNode.mtid, function (bearings, status) {
+        if (status == 'success' && !bearings.error) {
+            bearNum = bearings.length;
+            for (let index = 0; index < bearings.length; index++) {
+                const bearing = bearings[index];
+                serialNumber = bearing.serialNumber;
+                kind = bearing.kind;
+                position = bearing.position;
+                lastInspect = bearing.lastInspect;
+                good = bearing.good;
+                innerProblem = bearing.innerProblem;
+                outProblem = bearing.outProblem;
+                ballProblem = bearing.ballProblem;
+                $('#mainBearings').append(bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem)
+                );
+                addEdit(index, false);
+            }
+            $('button').kendoButton();
+            // console.log($('.edit-table button')[0]);
         }
-        console.log(payload)
+    })
+    $('#createBar').click(function () {
+        index = bearNum + 1
+        serialNumber = null;
+        kind = null;
+        position = null;
+        lastInspect = null;
+        good = 0;
+        innerProblem = 0;
+        outProblem = 0;
+        ballProblem = 0;
+        $('#mainBearings').prepend(bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem));
+        $('button').kendoButton();
+        addEdit(index, true);
+        $('#form' + String(index) + ' input')[1].disabled = false
+        $('#form' + String(index) + ' input')[1].focus()
+        $('#form' + String(index) + ' input')[2].disabled = false
+
+    })
+
+
+
+    Date.prototype.format = function (formatStr) {
+        var str = formatStr;
+        var Week = ['日', '一', '二', '三', '四', '五', '六'];
+        str = str.replace(/yyyy|YYYY/, this.getFullYear());
+        str = str.replace(/MM/, (this.getMonth() + 1) > 9 ? (this.getMonth() + 1).toString() : '0' + (this.getMonth() + 1));
+        str = str.replace(/dd|DD/, this.getDate() > 9 ? this.getDate().toString() : '0' + this.getDate());
+        str = str.replace(/hh|HH/, this.getHours() > 9 ? this.getHours().toString() : '0' + this.getHours());
+        str = str.replace(/mm/, this.getMinutes() > 9 ? this.getMinutes().toString() : '0' + this.getMinutes());
+        str = str.replace(/ss|SS/, this.getSeconds() > 9 ? this.getSeconds().toString() : '0' + this.getSeconds());
+        return str;
     }
-
-
-
 
 </script>
 <style>
     body html {
         height: 100%;
         width: 100%;
+    }
+
+    .toolbar {
+        padding: 15px
+    }
+
+    .toolbar button {
+        font-size: 16px
     }
 
     .show-bearing {
@@ -167,17 +264,17 @@
         min-width: 490px;
     }
 
-    #diagnosis-table input {
+    .diagnosis-table input {
         text-align: center;
         font-size: 1em;
         width: 80%
     }
 
-    #diagnosis-table td {
+    .diagnosis-table td {
         font-size: 13px
     }
 
-    #diagnosis-table p {
+    .diagnosis-table p {
         -webkit-margin-before: 0.5em;
         -webkit-margin-after: 0.5em;
     }
@@ -189,7 +286,7 @@
         padding: 1px 10px;
     }
 
-    #edit-table button {
+    .edit-table button {
         width: 60px;
         font-size: 13px;
     }
