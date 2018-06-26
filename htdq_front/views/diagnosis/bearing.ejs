@@ -27,7 +27,7 @@
 <script>
 
     // checkedNode = { 'mtid': 1 };
-    checkedNode = parent.checkednode
+    checkedNode = parent.checkednode[0]
     var bearNum = 0;
     function bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem) {
         return '<div id="showBearing' + String(index) + '" class="show-bearing">' +
