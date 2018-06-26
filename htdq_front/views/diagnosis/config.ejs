@@ -2,7 +2,6 @@
 <html>
 
 <head>
-    <title>轴承诊断分析系统</title>
     <meta charset="utf-8">
     <link href="/content/shared/styles/examples-offline.css" rel="stylesheet">
     <link href="/styles/kendo.common.min.css" rel="stylesheet">
@@ -17,69 +16,86 @@
 </head>
 
 <body>
-    <div class='backlayout'>
-        <div class='tool-show'>
-            <div style="width: 30%;float: left;min-width: 300px;">
-                <img src="/images/MTimg/GX1000-49.jpg" alt="" id='toolPic' class='toolPic'>
-                <table style="float: left;height: 90px;width: 50%;padding: 8px" id="toolinfo">
-                    <tr>
-                        <td>机床编号</td>
-                        <td>1</td>
-                    </tr>
-                    <tr>
-                        <td>机床名称</td>
-                        <td>GTX1000</td>
-                    </tr>
-                    <tr>
-                        <td>轴承数目</td>
-                        <td>4</td>
-                    </tr>
-
-                </table>
-            </div>
-
-            <div style="width: 54%;float: left;">
-                <table style="float: left;padding: 14px;background-color:gainsboro;width: 100%" id='bearinginfo'>
-                    <tr>
-                        <td>
-                            轴承编号：
-                        </td>
-                        <td>
-                            1_1
-                        </td>
-                        <td>
-                            1_2
-                        </td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>轴承状态：</td>
-                        <td>
-                            <button type="button" class='bearing'>状态正常</button>
-                        </td>
-                        <td>
-                            <button type="button" class='bearing'>状态正常</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div style="width: 12%;float: right;padding: 5px;text-align: center">
-                <div>
-                    <img src="/diagnosisImg/right.jpg" width="60px" alt="">
-                </div>
-
-                <div style="font-size: 10px">
-                    最近一次检测时间：
-                    <br> 2018-06-25 11:00:00
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id='mainshow'></div>
 </body>
 <script>
-    $(".bearing").kendoButton()
 
+    checkednode = [{ 'mtid': 1, 'toolname': 'GTX-1000' }, { 'mtid': 2, 'toolname': 'GTX1000-48' }, { 'mtid': 3, 'toolname': 'GTX1000-49' }];
+    for (let index = 0; index < checkednode.length; index++) {
+        const node = checkednode[index];
+        $('#mainshow').append(
+            "<div class='backlayout'><div class='tool-show'>" +
+            '<div class="tool"><img src="/images/MTimg/GX1000-49.jpg" class="toolPic" id="toolimg' + String(index) + '">' +
+            '<table class="tool-table" id="toolinfo' + String(index) + '">' +
+            '<tr>' +
+            '<td>机床编号</td>' +
+            '<td>1</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>机床名称</td>' +
+            '<td>GTX1000</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>轴承数目</td>' +
+            '<td>4</td>' +
+            '</tr>' +
+            '</table>' +
+            '</div>' +
+            '<div style="width: 50%;float: left;"><table class="bearing-table" id="bearinginfo' + String(index) + '">' +
+            '<tr><td>轴承编号：</td><td></td><td></td><td></td><td></td></tr><tr><td>轴承状态：</td><td></td><td></td><td></td><td></td></tr></table></div>' +
+            '<div class="bearing-result"><div><img src="/diagnosisImg/right.jpg" width="60px" alt="" id="bearingimg' + String(index) + '"></div><div style="font-size: 10px">最近一次检测时间：<br> <span id="lastInspect' + String(index) + '">2018-06-25 11:00:00</span></div></div></div></div>'
+        )
+        //机床id
+        $('#toolinfo' + String(index)).children('tbody').children('tr')[0].getElementsByTagName('td')[1].innerHTML = node.mtid;
+        //机床名称
+        $('#toolinfo' + String(index)).children('tbody').children('tr')[1].getElementsByTagName('td')[1].innerHTML = node.toolname;
+
+        $.get('/api/MDC_BEARING/' + String(node.mtid), function (bearings, status) {
+            if (status == 'success') {
+                var totalbad = 0;
+                var times = [];
+                for (let b_index = 0; b_index < bearings.length; b_index++) {
+                    const bearing = bearings[b_index];
+                    times.push(new Date(bearing.lastInspect).getTime())
+                    //轴承数目
+                    $('#toolinfo' + String(index)).children('tbody').children('tr')[2].getElementsByTagName('td')[1].innerHTML = bearings.length;
+                    //轴承状态
+                    // <button type="button" class="bearing">状态正常</button>
+                    $('#bearinginfo' + String(index)).children('tbody').children('tr')[0].getElementsByTagName('td')[b_index + 1].innerHTML = bearing.serialNumber;
+                    if (bearing.healthy == '1') {
+                        $('#bearinginfo' + String(index)).children('tbody').children('tr')[1].getElementsByTagName('td')[b_index + 1].innerHTML = '<button type="button" class="bearing bearing-good">状态正常</button>';
+                    } else {
+                        $('#bearinginfo' + String(index)).children('tbody').children('tr')[1].getElementsByTagName('td')[b_index + 1].innerHTML = '<button type="button" class="bearing bearing-bad">状态异常</button>';
+                        totalbad += 1;
+                    }
+                    if (times.length == bearings.length) {
+                        lastest = Math.max.apply(null, times);
+                        $('#lastInspect' + String(index))[0].innerHTML = new Date(lastest).format("yyyy-MM-dd HH:mm:ss");
+                    }
+                }
+                $(".bearing").kendoButton()
+
+                if (totalbad != 0) {
+                    $('#bearingimg' + String(index))[0].src = '/diagnosisImg/wrong.jpg'
+                }
+            } else {
+                console.log(err)
+            }
+        })
+        $(".bearing").kendoButton()
+    }
+
+    Date.prototype.format = function (formatStr) {
+        var str = formatStr;
+        var Week = ['日', '一', '二', '三', '四', '五', '六'];
+        str = str.replace(/yyyy|YYYY/, this.getFullYear());
+        str = str.replace(/MM/, (this.getMonth() + 1) > 9 ? (this.getMonth() + 1).toString() : '0' + (this.getMonth() + 1));
+        str = str.replace(/dd|DD/, this.getDate() > 9 ? this.getDate().toString() : '0' + this.getDate());
+        str = str.replace(/hh|HH/, this.getHours() > 9 ? this.getHours().toString() : '0' + this.getHours());
+        str = str.replace(/mm/, this.getMinutes() > 9 ? this.getMinutes().toString() : '0' + this.getMinutes());
+        str = str.replace(/ss|SS/, this.getSeconds() > 9 ? this.getSeconds().toString() : '0' + this.getSeconds());
+        return str;
+    } 
 </script>
 
 <style>
@@ -95,9 +111,15 @@
 
     .tool-show {
         border: 1px solid black;
-        min-width: 915px;
+        min-width: 960px;
         width: 100%;
         height: 100px;
+    }
+
+    .tool {
+        width: 30%;
+        float: left;
+        min-width: 320px;
     }
 
     .toolPic {
@@ -106,12 +128,19 @@
         margin: 5px 5px;
     }
 
-    #toolinfo td {
+    .tool-table {
+        float: left;
+        height: 90px;
+        width: 50%;
+        padding: 8px
+    }
+
+    table.tool-table td {
         padding: 5px 5px;
         text-align: center;
     }
 
-    #bearinginfo td {
+    table.bearing-table td {
         padding: 5px 10px;
         text-align: center;
         width: 8%
@@ -120,6 +149,28 @@
     .bearing {
         font-size: 15px;
         padding: 2px;
+    }
+
+    .bearing-table {
+        float: left;
+        padding: 14px;
+        background-color: gainsboro;
+        width: 100%
+    }
+
+    .bearing-result {
+        width: 12%;
+        float: right;
+        padding: 5px 10px;
+        text-align: center
+    }
+
+    .bearing-good {
+        background-color: green
+    }
+
+    .bearing-bad {
+        background-color: rgb(233, 38, 38)
     }
 </style>
 

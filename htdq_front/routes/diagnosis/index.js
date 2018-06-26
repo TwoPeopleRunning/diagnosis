@@ -33,6 +33,17 @@ exports.get('/config', function (req, res, next) {
         return;
     }
 });
+
+exports.get('/bearing', function (req, res, next) {
+    if (req.cookies.Token) {
+        // console.log(req.signedCookies.user, req.signedCookies.passwd);
+        // mtid = req.params.mtid;
+        res.render('diagnosis/bearing', {});
+    } else {
+        res.redirect('/users/login');
+        return;
+    }
+});
 // //概览
 // exports.get('/outline/running_eff', function (req, res, next) {
 //     if (req.cookies.Token) {

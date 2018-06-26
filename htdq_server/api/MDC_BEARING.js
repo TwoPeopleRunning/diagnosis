@@ -44,6 +44,21 @@ exports.route('/:mtid').get(function (req, res) {
 
 });
 
+
+
+//判断轴承检测康状况
+function bearHealth(savedata) {
+    good = savedata.good;
+    innerProblem = savedata.innerProblem
+    outProblem = savedata.outProblem
+    ballProblem = savedata.ballProblem
+    maxPos = Math.max(good, innerProblem, outProblem, ballProblem)
+    if (maxPos == good) {
+        return "1"
+    } else {
+        return "0"
+    }
+}
 //mtid为机床id，如果有serialNumber就是修改信息，如果没有serialNumber就是创建轴承信息，serialNumber格式mtid_id
 exports.route('/Create').post(function (req, res) {
     if (!req.body.mtid || !req.body.position || !req.body.kind) {
@@ -63,7 +78,7 @@ exports.route('/Create').post(function (req, res) {
                     'innerProblem': req.body.innerProblem ? req.body.innerProblem : 0,
                     'outProblem': req.body.outProblem ? req.body.outProblem : 0,
                     'ballProblem': req.body.ballProblem ? req.body.ballProblem : 0,
-                    'lastInspect': req.body.lastInspect ? req.body.lastInspect : '',
+                    'lastInspect': req.body.lastInspect ? req.body.lastInspect : (new Date()),
                 };
                 if (req.body.serialNumber) {
                     data.serialNumber = req.body.serialNumber;
@@ -73,6 +88,7 @@ exports.route('/Create').post(function (req, res) {
                         } else {
                             if (existdata) {
                                 mixin(existdata, data)
+                                existdata.healthy = bearHealth(existdata)
                                 existdata.save(function (err, data) {
                                     if (err) {
                                         res.send({
@@ -87,7 +103,7 @@ exports.route('/Create').post(function (req, res) {
                     })
                 }
                 else {
-                    MDC_BEARING.find({}).sort({ serialNumber: -1 }).exec(function (err, alldata) {
+                    MDC_BEARING.find({ mtid: req.body.mtid }).sort({ serialNumber: -1 }).exec(function (err, alldata) {
                         if (err) {
                             res.send({ 'error': err })
                         } else {
@@ -96,6 +112,7 @@ exports.route('/Create').post(function (req, res) {
                             } else {
                                 data.serialNumber = req.body.mtid + '_' + String(Number(alldata[0].serialNumber.split('_')[1]) + 1)
                             }
+                            data.healthy = bearHealth(data);
                             (new MDC_BEARING(data)).save(function (err, option) {
                                 if (err) {
                                     res.send({ 'error': err })

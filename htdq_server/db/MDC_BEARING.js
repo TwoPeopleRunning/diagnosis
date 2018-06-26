@@ -29,7 +29,8 @@ var schema = new Schema({
   innerProblem: { type: Number, required: true, default: 0 },
   outProblem: { type: Number, required: true, default: 0 },
   ballProblem: { type: Number, required: true, default: 0 },
-  lastInspect: { type: Date, default: "" }
+  lastInspect: { type: Date, default: new Date() },
+  healthy: { type: String, default: "1" }
 }, { collection: "MDC_BEARING" }, { _id: false });
 
 
