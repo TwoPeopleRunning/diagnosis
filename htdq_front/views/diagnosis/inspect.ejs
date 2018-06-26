@@ -13,5 +13,112 @@
 </head>
 
 <body>
+    <div id='searchCon' class="searchCon">
+        <div style="width: 70%;float: left;max-width: 850px;min-width: 800px;">
+            <table style="padding: 10px">
+                <tr>
+                    <th>轴承编号:</th>
+                    <td>
+                        <input type="text" name="" id="" value="1_1">
+                    </td>
+                    <th>机床编号:</th>
+                    <td>
+                        <input type="text" name="" id="" value="1">
+                    </td>
+                    <th>信号源选择:</th>
+                    <td>
+                        <select name="" id="" class="signal">
+                            <option value="1">振动信号</option>
+                            <option value="2">声音信号</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        样本数目:
+                    </th>
+                    <td>
+                        <input type="text" name="" id="" value="200">
+                    </td>
+                    <th>
+                        采样频率:
+                    </th>
+                    <td>
+                        <select name="" id="" style="width: 60%">
+                            <option value="1">3</option>
+                            <option value="2">6</option>
+                            <option value="3" selected='selected'>12</option>
+                        </select> KHZ
+                    </td>
+                    <th>
+                        采样长度:
+                    </th>
+                    <td>
+                        <select name="" id="" style="width: 80%">
+                            <option value="1">256</option>
+                            <option value="2">512</option>
+                            <option value="3" selected='selected'>1024</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
+        <div style="float: left;margin: 40px 0 0 5%;font-size: 1.5em">
+            <button id='submit' style="padding: 10px">开始检测</button>
+        </div>
+    </div>
+    <div style="width: 100%;border: 1px solid black;position: relative;top:110px"></div>
+    <div id='inspectResult' style="margin-top: 120px">
+        <h3>特征提取结果</h3>
+        <div>
+            good
+        </div>
+
+    </div>
 </body>
+<script>
+    $('select').kendoDropDownList();
+    $('#submit').kendoButton();
+    console.log(parent.window.a)
+
+</script>
+
+<style>
+    .searchCon {
+        width: 100%;
+        min-width: 1000px;
+    }
+
+    .signal {
+        width: 80%;
+    }
+
+    .k-icon {
+        margin-top: 7px;
+    }
+
+    td {
+        padding: 5px;
+    }
+
+    th {
+        text-align: right;
+        width: 100px;
+    }
+
+    .k-input {
+        text-align: left;
+        width: 100px;
+    }
+
+    input {
+        width: 60%;
+        font-size: 1em;
+        text-align: center
+    }
+
+    option {
+        text-align: center
+    }
+</style>

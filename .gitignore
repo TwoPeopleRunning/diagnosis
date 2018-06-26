@@ -4,3 +4,4 @@ htdq_server/node_modules
 
 # Common Ignores
 .DS_Store
+*.zip
