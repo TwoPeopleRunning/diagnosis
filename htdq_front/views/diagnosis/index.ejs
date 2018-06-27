@@ -225,15 +225,21 @@
                                     hlButton(this)
                                     generateCheckedNodes()
                                     $("#iframeId").attr('src', 'diagnosis/config')
+                                    $('.sidebar').css('display', 'block')
+                                    $('#iframeId').css('width', '70%')
                                 })
                                 $("#imageButton2").click(function () {
                                     hlButton(this)
                                     generateCheckedNodes()
                                     $("#iframeId").attr('src', 'diagnosis/bearing')
+                                    $('.sidebar').css('display', 'block')
+                                    $('#iframeId').css('width', '70%')
                                 })
                                 $("#imageButton3").click(function () {
                                     hlButton(this)
-                                    $("#iframeId").attr('src', 'diagnosis/inspect')
+                                    $("#iframeId").attr('src', 'diagnosis/inspect');
+                                    $('.sidebar').css('display', 'none')
+                                    $('#iframeId').css('width', '100%')
                                 })
                                 $("#imageButton4").click(function () {
                                     hlButton(this)
@@ -274,6 +280,7 @@
         height: 44px;
         width: 100%;
         z-index: 8;
+        margin: 0 auto;
     }
 
     .menu-botton {

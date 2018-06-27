@@ -14,18 +14,19 @@
 
 <body>
     <div id='searchCon' class="searchCon">
-        <div style="width: 70%;float: left;max-width: 850px;min-width: 800px;">
-            <table style="padding: 10px">
+        <div style="width: 55%;float: left;width: 850px;margin-left: 2%">
+            <span style="padding: 10px;font-size: 14px;font-weight: bold">参数设置</span>
+            <table style="padding: 10px 20px">
                 <tr>
-                    <th>轴承编号:</th>
+                    <td>轴承编号:</td>
                     <td>
                         <input type="text" name="" id="" value="1_1">
                     </td>
-                    <th>机床编号:</th>
+                    <td>机床编号:</td>
                     <td>
                         <input type="text" name="" id="" value="1">
                     </td>
-                    <th>信号源选择:</th>
+                    <td>信号源选择:</td>
                     <td>
                         <select name="" id="" class="signal">
                             <option value="1">振动信号</option>
@@ -34,15 +35,15 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>
+                    <td>
                         样本数目:
-                    </th>
+                    </td>
                     <td>
                         <input type="text" name="" id="" value="200">
                     </td>
-                    <th>
+                    <td>
                         采样频率:
-                    </th>
+                    </td>
                     <td>
                         <select name="" id="" style="width: 60%">
                             <option value="1">3</option>
@@ -50,9 +51,9 @@
                             <option value="3" selected='selected'>12</option>
                         </select> KHZ
                     </td>
-                    <th>
+                    <td>
                         采样长度:
-                    </th>
+                    </td>
                     <td>
                         <select name="" id="" style="width: 80%">
                             <option value="1">256</option>
@@ -64,30 +65,372 @@
             </table>
         </div>
 
-        <div style="float: left;margin: 40px 0 0 5%;font-size: 1.5em">
-            <button id='submit' style="padding: 10px">开始检测</button>
+        <div id='oprateTable' style="float: left;width: 5%;min-width: 80px;text-align: center;">
+            <p style="font-size: 14px;font-weight: bold;width: 100%">操作选项</p>
+            <table style="padding: 5px 1px 0 1px;width: 100%;text-align: center">
+                <tr>
+                    <td>
+                        <button id='getTimeSig' onclick="timeDomain(healthy)">时域信号</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button id='extract' onclick="extractFeatures(features,featuresName, healthy)">特征提取</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button id='diagResult' onclick="inspectResult(healthy)">诊断结果</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id='timesImg' style="float: left;margin-left:5%;width: 20%;min-width: 335px;">
+            <div style="font-size: 14px;font-weight: bold;float: left;padding-right: 4%">时域信号图:</div>
+            <img src="/diagnosisImg/blank.png" alt="" style="height: 120px;">
+        </div>
+
+        <div style="height: 100px;float: left;">
+            <p style="font-size: 14px;font-weight: bold;width: 100%">最终结果：</p>
+            <button id='finally' style="font: 2em  Arial,Helvetica,sans-serif;margin-top: 20px">
+                <p style="padding: 5px">----</p>
+            </button>
         </div>
     </div>
-    <div style="width: 100%;border: 1px solid black;position: relative;top:110px"></div>
-    <div id='inspectResult' style="margin-top: 120px">
-        <h2>特征提取结果</h2>
-        <div>
+
+
+    <div style="width: 100%;border: 1px solid gray;position: relative;top:140px"></div>
+    <div class='diagShow'>
+        <div id='features' style="float: left;width: 60%;margin-left: 2%">
+            <p style="padding: 10px;font:16px Arial,Helvetica,sans-serif;margin:20px 0 10px;">特征提取结果:</p>
+            <div>
+                <table style="padding: 5px auto">
+                    <tr>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                        <td>
+                            <img src="/diagnosisImg/blank.png" alt="">
+                            <p></p>
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+        <div style="width: 35%;float:right;">
+            <p style="padding: 10px;font:16px Arial,Helvetica,sans-serif;margin:20px 0 10px;text-align: center;width: 90%">诊断结果</p>
+            <table id='resultGrid' style="width: 90%">
+                <p style="border: 1.5px solid black;width: 90%"></p>
+                <tr>
+                    <td></td>
+                    <th>LVQ模型</th>
+                    <th>DT模型</th>
+                    <th>IDS模型</th>
+                </tr>
+
+                <tr class='threeLine2'>
+                    <td>
+                        <p></p>
+                    </td>
+                    <td>
+                        <p></p>
+                    </td>
+                    <td>
+                        <p></p>
+                    </td>
+                    <td>
+                        <p></p>
+                    </td>
+                </tr>
+
+                <tr id='good'>
+                    <th>正常状态</th>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr id='innerProblem'>
+                    <th>内圈故障</th>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr id='outProblem'>
+                    <th>外圈故障</th>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr id='ballProblem'>
+                    <th>滚珠故障</th>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+
+                <tr class='threeLine3'>
+                    <td>
+                        <p></p>
+                    </td>
+                    <td>
+                        <p></p>
+                    </td>
+                    <td>
+                        <p></p>
+                    </td>
+                    <td>
+                        <p></p>
+                    </td>
+                </tr>
+            </table>
+
+            <div id='resultChart' style="width: 90%;margin-top: 20px">
+
+            </div>
 
         </div>
-
     </div>
+
 </body>
 <script>
     $('select').kendoDropDownList();
-    $('#submit').kendoButton();
-    console.log(parent.window.a)
+    $('button').kendoButton();
+
+
+
+    features = $('#features td')
+    featuresName = ['Crest_Factor', 'Kurtosis_Factor', 'Kurtosis', 'Mean', 'Peak', 'RMS', 'Skewness', 'Standard_deviation', 'Var'];
+    resultTable = ['good', 'innerProblem', 'outProblem', 'ballProblem'];
+
+    healthy = randomStatus()
+
+    function inspectResult(healthy) {
+        if (features[0].getElementsByTagName('img')[0].src == 'http://localhost:9999/diagnosisImg/blank.png') {
+            alert('请先进行特征提取！')
+        } else {
+            resultPossible = modelPossible(healthy)
+            lvq = resultPossible.lvq;
+            dt = resultPossible.dt;
+            ids = resultPossible.ids;
+            for (let index = 0; index < resultTable.length; index++) {
+                const resultId = resultTable[index];
+                $('#' + resultId + ' td')[0].innerHTML = lvq[index]
+                $('#' + resultId + ' td')[1].innerHTML = dt[index]
+                $('#' + resultId + ' td')[2].innerHTML = ids[index]
+            }
+            $("#resultChart").kendoChart({
+                title: {
+                    text: "三种模型结果比较"
+                },
+                legend: {
+                    visible: true
+                },
+                seriesDefaults: {
+                    type: "bar"
+                },
+                series: [{
+                    name: "LVQ",
+                    data: lvq
+                }, {
+                    name: "DT",
+                    data: dt
+                }, {
+                    name: "IDS",
+                    data: ids
+                }],
+                valueAxis: {
+                    max: 1,
+                    line: {
+                        visible: false
+                    },
+                    minorGridLines: {
+                        visible: true
+                    },
+                    labels: {
+                        rotation: "auto"
+                    }
+                },
+                categoryAxis: {
+                    categories: ["正常状态", "内圈故障", "外圈故障", "滚珠故障"],
+                    majorGridLines: {
+                        visible: false
+                    }
+                },
+                tooltip: {
+                    visible: true,
+                    template: "#= series.name #: #= value #"
+                }
+            });
+            if (healthy == 'good') {
+                $('#finally').css('background-color', 'green');
+                $('#finally p')[0].innerHTML = healthy
+            }
+        }
+
+    }
+
+
+    //生成从minNum到maxNum的随机数
+    function randomNum(minNum, maxNum) {
+        switch (arguments.length) {
+            case 1:
+                return parseInt(Math.random() * minNum + 1, 10);
+                break;
+            case 2:
+                return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+
+    function randomStatus() {
+        var seed = 10 * Math.random()
+        if (seed < 7) {
+            return 'good'
+        } if (seed > 7 && seed < 8) {
+            return 'innerProblem'
+        }
+        if (seed > 8 && seed < 9) {
+            return 'outProblem'
+        }
+        if (seed > 9 && seed < 10) {
+            return 'ballProblem'
+        }
+    }
+
+    function randomPossible() {
+        var diff1 = Math.floor(Math.random() * 100) / 100;
+        var diff2 = Math.floor(Math.random() * 100) / 100;
+        while (diff1 + diff2 > 1) {
+            diff1 = Math.floor(Math.random() * 100) / 100;
+            diff2 = Math.floor(Math.random() * 100) / 100;
+        }
+        var diff3 = 1 - diff1 - diff2;
+        var maxPossible = randomNum(930, 999) / 1000
+        var leftPossible = 1 - maxPossible;
+        return [maxPossible, Math.floor(leftPossible * diff1 * 1000) / 1000, Math.floor(leftPossible * diff2 * 1000) / 1000, Math.floor(leftPossible * diff3 * 1000) / 1000]
+    }
+
+    function modelPossible(healthy) {
+        var diagModule = [randomPossible(), randomPossible(), randomPossible()];
+        var maxTemp = 0
+        var maxIndex = 0
+        var otherIndex = []
+        for (let index = 0; index < diagModule.length; index++) {
+            const element = diagModule[index];
+            if (element[0] > maxTemp || maxTemp == 0) {
+                maxTemp = element[0];
+                maxIndex = index;
+            } else {
+                otherIndex.push(index)
+            }
+        }
+        if (maxTemp != diagModule[0][0]) {
+            otherIndex.push(0)
+        }
+        switch (healthy) {
+            case 'good':
+                return {
+                    'lvq': diagModule[otherIndex[0]],
+                    'dt': diagModule[otherIndex[1]],
+                    'ids': diagModule[maxIndex]
+                }
+                break;
+            case 'innerProblem':
+                return {
+                    'lvq': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][0], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][3]],
+                    'dt': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][0], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][3]],
+                    'ids': [diagModule[maxIndex[0]][1], diagModule[maxIndex[0]][0], diagModule[maxIndex[0]][2], diagModule[maxIndex[0]][3]]
+                }
+                break;
+            case 'outProblem':
+                return {
+                    'lvq': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][0], diagModule[otherIndex[0]][3]],
+                    'dt': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][0], diagModule[otherIndex[0]][3]],
+                    'ids': [diagModule[maxIndex[0]][1], diagModule[maxIndex[0]][2], diagModule[maxIndex[0]][0], diagModule[maxIndex[0]][3]]
+                }
+                break;
+            case 'ballProblem':
+                return {
+                    'lvq': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][3], diagModule[otherIndex[0]][0]],
+                    'dt': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][3], diagModule[otherIndex[0]][0]],
+                    'ids': [diagModule[maxIndex[0]][1], diagModule[maxIndex[0]][2], diagModule[maxIndex[0]][3], diagModule[maxIndex[0]][0]]
+                }
+
+                break;
+        }
+
+    }
+
+
+
+    function timeDomain(healthy) {
+        $('#timesImg img')[0].src = '/diagnosisImg/' + healthy + '/time_Domain.png'
+    }
+
+    function extractFeatures(features, featuresName, healthy) {
+        // console.log($('#timesImg img')[0].src)
+        if ($('#timesImg img')[0].src == 'http://localhost:9999/diagnosisImg/blank.png') {
+            alert('请先获取时域信号！')
+        } else {
+            for (let index = 0; index < featuresName.length; index++) {
+                features[index].getElementsByTagName('img')[0].src = '/diagnosisImg/' + healthy + '/' + featuresName[index] + '.png'
+                features[index].getElementsByTagName('p')[0].innerHTML = featuresName[index]
+
+            }
+        }
+
+    }
+
+
+
+
 
 </script>
 
 <style>
-    .searchCon {
+    .searchCon,
+    .diagShow {
         width: 100%;
-        min-width: 1000px;
+        min-width: 1450px;
+        /* padding-left: 7%; */
     }
 
     .signal {
@@ -102,10 +445,10 @@
         padding: 5px;
     }
 
-    th {
+    /* th {
         text-align: right;
-        width: 100px;
-    }
+        width: 120px;
+    } */
 
     .k-input {
         text-align: left;
@@ -120,5 +463,46 @@
 
     option {
         text-align: center
+    }
+
+    #features img {
+        width: 100%
+    }
+
+    #features td {
+        text-align: center;
+        width: 30%
+    }
+
+    #features p {
+        font-size: 14px;
+    }
+
+    #resultGrid td,
+    th {
+        text-align: center
+    }
+
+    #oprateTable button {
+        font-size: 0.8em
+    }
+
+    #oprateTable td {
+        padding: 2px
+    }
+
+    .threeLine2 td,
+    .threeLine3 td {
+        padding: 0
+    }
+
+    .threeLine2 p {
+        border: 1.0px solid black;
+        width: 100%
+    }
+
+    .threeLine3 p {
+        border: 1.5px solid black;
+        width: 100%
     }
 </style>
