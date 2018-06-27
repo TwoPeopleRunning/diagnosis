@@ -12,7 +12,6 @@
     <script src="/js/jszip.min.js"></script>
     <script src="/js/kendo.all.min.js"></script>
     <script src="/content/shared/js/console.js"></script>
-
 </head>
 <html>
 
@@ -27,17 +26,12 @@
             <i class="fa fa-plus" aria-hidden="true"></i>
             新建</button>
     </div>
-    <!-- <div id='mainBearings'>
-    </div> -->
-    <div style="margin-left:10px">
-        <!-- 分页条 -->
-        <div id="Pagination" class="pagination"></div>
-        <div id="Searchresult">分页内容显示</div>
-
+    <!-- 分页条 -->
+    <div id="Pagination" class="pagination"></div>
+    <div id="Searchresult">分页内容显示</div>
+    <div id="hiddenresult" style="display:none;">
         <div id='mainBearings'></div>
     </div>
-
-
     <!-- 此表单用来证明一些参数的作用 -->
     <form name="paginationoptions" style="display: none;">
         <p>
@@ -62,17 +56,18 @@
         </p>
         <input type="button" id="setoptions" value="设置选项" />
     </form>
-
 </body>
 <script>
+
     // checkedNode = { 'mtid': 1 };
-    // checkedNode = parent.checkednode[0]
+    // checkedNode = parent.bearcheckednode[0]
     if (parent.bearcheckednode.length == 1) {
         checkedNode = { "mtid": parent.bearcheckednode[0].id }
     } else {
         checkedNode = { "mtid": null }
         alert("请先选择一个节点进行编辑")
     }
+    console.log(checkedNode)
     var bearNum = 0;
     function bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem, imgPath) {
         return '<div class="SB">' +
@@ -153,6 +148,7 @@
             '</div>' +
             '</div>'
     }
+
     function addEdit(index, newflag) {
         //编辑按钮
         $('#edit-table' + String(index) + ' button')[0].onclick = function () {
@@ -205,6 +201,8 @@
         }
         $('button').kendoButton();
     }
+
+
     $.get('/api/MDC_BEARING/' + checkedNode.mtid, function (bearings, status) {
         if (status == 'success' && !bearings.error) {
             bearNum = bearings.length;
@@ -223,10 +221,10 @@
                 );
                 addEdit(index, false);
             }
+            $('button').kendoButton();
+            loadPages()
             // console.log($('.edit-table button')[0]);
         }
-        $('button').kendoButton();
-        loadPages()
         $("img").click(function () {
             $("#label_fileInput2").click()
             // 取轴承ID
@@ -281,7 +279,6 @@
         })
     })
 
-
     $('#createBar').click(function () {
         if (checkedNode.mtid == null) {
             alert("请先选择一个节点进行添加")
@@ -298,12 +295,14 @@
         ballProblem = 0;
         imgPath = "/images/bearings/default.jpg";
         $('#mainBearings').prepend(bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem, imgPath));
+        $('button').kendoButton();
         addEdit(index, true);
         $('#form' + String(index) + ' input')[1].disabled = false
         $('#form' + String(index) + ' input')[1].focus()
         $('#form' + String(index) + ' input')[2].disabled = false
         loadPages()
     })
+
     Date.prototype.format = function (formatStr) {
         var str = formatStr;
         var Week = ['日', '一', '二', '三', '四', '五', '六'];
@@ -315,6 +314,7 @@
         str = str.replace(/ss|SS/, this.getSeconds() > 9 ? this.getSeconds().toString() : '0' + this.getSeconds());
         return str;
     }
+
     function loadPages() {
         $("#items_per_page").val(5)
         //总数目
@@ -362,6 +362,7 @@
     }
 
     loadPages()
+
 </script>
 <style>
     body html {
