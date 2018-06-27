@@ -265,6 +265,10 @@
     })
 
     $('#createBar').click(function () {
+        if (checkedNode.mtid == null) {
+            alert("请先选择一个节点进行添加")
+            return 0
+        }
         index = bearNum + 1
         serialNumber = null;
         kind = null;
