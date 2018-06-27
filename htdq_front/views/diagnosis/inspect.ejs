@@ -327,15 +327,15 @@
 
     function randomStatus() {
         var seed = 10 * Math.random()
-        if (seed < 7) {
+        if (seed < 2.5) {
             return 'good'
-        } if (seed > 7 && seed < 8) {
+        } if (seed > 2.5 && seed < 5.0) {
             return 'innerProblem'
         }
-        if (seed > 8 && seed < 9) {
+        if (seed > 5 && seed < 7.5) {
             return 'outProblem'
         }
-        if (seed > 9 && seed < 10) {
+        if (seed > 7.5 && seed < 10) {
             return 'ballProblem'
         }
     }
