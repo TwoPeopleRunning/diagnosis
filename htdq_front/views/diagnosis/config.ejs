@@ -26,16 +26,6 @@
         <div id='mainshow'></div>
     </div>
 
-    <!-- 此表单用来证明一些参数的作用 -->
-    <form name="paginationoptions" style="display: none;">
-        <p><label for="items_per_page">每页显示的列表数：</label><input type="text" value="5" name="items_per_page" id="items_per_page" class="numeric"/></p>
-        <p><label for="num_display_entries">分页链接显示数：</label><input type="text" value="5" name="num_display_entries" id="num_display_entries" class="numeric"/></p>
-        <p><label for="num">起始与结束点的数目：</label><input type="text" value="1" name="num_edge_entries" id="num_edge_entries" class="numeric"/></p>
-        <p><label for="prev_text">“上一页”标签：</label><input type="text" value="Prev" name="prev_text" id="prev_text"/></p>
-        <p><label for="next_text">“下一页”标签：</label><input type="text" value="Next" name="next_text" id="next_text"/></p>
-        <input type="button" id="setoptions" value="设置选项" />
-    </form>
-
 </body>
 <script>
     // checkednode = [{ 'mtid': 1, 'toolname': 'GTX-1000' }, { 'mtid': 2, 'toolname': 'GTX1000-48' }, { 'mtid': 3, 'toolname': 'GTX1000-49' }];
@@ -93,6 +83,10 @@
                         $('#lastInspect' + String(index))[0].innerHTML = new Date(lastest).format("yyyy-MM-dd HH:mm:ss");
                     }
                 }
+                // 异步加载的问题
+                if (index == checkednode.length - 1) {
+                    loadPages()
+                }
                 $(".bearing").kendoButton()
 
                 if (totalbad != 0) {
@@ -101,6 +95,7 @@
             } else {
                 console.log(err)
             }
+
         })
         $(".bearing").kendoButton()
     }
@@ -117,39 +112,25 @@
         return str;
     } 
 
-    $(function(){
-        $("#items_per_page").val(5)
-        //总数目
+    function loadPages(){
+        // 总条目
         var length = $("#hiddenresult .backlayout").length;
-        //从表单获取分页元素参数
-        var optInit = getOptionsFromForm();
+        var optInit = {callback: pageselectCallback}
+        // 每页显示的列表数
+        optInit.items_per_page = 5
+        // 分页链接显示数
+        optInit.num_display_entries = 5
+        // 起始与结束点的数目
+        optInit.num_edge_entries = 1
+        // 上一页标签
+        optInit.prev_text = "Prev"
+        // 下一页标签
+        optInit.next_text = "Next"
         $("#Pagination").pagination(length, optInit);
-        
-        // 按钮事件
-        $("#setoptions").click(function(){
-            var opt = getOptionsFromForm();
-            // 重新创建分页参数
-            $("#Pagination").pagination(length, opt);
-        }); 	
-        //-----------------------------------
-        function getOptionsFromForm(){
-            var opt = {callback: pageselectCallback};
-            // 从文本域中收集参数 - 这些空间名与参数名相对应
-            $("input:text").each(function(){
-                opt[this.name] = this.className.match(/numeric/) ? parseInt(this.value) : this.value;
-            });
-            //避免demo重引入HTML
-            var htmlspecialchars ={ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}
-            $.each(htmlspecialchars, function(k,v){
-                opt.prev_text = opt.prev_text.replace(k,v);
-                opt.next_text = opt.next_text.replace(k,v);
-            })
-            return opt;
-        }
-        //-------------------------------
+
         function pageselectCallback(page_index, jq){
             // 从表单获取每页的显示的列表项数目
-            var items_per_page = $("#items_per_page").val();
+            var items_per_page = 5;
             var max_elem = Math.min((page_index+1) * items_per_page, length);
             
             $("#Searchresult").html("");
@@ -160,7 +141,11 @@
             //阻止单击事件
             return false;
         }
-    });
+    }
+    // 测试用
+    // setTimeout(function() {
+    //     loadPages()
+    // }, 2000)
 </script>
 <style>
     body html {
