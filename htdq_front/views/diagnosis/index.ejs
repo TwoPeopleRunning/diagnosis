@@ -243,7 +243,9 @@
                                 })
                                 $("#imageButton4").click(function () {
                                     hlButton(this)
-                                    $("#iframeId").attr('src', '')
+                                    $("#iframeId").attr('src', 'diagnosis/history');
+                                    $('.sidebar').css('display', 'none')
+                                    $('#iframeId').css('width', '100%')
                                 })
                             }
                         });

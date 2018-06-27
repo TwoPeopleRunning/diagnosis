@@ -237,6 +237,8 @@
     featuresName = ['Crest_Factor', 'Kurtosis_Factor', 'Kurtosis', 'Mean', 'Peak', 'RMS', 'Skewness', 'Standard_deviation', 'Var'];
     resultTable = ['good', 'innerProblem', 'outProblem', 'ballProblem'];
 
+    label = { 'good': "正常状态", 'innerProblem': "内圈故障", 'outProblem': "外圈故障", 'ballProblem': "滚珠故障" }
+
     healthy = randomStatus()
 
     function inspectResult(healthy) {
@@ -298,7 +300,10 @@
             });
             if (healthy == 'good') {
                 $('#finally').css('background-color', 'green');
-                $('#finally p')[0].innerHTML = healthy
+                $('#finally p')[0].innerHTML = label[healthy]
+            } else {
+                $('#finally').css('background-color', 'red');
+                $('#finally p')[0].innerHTML = label[healthy]
             }
         }
 
@@ -377,21 +382,21 @@
                 return {
                     'lvq': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][0], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][3]],
                     'dt': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][0], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][3]],
-                    'ids': [diagModule[maxIndex[0]][1], diagModule[maxIndex[0]][0], diagModule[maxIndex[0]][2], diagModule[maxIndex[0]][3]]
+                    'ids': [diagModule[maxIndex][1], diagModule[maxIndex][0], diagModule[maxIndex][2], diagModule[maxIndex][3]]
                 }
                 break;
             case 'outProblem':
                 return {
                     'lvq': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][0], diagModule[otherIndex[0]][3]],
                     'dt': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][0], diagModule[otherIndex[0]][3]],
-                    'ids': [diagModule[maxIndex[0]][1], diagModule[maxIndex[0]][2], diagModule[maxIndex[0]][0], diagModule[maxIndex[0]][3]]
+                    'ids': [diagModule[maxIndex][1], diagModule[maxIndex][2], diagModule[maxIndex][0], diagModule[maxIndex][3]]
                 }
                 break;
             case 'ballProblem':
                 return {
                     'lvq': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][3], diagModule[otherIndex[0]][0]],
                     'dt': [diagModule[otherIndex[0]][1], diagModule[otherIndex[0]][2], diagModule[otherIndex[0]][3], diagModule[otherIndex[0]][0]],
-                    'ids': [diagModule[maxIndex[0]][1], diagModule[maxIndex[0]][2], diagModule[maxIndex[0]][3], diagModule[maxIndex[0]][0]]
+                    'ids': [diagModule[maxIndex][1], diagModule[maxIndex][2], diagModule[maxIndex][3], diagModule[maxIndex][0]]
                 }
 
                 break;
