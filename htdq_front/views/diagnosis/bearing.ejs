@@ -27,7 +27,7 @@
 <script>
 
     // checkedNode = { 'mtid': 1 };
-    checkedNode = parent.checkednode
+    checkedNode = parent.checkednode[0]
     var bearNum = 0;
     function bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem) {
         return '<div id="showBearing' + String(index) + '" class="show-bearing">' +
@@ -157,6 +157,7 @@
                 }
             })
         }
+        $('button').kendoButton();
     }
 
 
@@ -177,9 +178,9 @@
                 );
                 addEdit(index, false);
             }
-            $('button').kendoButton();
             // console.log($('.edit-table button')[0]);
         }
+        $('button').kendoButton();
     })
     $('#createBar').click(function () {
         index = bearNum + 1
@@ -192,7 +193,6 @@
         outProblem = 0;
         ballProblem = 0;
         $('#mainBearings').prepend(bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem));
-        $('button').kendoButton();
         addEdit(index, true);
         $('#form' + String(index) + ' input')[1].disabled = false
         $('#form' + String(index) + ' input')[1].focus()
