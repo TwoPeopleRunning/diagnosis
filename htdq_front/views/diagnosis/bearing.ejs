@@ -6,40 +6,66 @@
     <link href="/styles/kendo.default.min.css" rel="stylesheet">
     <link href="/styles/kendo.default.mobile.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/pagination/lib/pagination.css">
     <script src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/pagination/lib/jquery.pagination.js"></script>    
     <script src="/js/jszip.min.js"></script>
     <script src="/js/kendo.all.min.js"></script>
     <script src="/content/shared/js/console.js"></script>
-
 </head>
 <html>
 
 <body>
+    <form id="upForm2" name="upForm2" enctype="multipart/form-data" style="display: none;">
+        <label for="fileInput2" id="label_fileInput2" class="label_fileInput">选择文件</label>
+        <input class="fileInput" type="file" id="fileInput2" name="imgFile2" accept="image/*">
+        <input type='text' id="BEARID" name='BEARID' value='default'>
+    </form>
     <div id="toolbar" class="toolbar">
         <button id='createBar'>
             <i class="fa fa-plus" aria-hidden="true"></i>
             新建</button>
     </div>
-    <div id='mainBearings'>
+    <!-- 分页条 -->
+    <div id="Pagination" class="pagination"></div>
+    <div id="Searchresult">分页内容显示</div>
+    <div id="hiddenresult" style="display:none;">
+        <div id='mainBearings'></div>
     </div>
-
+    <!-- 此表单用来证明一些参数的作用 -->
+    <form name="paginationoptions" style="display: none;">
+        <p><label for="items_per_page">每页显示的列表数：</label><input type="text" value="5" name="items_per_page" id="items_per_page" class="numeric"/></p>
+        <p><label for="num_display_entries">分页链接显示数：</label><input type="text" value="5" name="num_display_entries" id="num_display_entries" class="numeric"/></p>
+        <p><label for="num">起始与结束点的数目：</label><input type="text" value="1" name="num_edge_entries" id="num_edge_entries" class="numeric"/></p>
+        <p><label for="prev_text">“上一页”标签：</label><input type="text" value="Prev" name="prev_text" id="prev_text"/></p>
+        <p><label for="next_text">“下一页”标签：</label><input type="text" value="Next" name="next_text" id="next_text"/></p>
+        <input type="button" id="setoptions" value="设置选项" />
+    </form>
 </body>
 <script>
 
     // checkedNode = { 'mtid': 1 };
-    checkedNode = parent.checkednode[0]
+    // checkedNode = parent.bearcheckednode[0]
+    if (parent.bearcheckednode.length == 1) {
+        checkedNode = {"mtid": parent.bearcheckednode[0].id}
+    } else {
+        checkedNode = {"mtid": null}
+        alert("请先选择一个节点进行编辑")
+    }
+    console.log(checkedNode)
     var bearNum = 0;
-    function bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem) {
-        return '<div id="showBearing' + String(index) + '" class="show-bearing">' +
+    function bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem, imgPath) {
+        return '<div class="SB">' +
+            '<div id="showBearing' + String(index) + '" class="show-bearing">' +
             '<form id="form' + String(index) + '" class="form">' +
-            '<img src="/images/MTimg/GX1000-49.jpg" alt="" style="height: 80px;float: left;">' +
+            '<img src="' + imgPath +'" alt="B' + String(index) + '" style="height: 80px;float: left;">' +
             '<table class="table-info">' +
             '<tr>' +
             '<td>' +
             '<p>轴承编号：</p>' +
             '</td>' +
             '<td>' +
-            '<input type="text" name="" id="" value="' + serialNumber + '" disabled>' +
+            '<input type="text" name="" id="B' + String(index) + '" value="' + serialNumber + '" disabled>' +
             '</td>' +
             '</tr>' +
             '<tr>' +
@@ -104,6 +130,7 @@
             '</td>' +
             '</tr>' +
             '</table>' +
+            '</div>' +
             '</div>'
     }
 
@@ -173,14 +200,69 @@
                 innerProblem = bearing.innerProblem;
                 outProblem = bearing.outProblem;
                 ballProblem = bearing.ballProblem;
-                $('#mainBearings').append(bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem)
+                let imgPath = bearing.imgPath == "" ? "/images/bearings/default.jpg" : bearing.imgPath
+                $('#mainBearings').append(bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem, imgPath)
                 );
                 addEdit(index, false);
             }
             $('button').kendoButton();
+            loadPages()
             // console.log($('.edit-table button')[0]);
         }
+        $("img").click(function () {
+            $("#label_fileInput2").click()
+            // 取轴承ID
+            var pID = $(this).attr('alt')
+            $('#BEARID').val($("#" + pID).val())
+            $('#fileInput2').on("change",
+                e => {
+                    let file = e.target.files[0];
+                    // log(file);
+                    let reader = new FileReader();
+
+                    reader.addEventListener('load', () => {
+                        let form = document.getElementById('upForm2');
+                        let formData = new FormData(form);
+                        // formData.append('avatar', 'muzhi');
+                        let url = '/upload/bearing';
+
+                        $.ajax({
+                            url: url,
+                            async: true,
+                            method: 'POST',
+                            data: formData,
+                            cache: false,
+                            // dataType: 'json',
+                            // contentType: 'multipart/form-data',
+                            contentType: false,
+                            processData: false
+                        }).done((data, textStatus, jqXHR) => {
+                            alert(JSON.stringify(data));
+                            // log(data);
+                            // log(textStatus);     // success: String
+                            $(this).attr('src', reader.result);
+                        }).fail((jqXHR, textStatus, errorThrown) => {
+                            console.log({ Error: textStatus });
+                            // console.log(JSON.stringify(errorThrown))
+                            // alert('上传失败' + '\n' + '[ERROR]' + errorThrown.message);
+                            alert('上传失败' + '\n' + '[ERROR]' + JSON.stringify(errorThrown));
+                        });
+
+                    }, false);
+                    if (!file.type.match('image.*')) {
+                        alert('请上传图片格式');
+                        console.log('Only image type supported');
+                        return false;
+                    }
+                    if (file) {
+                        reader.readAsDataURL(file);
+                        // log(reader.result);
+                    }
+                }
+            );
+        })
     })
+
     $('#createBar').click(function () {
         index = bearNum + 1
         serialNumber = null;
@@ -191,16 +273,15 @@
         innerProblem = 0;
         outProblem = 0;
         ballProblem = 0;
-        $('#mainBearings').prepend(bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem));
+        imgPath = "/images/bearings/default.jpg";
+        $('#mainBearings').prepend(bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem, imgPath));
         $('button').kendoButton();
         addEdit(index, true);
         $('#form' + String(index) + ' input')[1].disabled = false
         $('#form' + String(index) + ' input')[1].focus()
         $('#form' + String(index) + ' input')[2].disabled = false
-
+        loadPages()
     })
-
-
 
     Date.prototype.format = function (formatStr) {
         var str = formatStr;
@@ -214,6 +295,54 @@
         return str;
     }
 
+    function loadPages() {
+        $("#items_per_page").val(5)
+        //总数目
+        var length = $("#hiddenresult .SB").length;
+        //从表单获取分页元素参数
+        var optInit = getOptionsFromForm();
+        $("#Pagination").pagination(length, optInit);
+
+        // 按钮事件
+        $("#setoptions").click(function () {
+            var opt = getOptionsFromForm();
+            // 重新创建分页参数
+            $("#Pagination").pagination(length, opt);
+        })
+
+        //-----------------------------------
+        function getOptionsFromForm() {
+            var opt = { callback: pageselectCallback };
+            // 从文本域中收集参数 - 这些空间名与参数名相对应
+            $("input:text").each(function () {
+                opt[this.name] = this.className.match(/numeric/) ? parseInt(this.value) : this.value;
+            });
+            //避免demo重引入HTML
+            var htmlspecialchars = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }
+            $.each(htmlspecialchars, function (k, v) {
+                opt.prev_text = opt.prev_text.replace(k, v);
+                opt.next_text = opt.next_text.replace(k, v);
+            })
+            return opt;
+        }
+        //-------------------------------
+        function pageselectCallback(page_index, jq) {
+            // 从表单获取每页的显示的列表项数目
+            var items_per_page = $("#items_per_page").val();
+            var max_elem = Math.min((page_index + 1) * items_per_page, length);
+
+            $("#Searchresult").html("");
+            // 获取加载元素
+            for (var i = page_index * items_per_page; i < max_elem; i++) {
+                $("#Searchresult").append($("#hiddenresult .SB:eq(" + i + ")").clone());
+            }
+            //阻止单击事件
+            return false;
+        }
+    }
+
+    loadPages()
+    
 </script>
 <style>
     body html {
@@ -292,9 +421,13 @@
         font-size: 13px;
     }
 
-    #choosePic {
-        float: right;
-
+    img {
+        cursor: pointer;
+    }
+    .pagination {
+        /* border: 1px solid red; */
+        /* width: 40%; */
+        margin: 10px auto;
     }
 </style>
 

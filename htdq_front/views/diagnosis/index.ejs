@@ -134,11 +134,35 @@
     }
 
     var checkednode = []
+    var bearcheckednode = []
     function generateCheckedNodes() {
         checkednode = []
         var checked = onCheck()
         for (var i = 0; i < checked.length; i++) {
             checkednode.push({ "mtid": checked[i].id, "toolname": checked[i].name })
+        }
+    }
+    // 针对轴承配置 每次只能选择一个叶节点
+    function checkUncheckAllNodes(nodes, checked) {
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].set("checked", checked);
+            if (nodes[i].hasChildren) {
+                checkUncheckAllNodes(nodes[i].children.view(), checked);
+            }
+        }
+    }
+    var isBearConfig = false
+    function OneCheckedNode() {
+        if (isBearConfig) {
+            bearcheckednode = []
+            var treeView = $("#treeview").data("kendoTreeView")
+            checkedNodeIds(treeView.dataSource.view(), bearcheckednode)
+            if (bearcheckednode.length > 1) {
+                checkUncheckAllNodes(treeView.dataSource.view(), false)
+            }
+            if (bearcheckednode.length == 1) {
+                document.getElementById('iframeId').contentWindow.location.reload(true)
+            }
         }
     }
 
@@ -190,7 +214,7 @@
                                         checkChildren: true
                                     },
                                     dataSource: dataSource,
-                                    // check: onCheck
+                                    check: OneCheckedNode
                                 })
                                 var treeview = $("#treeview").data("kendoTreeView")
                                 treeview.expand(".k-item")
@@ -223,22 +247,33 @@
 
                                 $("#imageButton1").click(function () {
                                     hlButton(this)
+                                    isBearConfig = false
+                                    $("#primaryTextButton5").css("display", "")
                                     generateCheckedNodes()
                                     $("#iframeId").attr('src', 'diagnosis/config')
                                 })
                                 $("#imageButton2").click(function () {
                                     hlButton(this)
-                                    generateCheckedNodes()
+                                    // generateCheckedNodes()
+                                    // 隐藏提交按钮
+                                    $("#primaryTextButton5").css("display", "none")
+                                    // 激活check回调函数
+                                    isBearConfig = true
+                                    OneCheckedNode()
                                     $("#iframeId").attr('src', 'diagnosis/bearing')
                                 })
                                 $("#imageButton3").click(function () {
                                     hlButton(this)
+                                    isBearConfig = false
+                                    $("#primaryTextButton5").css("display", "")
                                     $("#iframeId").attr('src', 'diagnosis/inspect')
                                 })
                                 $("#imageButton4").click(function () {
                                     hlButton(this)
+                                    isBearConfig = false
                                     $("#iframeId").attr('src', '')
                                 })
+                                $("#imageButton1").click()
                             }
                         });
                     }
@@ -247,7 +282,7 @@
         });
         $("#primaryTextButton5").click(function () {
             generateCheckedNodes()
-            console.log(checkednode)
+            // console.log(checkednode)
             document.getElementById('iframeId').contentWindow.location.reload(true)
         })
     });
@@ -297,7 +332,7 @@
     .sidebar {
         width: 15%;
         float: left;
-        padding-top: 150px;
+        padding-top: 130px;
         margin-left: 2em;
         margin-right: 20px;
         border-right: 1px solid #ccc;
@@ -321,7 +356,7 @@
 
         /* float: right; */
         /* overflow: hidden; */
-        padding-top: 160px;
+        padding-top: 130px;
         /* border: 1px solid red; */
     }
 

@@ -24,6 +24,7 @@ var schema = new Schema({
       }, message: 'serialNumber is not a valid number like as "4421'
     }
   },
+  imgPath: {type: String, default: ""},
   // health:{type:Object,required:true,default:{}},
   good: { type: Number, required: true, default: 0 },
   innerProblem: { type: Number, required: true, default: 0 },

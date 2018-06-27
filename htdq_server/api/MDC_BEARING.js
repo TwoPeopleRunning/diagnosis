@@ -32,6 +32,80 @@ exports.route('/Delete/:serialNumber').get(function (req, res) {
 
 });
 
+exports.route('/Update').post(function (req, res) {
+    if (!req.body.isArray) {
+        if (!req.body.serialNumber) {
+            res.send({
+                error: 'serialNumber must be specified!'
+            });
+            return;
+        }
+
+        MDC_BEARING.findOne({ 'serialNumber': req.body.serialNumber }).exec(function (err, data) {
+            if (err) {
+                res.send({
+                    error: err
+                });
+                return;
+            }
+            if (!data) {
+                var data = {};
+                mixin(data, req.body);
+                (new MDC_BEARING(data)).save(function (err, data) {
+                    if (err) {
+                        res.send({
+                            error: 'Save data failed!'
+                        });
+                        return;
+                    }
+                    res.send(data);
+                });
+                return;
+            }
+            mixin(data, req.body);
+            data.save(function (err, data) {
+                if (err) {
+                    res.send({
+                        error: 'Save data failed!'
+                    });
+                    return;
+                }
+                res.send(data);
+            });
+            return;
+        });
+    } else {
+        //console.log(req.body);
+        //console.log(req.body.data);
+        req.body.data.forEach(function (e) {
+            //console.log(e);
+            MDC_BEARING.findOne({ 'serialNumber': e.serialNumber }).exec(function (err, data) {
+                // //console.log(req.body.ID);
+                if (err || !data) {
+                    res.send({
+                        error: 'Data does not exist!'
+                    });
+                    return;
+                }
+
+                mixin(data, e);
+                //console.log(data);
+                data.save(function (err, data) {
+                    if (err) {
+                        res.send({
+                            error: 'Save datafailed!'
+                        });
+                        return;
+                    }
+                });
+            });
+        });
+        res.send({
+            success: true
+        });
+    }
+});
+
 exports.route('/:mtid').get(function (req, res) {
     mtid = req.params.mtid;
     MDC_BEARING.find({ mtid: mtid }, function (err, response) {
