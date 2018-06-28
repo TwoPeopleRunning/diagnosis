@@ -24,6 +24,7 @@ module.exports = exports = express.Router();
 //创建检测记录，可以兼顾单条和批量的创建，并更新轴承对应数据(轴承编号和mtid必须，且在数据库中有记录)
 exports.route('/Create').post(function (req, res) {
     savedata = req.body;
+    savedata.lastInspect = new Date();
     INSPECT_HIS.find({}).sort({ id: -1 }).exec(function (err, data) {
         if (err) {
             res.send({ "error": err })
@@ -66,6 +67,11 @@ exports.route('/Create').post(function (req, res) {
                                 res.send({ "error": finderr })
                             } else {
                                 mixin(updateInspect, savedata);
+                                if (savedata.result != '正常状态') {
+                                    updateInspect.healthy = '0'
+                                } else {
+                                    updateInspect.healthy = '1'
+                                }
                                 updateInspect.save()
                             }
                         })

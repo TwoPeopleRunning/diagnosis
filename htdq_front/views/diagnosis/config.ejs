@@ -20,7 +20,9 @@
 <body>
     <!-- 分页条 -->
     <div id="Pagination" class="pagination"></div>
-    <div id="Searchresult"><img src="/styles/Default/loading.gif" alt=""></div>
+    <div id="Searchresult">
+        <img src="/styles/Default/loading.gif" alt="">
+    </div>
     <!-- 一次加载至此 -->
     <div id="hiddenresult" style="display:none;">
         <div id='mainshow'></div>
@@ -64,13 +66,14 @@
             if (status == 'success') {
                 var totalbad = 0;
                 var times = [];
-                for (let b_index = 0; b_index < bearings.length; b_index++) {
+                for (let b_index = 0; b_index < (bearings.length > 4 ? 4 : bearings.length); b_index++) {
                     const bearing = bearings[b_index];
                     times.push(new Date(bearing.lastInspect).getTime())
                     //轴承数目
                     $('#toolinfo' + String(index)).children('tbody').children('tr')[2].getElementsByTagName('td')[1].innerHTML = bearings.length;
                     //轴承状态
                     // <button type="button" class="bearing">状态正常</button>
+                    // console.log($('#bearinginfo' + String(index)).children('tbody').children('tr')[0].getElementsByTagName('td'))
                     $('#bearinginfo' + String(index)).children('tbody').children('tr')[0].getElementsByTagName('td')[b_index + 1].innerHTML = bearing.serialNumber;
                     if (bearing.healthy == '1') {
                         $('#bearinginfo' + String(index)).children('tbody').children('tr')[1].getElementsByTagName('td')[b_index + 1].innerHTML = '<button type="button" class="bearing bearing-good">状态正常</button>';
@@ -78,7 +81,7 @@
                         $('#bearinginfo' + String(index)).children('tbody').children('tr')[1].getElementsByTagName('td')[b_index + 1].innerHTML = '<button type="button" class="bearing bearing-bad">状态异常</button>';
                         totalbad += 1;
                     }
-                    if (times.length == bearings.length) {
+                    if (times.length == 4) {
                         lastest = Math.max.apply(null, times);
                         $('#lastInspect' + String(index))[0].innerHTML = new Date(lastest).format("yyyy-MM-dd HH:mm:ss");
                     }
