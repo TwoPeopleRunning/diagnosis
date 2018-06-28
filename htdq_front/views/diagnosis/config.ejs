@@ -37,7 +37,7 @@
         const node = checkednode[index];
         $('#mainshow').append(
             "<div class='backlayout'><div class='tool-show'>" +
-            '<div class="tool"><img src="/images/machineTools/default.jpg" class="toolPic" id="toolimg' + String(index) + '">' +
+            '<div class="tool"><img src="/images/machineTools/' + checkednode[index].toolname + '.jpg" class="toolPic" id="toolimg' + String(index) + ' "onerror=javascript:this.src="/images/machineTools/default.jpg">' +
             '<table class="tool-table" id="toolinfo' + String(index) + '">' +
             '<tr>' +
             '<td>机床编号</td>' +
