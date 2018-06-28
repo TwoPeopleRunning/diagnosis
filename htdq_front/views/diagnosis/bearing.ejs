@@ -33,6 +33,7 @@
         <div id='mainBearings'>
         </div>
     </div>
+<<<<<<< HEAD
 
     <!-- 分页条 -->
 
@@ -64,6 +65,8 @@
         <input type="button" id="setoptions" value="设置选项" />
     </form>
 
+=======
+>>>>>>> 60ce1de234a0c1937768dd260ec42a421226d526
 </body>
 <script>
     // checkedNode = { 'mtid': 1 };
@@ -317,39 +320,23 @@
         return str;
     }
     function loadPages() {
-        $("#items_per_page").val(5)
-        //总数目
+        // 总数目
         var length = $("#hiddenresult .SB").length;
-        //从表单获取分页元素参数
-        var optInit = getOptionsFromForm();
+        var optInit = {callback: pageselectCallback}
+        // 每页显示的列表数
+        optInit.items_per_page = 5
+        // 分页链接显示数
+        optInit.num_display_entries = 5
+        // 起始与结束点的数目
+        optInit.num_edge_entries = 1
+        // 上一页标签
+        optInit.prev_text = "Prev"
+        // 下一页标签
+        optInit.next_text = "Next"
         $("#Pagination").pagination(length, optInit);
 
-        // 按钮事件
-        $("#setoptions").click(function () {
-            var opt = getOptionsFromForm();
-            // 重新创建分页参数
-            $("#Pagination").pagination(length, opt);
-        })
-
-        //-----------------------------------
-        function getOptionsFromForm() {
-            var opt = { callback: pageselectCallback };
-            // 从文本域中收集参数 - 这些空间名与参数名相对应
-            $("input:text").each(function () {
-                opt[this.name] = this.className.match(/numeric/) ? parseInt(this.value) : this.value;
-            });
-            //避免demo重引入HTML
-            var htmlspecialchars = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }
-            $.each(htmlspecialchars, function (k, v) {
-                opt.prev_text = opt.prev_text.replace(k, v);
-                opt.next_text = opt.next_text.replace(k, v);
-            })
-            return opt;
-        }
-        //-------------------------------
         function pageselectCallback(page_index, jq) {
-            // 从表单获取每页的显示的列表项数目
-            var items_per_page = $("#items_per_page").val();
+            var items_per_page = 5;
             var max_elem = Math.min((page_index + 1) * items_per_page, length);
 
             $("#Searchresult").html("");
@@ -361,7 +348,6 @@
             return false;
         }
     }
-
     loadPages()
 </script>
 <style>
