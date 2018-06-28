@@ -21,7 +21,7 @@ module.exports = exports = express.Router();
 // INSPECT_HIS management  api/INSPECT_HIS
 
 
-//创建检测记录，可以兼顾单条和批量的创建，并更新轴承对应数据(轴承编号必须，且在数据库中有记录)
+//创建检测记录，可以兼顾单条和批量的创建，并更新轴承对应数据(轴承编号和mtid必须，且在数据库中有记录)
 exports.route('/Create').post(function (req, res) {
     savedata = req.body;
     INSPECT_HIS.find({}).sort({ id: -1 }).exec(function (err, data) {
@@ -78,3 +78,20 @@ exports.route('/Create').post(function (req, res) {
 
 });
 
+exports.route('/').get(function (req, res) {
+    var condition = {};
+    if (req.query.start || req.query.end) {
+        condition['lastInspect'] = {};
+    }
+    if (req.query.mtid) { condition.mtid = req.query.mtid }
+    if (req.query.serialNumber) { condition.serialNumber = req.query.serialNumber }
+    if (req.query.start) { condition.lastInspect['$gt'] = new Date(req.query.start) }
+    if (req.query.end) { condition.lastInspect['$lt'] = new Date(req.query.end) }
+    INSPECT_HIS.find(condition, function (err, datas) {
+        if (err) {
+            res.send({ 'error': err })
+        } else {
+            res.send(datas)
+        }
+    })
+})

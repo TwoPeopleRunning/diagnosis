@@ -13,38 +13,42 @@
 </head>
 
 <body>
-    <div id='searchCon'>
+    <div id='searchCon' style="padding-left:5%;background-color:gainsboro">
         <p style="padding: 20px;font-size: 2em">搜索条件:</p>
-        <table style="width: 100%;text-align: center;padding: 10px;max-width: 1250px;margin-left: 15px">
+        <table style="width: 100%;text-align: center;padding: 10px;min-width: 1200px;;max-width: 1250px;margin-left: 15px">
             <tr>
                 <td class="tdRight">机床编号:</td>
                 <td class="tdLeft">
-                    <select name="" id="toolsId"></select>
+                    <select name="" id="toolId">
+                        <option value=""></option>
+                    </select>
                 </td>
                 <td class="tdRight">轴承编号:</td>
                 <td class="tdLeft">
-                    <select name="" id="bearingsId"></select>
+                    <select name="" id="bearingId">
+                        <option value=""></option>
+                    </select>
                 </td>
                 <td class="tdRight">开始时间:</td>
                 <td class="tdLeft">
-                    <input id="start" />
+                    <input id="start" value="" />
                 </td>
                 <td class="tdRight">结束时间:</td>
                 <td class="tdLeft">
-                    <input id="end" />
+                    <input id="end" value="" />
                 </td>
                 <td class="tdLeft">
                     <button class='search' id='clearTime'>清除时间</button>
                 </td>
                 <td class="tdLeft">
-                    <button class='search'>搜索</button>
+                    <button class='search' id='submitSearch'>搜索</button>
                 </td>
             </tr>
 
         </table>
     </div>
 
-    <div id='bearingsGrid'>
+    <div id='bearingsGrid' style="width:90%;padding: 0 5%;height: 600px;min-width: 1200px;">
 
     </div>
 
@@ -58,27 +62,68 @@
         $("#end").val('')
     })
 
-    //  $("bearingsGrid").kendoGrid({
-    //     dataSource: Result,
-    //     toolbar: ["excel"],
-    //     excel: {
-    //         fileName: "运行效率" + "(" + begintime + "--" + endtime + ")"
-    //     },
-    //     pageable: {
-    //         pageSize: 10,
-    //         refresh: true
-    //     },
-    //     sortable: true,
-    //     columns: [
-    //         { field: "MTID", title: "设备编号", format: "{0:n0}" },
-    //         { field: "MTNAME", title: "设备名称" },
-    //         { field: "RunTime", title: "运行时间/h", format: "{0:n2}" },
-    //         { field: "OnTime", title: "开机时间/h", format: "{0:n2}" },
-    //         { field: "RunEff", title: "运行效率", format: "{0:p2}" },
-    //         // { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
-    //     ]
-    // });
+    $.get('/api/MDC_MACHINETOOLS', function (tools, status) {
+        if (status == 'success') {
+            for (let index = 0; index < tools.length; index++) {
+                const tool = tools[index];
+                $('#toolId').append('<option value="' + tool.ID + '">' + tool.ID + '</option>')
+            }
+        }
+    })
 
+    $('#toolId').change(function () {
+        mtid = $('#toolId').val()
+        $('#bearingId').empty()
+        $.get('/api/MDC_BEARING/' + mtid, function (bearings, status) {
+            if (status == 'success') {
+                for (let index = 0; index < bearings.length; index++) {
+                    const bearing = bearings[index];
+                    $('#bearingId').append('<option value="' + bearing.serialNumber + '">' + bearing.serialNumber + '</option>')
+                }
+            } else {
+                alert('获取轴承数据失败，请稍后再试！')
+            }
+        })
+    }
+    )
+
+    $('#submitSearch').click(function () {
+        var mtid = $('#toolId').val();
+        var serialNumber = $('#bearingId').val();
+        var start = $('#start').val();
+        var end = $('#end').val();
+        $.get('/api/INSPECT_HIS?mtid=' + mtid + '&serialNumber=' + serialNumber + '&start=' + start + '&end=' + end, function (datas, status) {
+            for (let index = 0; index < datas.length; index++) {
+                datas[index].lastInspect = new Date(datas[index].lastInspect);
+                datas[index].possible = String(datas[index].good) + ' ' + String(datas[index].innerProblem) + ' ' + String(datas[index].outProblem) + ' ' + String(datas[index].ballProblem)
+            }
+            if (status == 'success') {
+                $("#bearingsGrid").kendoGrid({
+                    dataSource: datas,
+                    toolbar: ["excel"],
+                    excel: {
+                        fileName: "历史数据"
+                    },
+                    pageable: {
+                        pageSize: 10,
+                        refresh: true
+                    },
+                    sortable: true,
+                    columns: [
+                        { field: "id", title: "序号", format: "{0:n0}" },
+                        { field: "mtid", title: "机床ID" },
+                        { field: "serialNumber", title: "轴承编号" },
+                        { field: "possible", title: "诊断输出" },
+                        { field: "result", title: "诊断结果" },
+                        { field: "lastInspect", title: "检测时间", format: "{0: yyyy-MM-dd HH:mm:ss}" },
+                        // { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+                    ]
+                });
+            } else {
+                alert('获取数据失败，请稍后再试！')
+            }
+        })
+    })
 
 
     var today = new Date();
@@ -159,5 +204,17 @@
 
     td {
         width: 10%
+    }
+
+    select {
+        font-size: 1em
+    }
+
+    .k-grid-header th.k-header {
+        text-align: center
+    }
+
+    #bearingsGrid td {
+        text-align: center
     }
 </style>

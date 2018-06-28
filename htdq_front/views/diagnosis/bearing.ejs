@@ -100,6 +100,7 @@
             '</th>' +
             '<td style="text-align: right">' + new Date(lastInspect).format("yyyy-MM-DD") + '</td>' +
             '<td style="text-align: left">' + new Date(lastInspect).format("HH:mm:SS") + '</td>' +
+            '<td><button id="inspect' + String(index) + '">诊断</button></td>' +
             '</tr>' +
             '<tr>' +
             '<td>' +
@@ -124,9 +125,18 @@
             '</div>'
     }
     function addEdit(index, newflag) {
+        //诊断按钮
+        // console.log($('#inspect' + String(index))[0])
+        $('#inspect' + String(index))[0].onclick = function () {
+            serialNumber = $('#form' + String(index) + ' input')[0].value
+            parent.document.getElementById('iframeId').src = 'diagnosis/inspect/?serialNumber=' + serialNumber
+            parent.document.getElementById('iframeId').style.width = '100%'
+            parent.document.getElementsByClassName('sidebar')[0].style.display = 'none'
+
+        }
         //编辑按钮
         $('#edit-table' + String(index) + ' button')[0].onclick = function () {
-            console.log($('#form' + String(index) + ' input'))
+            // console.log($('#form' + String(index) + ' input'))
             $('#form' + String(index) + ' input')[1].disabled = false
             $('#form' + String(index) + ' input')[1].focus()
             $('#form' + String(index) + ' input')[2].disabled = false

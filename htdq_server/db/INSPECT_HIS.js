@@ -14,13 +14,15 @@ var lastID = 0;
  */
 var schema = new Schema({
   id: { type: Number, required: true },
+  mtid: { type: String, required: true },
   serialNumber: { type: String, required: true },
   // health:{type:Object,required:true,default:{}},
   good: { type: Number, required: true, default: 0 },
   innerProblem: { type: Number, required: true, default: 0 },
   outProblem: { type: Number, required: true, default: 0 },
   ballProblem: { type: Number, required: true, default: 0 },
-  lastInspect: { type: Date, default: new Date() }
+  lastInspect: { type: Date, default: new Date() },
+  result: { type: String, required: true }
 }, { collection: "INSPECT_HIS" });
 
 

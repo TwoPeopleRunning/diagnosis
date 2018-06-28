@@ -20,11 +20,11 @@
                 <tr>
                     <td>轴承编号:</td>
                     <td>
-                        <input type="text" name="" id="serialNumber" value="1_1">
+                        <input type="text" name="" id="serialNumber" value="">
                     </td>
                     <td>机床编号:</td>
                     <td>
-                        <input type="text" name="" id="" value="1">
+                        <input type="text" name="" id="toolId" value="">
                     </td>
                     <td>信号源选择:</td>
                     <td>
@@ -231,7 +231,12 @@
     $('select').kendoDropDownList();
     $('button').kendoButton();
 
-
+    var serialNumber = '<%=serialNumber%>'
+    if (serialNumber) {
+        $('#serialNumber').val(serialNumber)
+        $('#serialNumber').val(serialNumber)
+        $('#toolId').val(serialNumber.split('_')[0])
+    }
 
     features = $('#features td')
     featuresName = ['Crest_Factor', 'Kurtosis_Factor', 'Kurtosis', 'Mean', 'Peak', 'RMS', 'Skewness', 'Standard_deviation', 'Var'];
@@ -249,14 +254,7 @@
             lvq = resultPossible.lvq;
             dt = resultPossible.dt;
             ids = resultPossible.ids;
-            var payload = {
-                'serialNumber': $('#serialNumber').val(),
-                "good": ids[0],
-                "innerProblem": ids[1],
-                "outProblem": ids[2],
-                "ballProblem": ids[3]
-            }
-            createHis(payload);
+
             for (let index = 0; index < resultTable.length; index++) {
                 const resultId = resultTable[index];
                 $('#' + resultId + ' td')[0].innerHTML = lvq[index]
@@ -313,6 +311,16 @@
                 $('#finally').css('background-color', 'red');
                 $('#finally p')[0].innerHTML = label[healthy]
             }
+            var payload = {
+                'mtid': ($('#serialNumber').val()).split('_')[0],
+                'serialNumber': $('#serialNumber').val(),
+                "good": ids[0],
+                "innerProblem": ids[1],
+                "outProblem": ids[2],
+                "ballProblem": ids[3],
+                "result": label[healthy]
+            }
+            createHis(payload);
         }
     }
 
@@ -423,7 +431,14 @@
 
 
     function timeDomain(healthy) {
-        $('#timesImg img')[0].src = '/diagnosisImg/' + healthy + '/time_Domain.png'
+        serialNumber = $('#serialNumber').val();
+        if (serialNumber != '') {
+            $('#timesImg img')[0].src = '/diagnosisImg/' + healthy + '/time_Domain.png'
+            $('#toolId').val(serialNumber.split('_')[0])
+        } else {
+            alert('请先输入轴承编号')
+        }
+
     }
 
     function extractFeatures(features, featuresName, healthy) {
@@ -450,7 +465,7 @@
     .searchCon,
     .diagShow {
         width: 100%;
-        min-width: 1450px;
+        min-width: 1500px;
         /* padding-left: 7%; */
     }
 

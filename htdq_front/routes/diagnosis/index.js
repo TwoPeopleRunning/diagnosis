@@ -49,7 +49,11 @@ exports.get('/inspect', function (req, res, next) {
     if (req.cookies.Token) {
         // console.log(req.signedCookies.user, req.signedCookies.passwd);
         // mtid = req.params.mtid;
-        res.render('diagnosis/inspect', {});
+        if (req.query.serialNumber) {
+            res.render('diagnosis/inspect', { 'serialNumber': req.query.serialNumber });
+        } else {
+            res.render('diagnosis/inspect', { 'serialNumber': null });
+        }
     } else {
         res.redirect('/users/login');
         return;
