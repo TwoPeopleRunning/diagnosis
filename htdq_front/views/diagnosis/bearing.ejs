@@ -33,40 +33,6 @@
         <div id='mainBearings'>
         </div>
     </div>
-<<<<<<< HEAD
-
-    <!-- 分页条 -->
-
-    <div id="hiddenresult">
-        <div id='mainBearings'></div>
-    </div>
-    <!-- 此表单用来证明一些参数的作用 -->
-    <form name="paginationoptions" style="display: none;">
-        <p>
-            <label for="items_per_page">每页显示的列表数：</label>
-            <input type="text" value="5" name="items_per_page" id="items_per_page" class="numeric" />
-        </p>
-        <p>
-            <label for="num_display_entries">分页链接显示数：</label>
-            <input type="text" value="5" name="num_display_entries" id="num_display_entries" class="numeric" />
-        </p>
-        <p>
-            <label for="num">起始与结束点的数目：</label>
-            <input type="text" value="1" name="num_edge_entries" id="num_edge_entries" class="numeric" />
-        </p>
-        <p>
-            <label for="prev_text">“上一页”标签：</label>
-            <input type="text" value="Prev" name="prev_text" id="prev_text" />
-        </p>
-        <p>
-            <label for="next_text">“下一页”标签：</label>
-            <input type="text" value="Next" name="next_text" id="next_text" />
-        </p>
-        <input type="button" id="setoptions" value="设置选项" />
-    </form>
-
-=======
->>>>>>> 60ce1de234a0c1937768dd260ec42a421226d526
 </body>
 <script>
     // checkedNode = { 'mtid': 1 };
@@ -322,7 +288,7 @@
     function loadPages() {
         // 总数目
         var length = $("#hiddenresult .SB").length;
-        var optInit = {callback: pageselectCallback}
+        var optInit = { callback: pageselectCallback }
         // 每页显示的列表数
         optInit.items_per_page = 5
         // 分页链接显示数
