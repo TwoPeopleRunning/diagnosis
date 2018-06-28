@@ -74,6 +74,7 @@
     $('#toolId').change(function () {
         mtid = $('#toolId').val()
         $('#bearingId').empty()
+        $('#bearingId').append('<option value=""><option>')
         $.get('/api/MDC_BEARING/' + mtid, function (bearings, status) {
             if (status == 'success') {
                 for (let index = 0; index < bearings.length; index++) {

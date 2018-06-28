@@ -326,7 +326,7 @@
 
     function createHis(payload) {
         $.post('/api/INSPECT_HIS/Create', payload, function (data, status) {
-            if (status == 'success') {
+            if (status == 'success' & !data.error) {
                 console.log('创建历史数据成功！')
             } else {
                 alert('创建历史数据失败！')
