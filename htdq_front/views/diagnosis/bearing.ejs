@@ -140,16 +140,13 @@
 
         }
         //编辑按钮
-<<<<<<< HEAD
         $('#edit-table' + String(index) + ' button')[0].onclick = function () {
-=======
-        $('#edit-button' + String(index)).click(function () {
->>>>>>> ac7b1628029c4f65b6b0bc64a5d3f3c8f7a186f5
+
             // console.log($('#form' + String(index) + ' input'))
             $('#form' + String(index) + ' input')[1].disabled = false
             $('#form' + String(index) + ' input')[1].focus()
             $('#form' + String(index) + ' input')[2].disabled = false
-        })
+        }
         //删除按钮
         $('#delete-button' + String(index)).click(function () {
             remove = confirm('确定要删除该轴承么？')
@@ -217,7 +214,7 @@
             }
             // console.log($('.edit-table button')[0]);
             // 异步问题
-            loadPages()           
+            loadPages()
         }
         $('button').kendoButton();
         $("img").click(function () {
@@ -313,7 +310,7 @@
         console.log("loadPages run")
         // 总数目
         var length = $("#mainBearings .SB").length;
-        var optInit = {callback: pageselectCallback}
+        var optInit = { callback: pageselectCallback }
         // 每页显示的列表数
         optInit.items_per_page = 4
         // 分页链接显示数
