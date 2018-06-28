@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="/font_awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="/pagination/lib/pagination.css">
     <script src="/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/pagination/lib/jquery.pagination.js"></script>
     <script src="/js/jszip.min.js"></script>
     <script src="/js/kendo.all.min.js"></script>
     <script src="/content/shared/js/console.js"></script>
+    <script type="text/javascript" src="/pagination/lib/jquery.pagination.js"></script>
 
 </head>
 <html>
@@ -27,11 +27,12 @@
             <i class="fa fa-plus" aria-hidden="true"></i>
             新建</button>
     </div>
-    <div style="margin-left: 10px">
+    <div style="margin-left:10px">
+        <!-- 分页条 -->
         <div id="Pagination" class="pagination"></div>
         <div id="Searchresult">分页内容显示</div>
-        <div id='mainBearings'>
-        </div>
+
+        <div id='mainBearings' style="display: none;"></div>
     </div>
 </body>
 <script>
@@ -44,8 +45,12 @@
         alert("请先选择一个节点进行编辑")
     }
     var bearNum = 0;
+
+    function del(e) {
+        alert(JSON.stringify(e, null, 4))
+    }
     function bearingString(index, serialNumber, kind, position, lastInspect, good, innerProblem, outProblem, ballProblem, imgPath) {
-        return '<div class="SB">' +
+        return '<div class="SB" id="SB' + String(index) + '">' +
             '<div id="showBearing' + String(index) + '" class="show-bearing">' +
             '<form id="form' + String(index) + '" class="form">' +
             '<img src="' + imgPath + '" alt="B' + String(index) + '" style="height: 80px;float: left;">' +
@@ -79,17 +84,17 @@
             '<table id="edit-table' + String(index) + '" class="edit-table">' +
             ' <tr>' +
             ' <td>' +
-            ' <button>编辑</button>' +
+            ' <button  id="edit-button' + String(index) + '">编辑</button>' +
             ' </td>' +
             ' </tr>' +
             ' <tr>' +
             ' <td>' +
-            ' <button>删除</button>' +
+            ' <button id="delete-button' + String(index) + '">删除</button>' +
             ' </td>' +
             ' </tr>' +
             ' <tr>' +
             ' <td>' +
-            ' <button>保存</button>' +
+            ' <button id="save-button' + String(index) + '">保存</button>' +
             ' </td>' +
             ' </tr>' +
             '</table>' +
@@ -135,30 +140,37 @@
 
         }
         //编辑按钮
+<<<<<<< HEAD
         $('#edit-table' + String(index) + ' button')[0].onclick = function () {
+=======
+        $('#edit-button' + String(index)).click(function () {
+>>>>>>> ac7b1628029c4f65b6b0bc64a5d3f3c8f7a186f5
             // console.log($('#form' + String(index) + ' input'))
             $('#form' + String(index) + ' input')[1].disabled = false
             $('#form' + String(index) + ' input')[1].focus()
             $('#form' + String(index) + ' input')[2].disabled = false
-        }
+        })
         //删除按钮
-        $('#edit-table' + String(index) + ' button')[1].onclick = function () {
+        $('#delete-button' + String(index)).click(function () {
             remove = confirm('确定要删除该轴承么？')
             if (remove) {
                 serialNumber = $('#form' + String(index) + ' input')[0].value;
                 $.get('/api/MDC_BEARING/Delete/' + serialNumber, function (deleteData, status) {
                     if (status == 'success' && !deleteData.error) {
-                        $('#showBearing' + String(index)).remove();
+                        $('#SB' + String(index)).remove();
                         alert('删除成功')
+                        // loadPages()
+                        window.location.reload()
                     } else {
                         console.log(deleteData)
                         alert('删除失败，请重新登录后再试！')
                     }
                 })
             }
-        }
+        })
+
         //保存按钮
-        $('#edit-table' + String(index) + ' button')[2].onclick = function () {
+        $('#save-button' + String(index)).click(function () {
             if (newflag) {
                 var payload = {
                     'mtid': checkedNode.mtid,
@@ -182,7 +194,7 @@
                     alert('保存失败，请重新登录后再试！')
                 }
             })
-        }
+        })
         $('button').kendoButton();
     }
     $.get('/api/MDC_BEARING/' + checkedNode.mtid, function (bearings, status) {
@@ -204,9 +216,10 @@
                 addEdit(index, false);
             }
             // console.log($('.edit-table button')[0]);
+            // 异步问题
+            loadPages()           
         }
         $('button').kendoButton();
-        loadPages()
         $("img").click(function () {
             $("#label_fileInput2").click()
             // 取轴承ID
@@ -295,12 +308,14 @@
         str = str.replace(/ss|SS/, this.getSeconds() > 9 ? this.getSeconds().toString() : '0' + this.getSeconds());
         return str;
     }
+    // 分页设置
     function loadPages() {
+        console.log("loadPages run")
         // 总数目
-        var length = $("#hiddenresult .SB").length;
-        var optInit = { callback: pageselectCallback }
+        var length = $("#mainBearings .SB").length;
+        var optInit = {callback: pageselectCallback}
         // 每页显示的列表数
-        optInit.items_per_page = 5
+        optInit.items_per_page = 4
         // 分页链接显示数
         optInit.num_display_entries = 5
         // 起始与结束点的数目
@@ -312,19 +327,19 @@
         $("#Pagination").pagination(length, optInit);
 
         function pageselectCallback(page_index, jq) {
-            var items_per_page = 5;
+            var items_per_page = 4;
             var max_elem = Math.min((page_index + 1) * items_per_page, length);
 
             $("#Searchresult").html("");
             // 获取加载元素
             for (var i = page_index * items_per_page; i < max_elem; i++) {
-                $("#Searchresult").append($("#hiddenresult .SB:eq(" + i + ")").clone());
+                $("#Searchresult").append($("#mainBearings .SB:eq(" + i + ")").clone(true));
+                // i == 0 ? console.log($("#mainBearings .SB:eq(" + i + ")")) : console.log("asdada")
             }
             //阻止单击事件
             return false;
         }
     }
-    loadPages()
 </script>
 <style>
     body html {
