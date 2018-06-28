@@ -110,12 +110,12 @@
         str = str.replace(/mm/, this.getMinutes() > 9 ? this.getMinutes().toString() : '0' + this.getMinutes());
         str = str.replace(/ss|SS/, this.getSeconds() > 9 ? this.getSeconds().toString() : '0' + this.getSeconds());
         return str;
-    } 
+    }
 
-    function loadPages(){
+    function loadPages() {
         // 总条目
         var length = $("#hiddenresult .backlayout").length;
-        var optInit = {callback: pageselectCallback}
+        var optInit = { callback: pageselectCallback }
         // 每页显示的列表数
         optInit.items_per_page = 5
         // 分页链接显示数
@@ -128,15 +128,15 @@
         optInit.next_text = "Next"
         $("#Pagination").pagination(length, optInit);
 
-        function pageselectCallback(page_index, jq){
+        function pageselectCallback(page_index, jq) {
             // 从表单获取每页的显示的列表项数目
             var items_per_page = 5;
-            var max_elem = Math.min((page_index+1) * items_per_page, length);
-            
+            var max_elem = Math.min((page_index + 1) * items_per_page, length);
+
             $("#Searchresult").html("");
             // 获取加载元素
-            for(var i=page_index*items_per_page;i<max_elem;i++){
-                $("#Searchresult").append($("#hiddenresult .backlayout:eq("+i+")").clone());
+            for (var i = page_index * items_per_page; i < max_elem; i++) {
+                $("#Searchresult").append($("#hiddenresult .backlayout:eq(" + i + ")").clone());
             }
             //阻止单击事件
             return false;
@@ -221,6 +221,7 @@
     .bearing-bad {
         background-color: rgb(233, 38, 38)
     }
+
     .pagination {
         /* border: 1px solid red; */
         /* width: 40%; */
