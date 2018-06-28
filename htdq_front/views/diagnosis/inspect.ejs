@@ -20,7 +20,7 @@
                 <tr>
                     <td>轴承编号:</td>
                     <td>
-                        <input type="text" name="" id="" value="1_1">
+                        <input type="text" name="" id="serialNumber" value="1_1">
                     </td>
                     <td>机床编号:</td>
                     <td>
@@ -249,6 +249,14 @@
             lvq = resultPossible.lvq;
             dt = resultPossible.dt;
             ids = resultPossible.ids;
+            var payload = {
+                'serialNumber': $('#serialNumber').val(),
+                "good": ids[0],
+                "innerProblem": ids[1],
+                "outProblem": ids[2],
+                "ballProblem": ids[3]
+            }
+            createHis(payload);
             for (let index = 0; index < resultTable.length; index++) {
                 const resultId = resultTable[index];
                 $('#' + resultId + ' td')[0].innerHTML = lvq[index]
@@ -306,9 +314,17 @@
                 $('#finally p')[0].innerHTML = label[healthy]
             }
         }
-
     }
 
+    function createHis(payload) {
+        $.post('/api/INSPECT_HIS/Create', payload, function (data, status) {
+            if (status == 'success') {
+                console.log('创建历史数据成功！')
+            } else {
+                alert('创建历史数据失败！')
+            }
+        })
+    }
 
     //生成从minNum到maxNum的随机数
     function randomNum(minNum, maxNum) {

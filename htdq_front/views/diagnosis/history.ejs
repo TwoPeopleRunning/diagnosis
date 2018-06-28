@@ -13,23 +13,151 @@
 </head>
 
 <body>
-    <div id='search'>
-        <table>
+    <div id='searchCon'>
+        <p style="padding: 20px;font-size: 2em">搜索条件:</p>
+        <table style="width: 100%;text-align: center;padding: 10px;max-width: 1250px;margin-left: 15px">
             <tr>
-                <th>搜索条件</th>
+                <td class="tdRight">机床编号:</td>
+                <td class="tdLeft">
+                    <select name="" id="toolsId"></select>
+                </td>
+                <td class="tdRight">轴承编号:</td>
+                <td class="tdLeft">
+                    <select name="" id="bearingsId"></select>
+                </td>
+                <td class="tdRight">开始时间:</td>
+                <td class="tdLeft">
+                    <input id="start" />
+                </td>
+                <td class="tdRight">结束时间:</td>
+                <td class="tdLeft">
+                    <input id="end" />
+                </td>
+                <td class="tdLeft">
+                    <button class='search' id='clearTime'>清除时间</button>
+                </td>
+                <td class="tdLeft">
+                    <button class='search'>搜索</button>
+                </td>
             </tr>
-            <tr>
-                机床名称
-            </tr>
+
         </table>
+    </div>
+
+    <div id='bearingsGrid'>
+
     </div>
 
 </body>
 <script>
+
+    $('.search').kendoButton()
+
+    $('#clearTime').click(function () {
+        $("#start").val('')
+        $("#end").val('')
+    })
+
+    //  $("bearingsGrid").kendoGrid({
+    //     dataSource: Result,
+    //     toolbar: ["excel"],
+    //     excel: {
+    //         fileName: "运行效率" + "(" + begintime + "--" + endtime + ")"
+    //     },
+    //     pageable: {
+    //         pageSize: 10,
+    //         refresh: true
+    //     },
+    //     sortable: true,
+    //     columns: [
+    //         { field: "MTID", title: "设备编号", format: "{0:n0}" },
+    //         { field: "MTNAME", title: "设备名称" },
+    //         { field: "RunTime", title: "运行时间/h", format: "{0:n2}" },
+    //         { field: "OnTime", title: "开机时间/h", format: "{0:n2}" },
+    //         { field: "RunEff", title: "运行效率", format: "{0:p2}" },
+    //         // { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+    //     ]
+    // });
+
+
+
+    var today = new Date();
+
+    var start = $("#start").kendoDateTimePicker({
+        value: '',
+        change: startChange,
+        parseFormats: ["MM/dd/yyyy"]
+    }).data("kendoDateTimePicker");
+
+    var end = $("#end").kendoDateTimePicker({
+        value: '',
+        change: endChange,
+        parseFormats: ["MM/dd/yyyy"]
+    }).data("kendoDateTimePicker");
+    // 时间区间选择
+    function startChange() {
+        var startDate = start.value(),
+            endDate = end.value();
+
+        if (startDate) {
+            startDate = new Date(startDate);
+            startDate.setDate(startDate.getDate());
+            end.min(startDate);
+        } else if (endDate) {
+            start.max(new Date(endDate));
+        } else {
+            endDate = new Date();
+            start.max(endDate);
+            end.min(endDate);
+        }
+        // $("#timesize").val("");
+        // onCheck();
+    }
+
+    function endChange() {
+        var endDate = end.value(),
+            startDate = start.value();
+
+        if (endDate) {
+            endDate = new Date(endDate);
+            endDate.setDate(endDate.getDate());
+            start.max(endDate);
+        } else if (startDate) {
+            end.min(new Date(startDate));
+        } else {
+            endDate = new Date();
+            start.max(endDate);
+            end.min(endDate);
+        }
+        // document.getElementById('timesize').value = null;
+        // console.log($("#start").val())
+    }
+    start.max(end.value());
+    end.min(start.value());
 
 
 
 </script>
 
 <style>
+    .k-datetimepicker .k-picker-wrap .k-icon {
+        margin: 7px 2px;
+    }
+
+    select {
+        width: 70px;
+        height: 30px
+    }
+
+    .tdLeft {
+        text-align: left;
+    }
+
+    .tdRight {
+        text-align: right;
+    }
+
+    td {
+        width: 10%
+    }
 </style>

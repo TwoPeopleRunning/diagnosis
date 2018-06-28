@@ -28,11 +28,28 @@
 
     <!-- 此表单用来证明一些参数的作用 -->
     <form name="paginationoptions" style="display: none;">
-        <p><label for="items_per_page">每页显示的列表数：</label><input type="text" value="5" name="items_per_page" id="items_per_page" class="numeric"/></p>
-        <p><label for="num_display_entries">分页链接显示数：</label><input type="text" value="5" name="num_display_entries" id="num_display_entries" class="numeric"/></p>
-        <p><label for="num">起始与结束点的数目：</label><input type="text" value="1" name="num_edge_entries" id="num_edge_entries" class="numeric"/></p>
-        <p><label for="prev_text">“上一页”标签：</label><input type="text" value="Prev" name="prev_text" id="prev_text"/></p>
-        <p><label for="next_text">“下一页”标签：</label><input type="text" value="Next" name="next_text" id="next_text"/></p>
+        <p>
+            <label for="items_per_page">每页显示的列表数：</label>
+            <input type="text" value="5" name="items_per_page" id="items_per_page" class="numeric" />
+        </p>
+        <p>
+            <label for="num_display_entries">分页链接显示数：</label>
+            <input type="text" value="5" name="num_display_entries" id="num_display_entries" class="numeric"
+            />
+        </p>
+        <p>
+            <label for="num">起始与结束点的数目：</label>
+            <input type="text" value="1" name="num_edge_entries" id="num_edge_entries" class="numeric"
+            />
+        </p>
+        <p>
+            <label for="prev_text">“上一页”标签：</label>
+            <input type="text" value="Prev" name="prev_text" id="prev_text" />
+        </p>
+        <p>
+            <label for="next_text">“下一页”标签：</label>
+            <input type="text" value="Next" name="next_text" id="next_text" />
+        </p>
         <input type="button" id="setoptions" value="设置选项" />
     </form>
 
@@ -115,47 +132,47 @@
         str = str.replace(/mm/, this.getMinutes() > 9 ? this.getMinutes().toString() : '0' + this.getMinutes());
         str = str.replace(/ss|SS/, this.getSeconds() > 9 ? this.getSeconds().toString() : '0' + this.getSeconds());
         return str;
-    } 
+    }
 
-    $(function(){
+    $(function () {
         $("#items_per_page").val(5)
         //总数目
         var length = $("#hiddenresult .backlayout").length;
         //从表单获取分页元素参数
         var optInit = getOptionsFromForm();
         $("#Pagination").pagination(length, optInit);
-        
+
         // 按钮事件
-        $("#setoptions").click(function(){
+        $("#setoptions").click(function () {
             var opt = getOptionsFromForm();
             // 重新创建分页参数
             $("#Pagination").pagination(length, opt);
-        }); 	
+        });
         //-----------------------------------
-        function getOptionsFromForm(){
-            var opt = {callback: pageselectCallback};
+        function getOptionsFromForm() {
+            var opt = { callback: pageselectCallback };
             // 从文本域中收集参数 - 这些空间名与参数名相对应
-            $("input:text").each(function(){
+            $("input:text").each(function () {
                 opt[this.name] = this.className.match(/numeric/) ? parseInt(this.value) : this.value;
             });
             //避免demo重引入HTML
-            var htmlspecialchars ={ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}
-            $.each(htmlspecialchars, function(k,v){
-                opt.prev_text = opt.prev_text.replace(k,v);
-                opt.next_text = opt.next_text.replace(k,v);
+            var htmlspecialchars = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }
+            $.each(htmlspecialchars, function (k, v) {
+                opt.prev_text = opt.prev_text.replace(k, v);
+                opt.next_text = opt.next_text.replace(k, v);
             })
             return opt;
         }
         //-------------------------------
-        function pageselectCallback(page_index, jq){
+        function pageselectCallback(page_index, jq) {
             // 从表单获取每页的显示的列表项数目
             var items_per_page = $("#items_per_page").val();
-            var max_elem = Math.min((page_index+1) * items_per_page, length);
-            
+            var max_elem = Math.min((page_index + 1) * items_per_page, length);
+
             $("#Searchresult").html("");
             // 获取加载元素
-            for(var i=page_index*items_per_page;i<max_elem;i++){
-                $("#Searchresult").append($("#hiddenresult .backlayout:eq("+i+")").clone());
+            for (var i = page_index * items_per_page; i < max_elem; i++) {
+                $("#Searchresult").append($("#hiddenresult .backlayout:eq(" + i + ")").clone());
             }
             //阻止单击事件
             return false;
@@ -236,6 +253,7 @@
     .bearing-bad {
         background-color: rgb(233, 38, 38)
     }
+
     .pagination {
         /* border: 1px solid red; */
         /* width: 40%; */
